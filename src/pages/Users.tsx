@@ -1,10 +1,14 @@
 import { UserForm } from "../components/UserForm";
-import { UserList } from "../components/UserList";
+import { useNavigate } from "react-router-dom";
 
-export const Users = () => (
-  <div>
-    <h1>Gestión de Usuarios</h1>
-    <UserForm />
-    <UserList />
-  </div>
-);
+export const Users = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div>
+      <h1>Gestión de Usuarios</h1>
+      <UserForm />
+      <button onClick={() => navigate("/")}>Volver</button>
+    </div>
+  );
+};

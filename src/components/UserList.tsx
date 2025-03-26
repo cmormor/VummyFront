@@ -6,7 +6,15 @@ export const UserList = () => {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
 
   useEffect(() => {
-    getUsuarios().then(setUsuarios).catch(console.error);
+    const fetchUsuarios = () => {
+      getUsuarios().then(setUsuarios).catch(console.error);
+    };
+
+    fetchUsuarios();
+
+    const interval = setInterval(fetchUsuarios, 3000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
