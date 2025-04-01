@@ -3,4 +3,10 @@ export interface Usuario {
   nombre: string;
   email: string;
   password: string;
+  altura: number;
+  cuelloManga: number;
+  pecho: number;
+  cintura: number;
+  cadera: number;
+  entrepierna: number;
 }

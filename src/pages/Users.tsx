@@ -1,4 +1,4 @@
-import { UserForm } from "../components/UserForm";
+import { UserForm } from "../components/UserFormRegister";
 import { UserList } from "../components/UserList";
 import { useNavigate } from "react-router-dom";
 
