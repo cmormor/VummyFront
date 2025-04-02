@@ -15,10 +15,18 @@ export const Page = () => {
           alignItems: "center",
           height: "100vh",
           textAlign: "center",
+          padding: "20px",
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <img src={logo} alt="Logo" style={{ height: 250 }} />
+          <img
+            src={logo}
+            alt="Logo"
+            style={{
+              height: "200px",
+              maxWidth: "80%",
+            }}
+          />
         </Box>
         <Typography
           level="h4"
@@ -26,7 +34,7 @@ export const Page = () => {
             marginBottom: 2,
             fontFamily: "'Lexend Zetta', sans-serif",
             fontWeight: "200",
-            fontSize: "2rem",
+            fontSize: { xs: "1.5rem", sm: "2rem" },
             color: "white",
           }}
         >
@@ -39,6 +47,10 @@ export const Page = () => {
           sx={{
             lineHeight: "1.5",
             fontFamily: "'Poppins', sans-serif",
+            fontSize: { xs: "0.875rem", sm: "1rem" },
+            padding: "8px 16px",
+            width: "80%",
+            maxWidth: "300px",
           }}
         >
           DESCONECTARSE
