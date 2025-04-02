@@ -171,6 +171,22 @@ export const Login = () => {
           >
             INICIAR SESIÓN
           </Button>
+          <Button
+            onClick={() => navigate("/register")}
+            fullWidth
+            type="submit"
+            variant="outlined"
+            color="primary"
+            sx={{
+              marginTop: 2,
+              lineHeight: "1.5",
+              fontFamily: "'Poppins', sans-serif",
+              fontSize: { xs: "0.75rem", md: "1rem" },
+              borderRadius: "8px",
+            }}
+          >
+            ¿NO TIENES CUENTA? REGISTRATE
+          </Button>
         </form>
       </Stack>
     </>

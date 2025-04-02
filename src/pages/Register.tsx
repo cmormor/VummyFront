@@ -171,6 +171,26 @@ export const Register = () => {
             UNETE A VUMMY
           </Typography>
         </Box>
+        <Box
+          sx={{
+            textAlign: "center",
+            maxWidth: "90%",
+            margin: "0 auto",
+            marginBottom: 2,
+          }}
+        >
+          <Typography
+            variant="body1"
+            sx={{
+              fontSize: { xs: "0.9rem", sm: "1rem" },
+              color: "gray",
+            }}
+          >
+            Es necesario que ingrese sus medidas para poder brindarle una mejor
+            experiencia en la app.
+          </Typography>
+        </Box>
+
         {error && <Alert severity="error">{error}</Alert>}
         <form onSubmit={handleSubmit}>
           <Box
