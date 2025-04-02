@@ -24,7 +24,6 @@ export const Page = () => {
             alt="Logo"
             style={{
               height: "200px",
-              maxWidth: "80%",
             }}
           />
         </Box>
