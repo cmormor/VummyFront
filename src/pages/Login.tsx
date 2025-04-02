@@ -113,7 +113,7 @@ export const Login = () => {
             <TextField
               fullWidth
               label="Email"
-              variant="outlined"
+              variant="filled"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -121,6 +121,7 @@ export const Login = () => {
               sx={{
                 backgroundColor: "white",
                 borderRadius: "8px",
+                borderColor: "white",
               }}
             />
           </Box>
@@ -129,7 +130,7 @@ export const Login = () => {
             <TextField
               fullWidth
               label="Contraseña"
-              variant="outlined"
+              variant="filled"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

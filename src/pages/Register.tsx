@@ -188,7 +188,7 @@ export const Register = () => {
               <TextField
                 fullWidth
                 label="Username"
-                variant="outlined"
+                variant="filled"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
                 required
@@ -201,7 +201,7 @@ export const Register = () => {
               <TextField
                 fullWidth
                 label="Email"
-                variant="outlined"
+                variant="filled"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -215,7 +215,7 @@ export const Register = () => {
               <TextField
                 fullWidth
                 label="Contraseña"
-                variant="outlined"
+                variant="filled"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -237,7 +237,7 @@ export const Register = () => {
               <TextField
                 fullWidth
                 label="Altura (cm)"
-                variant="outlined"
+                variant="filled"
                 type="number"
                 value={altura}
                 onChange={(e) => setAltura(e.target.value)}
@@ -251,7 +251,7 @@ export const Register = () => {
               <TextField
                 fullWidth
                 label="Cuello/Manga (cm)"
-                variant="outlined"
+                variant="filled"
                 type="number"
                 value={cuelloManga}
                 onChange={(e) => setCuelloManga(e.target.value)}
@@ -265,7 +265,7 @@ export const Register = () => {
               <TextField
                 fullWidth
                 label="Pecho (cm)"
-                variant="outlined"
+                variant="filled"
                 type="number"
                 value={pecho}
                 onChange={(e) => setPecho(e.target.value)}
@@ -287,7 +287,7 @@ export const Register = () => {
               <TextField
                 fullWidth
                 label="Cintura (cm)"
-                variant="outlined"
+                variant="filled"
                 type="number"
                 value={cintura}
                 onChange={(e) => setCintura(e.target.value)}
@@ -301,7 +301,7 @@ export const Register = () => {
               <TextField
                 fullWidth
                 label="Cadera (cm)"
-                variant="outlined"
+                variant="filled"
                 type="number"
                 value={cadera}
                 onChange={(e) => setCadera(e.target.value)}
@@ -315,7 +315,7 @@ export const Register = () => {
               <TextField
                 fullWidth
                 label="Entrepierna (cm)"
-                variant="outlined"
+                variant="filled"
                 type="number"
                 value={entrepierna}
                 onChange={(e) => setEntrepierna(e.target.value)}
