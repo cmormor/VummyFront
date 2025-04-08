@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createUsuario } from "../api/userApi";
 import { Usuario } from "../types/user";
 import {
@@ -7,13 +7,12 @@ import {
   Button,
   Typography,
   Stack,
-  IconButton,
   Alert,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import logoDiamante from "../assets/VummyLogo_Azul_Diamante.png";
+import { NavBar } from "../components/NavBar";
+import { Title } from "../components/Title";
 import logo from "../assets/VummyLogo_Azul.png";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export const Register = () => {
   const [nombre, setNombre] = useState("");
@@ -95,49 +94,26 @@ export const Register = () => {
     }
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <>
+      <NavBar arrow={true} path="/" />
       <Stack
         sx={{
-          position: "relative",
-          width: "100%",
-          paddingTop: "20px",
+          position: "absolute",
+          bottom: 20,
+          left: "50%",
+          transform: "translateX(-50%)",
+          opacity: 0.5,
         }}
       >
-        <IconButton
-          onClick={() => navigate("/")}
-          sx={{
-            position: "absolute",
-            top: 10,
-            left: 10,
-            color: "gray",
-            "&:hover": {
-              color: "#fff",
-            },
-          }}
-        >
-          <ArrowBackIcon />
-        </IconButton>
+        <img src={logo} alt="Logo" style={{ height: 150 }} />
       </Stack>
-
-      <div className="logo">
-        <img
-          src={logo}
-          alt="Logo"
-          style={{
-            height: 150,
-            position: "absolute",
-            bottom: "20px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            opacity: 0.5,
-          }}
-        />
-      </div>
-
       <Stack
         sx={{
-          marginTop: { xs: 0, sm: "100px" },
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -147,30 +123,7 @@ export const Register = () => {
           width: "100%",
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 3,
-          }}
-        >
-          <img
-            src={logoDiamante}
-            alt="Logo Vummy"
-            style={{ width: "60px", marginRight: "5px", marginBottom: "5px" }}
-          />
-          <Typography
-            variant="h4"
-            sx={{
-              fontFamily: "'Lexend Zetta', sans-serif",
-              fontWeight: "200",
-              fontSize: { xs: "1.5rem", md: "2rem" },
-            }}
-          >
-            UNETE A VUMMY
-          </Typography>
-        </Box>
+        <Title text="UNETE A VUMMY" sizeXs="1.5rem" sizeMd="2rem" />
         <Box
           sx={{
             textAlign: "center",
@@ -366,6 +319,23 @@ export const Register = () => {
               REGISTRATE
             </Button>
           </Box>
+          <Button
+            onClick={() => navigate("/login")}
+            fullWidth
+            type="submit"
+            variant="outlined"
+            color="primary"
+            sx={{
+              marginTop: 2,
+              lineHeight: "1.5",
+              fontFamily: "'Poppins', sans-serif",
+              fontSize: { xs: "0.75rem", md: "1rem" },
+              borderRadius: "8px",
+              color: "white",
+            }}
+          >
+            ¿YA TIENES CUENTA? INICIA SESIÓN
+          </Button>
         </form>
       </Stack>
     </>

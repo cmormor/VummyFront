@@ -1,17 +1,10 @@
 import { useState } from "react";
 import { loginUsuario } from "../api/userApi";
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Stack,
-  IconButton,
-} from "@mui/material";
+import { Box, TextField, Button, Typography, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import logoDiamante from "../assets/VummyLogo_Azul_Diamante.png";
 import logo from "../assets/VummyLogo_Azul.png";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { NavBar } from "../components/NavBar";
+import { Title } from "../components/Title";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
@@ -36,29 +29,7 @@ export const Login = () => {
 
   return (
     <>
-      <Stack
-        sx={{
-          position: "relative",
-          width: "100%",
-          paddingTop: "20px",
-        }}
-      >
-        <IconButton
-          onClick={() => navigate("/")}
-          sx={{
-            position: "absolute",
-            top: 10,
-            left: 10,
-            color: "gray",
-            "&:hover": {
-              color: "#fff",
-            },
-          }}
-        >
-          <ArrowBackIcon />
-        </IconButton>
-      </Stack>
-
+      <NavBar arrow={true} path="/" />
       <Stack
         sx={{
           position: "absolute",
@@ -73,7 +44,6 @@ export const Login = () => {
 
       <Stack
         sx={{
-          marginTop: "150px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -83,31 +53,7 @@ export const Login = () => {
           width: "100%",
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 3,
-          }}
-        >
-          <img
-            src={logoDiamante}
-            alt="Logo Vummy"
-            style={{ width: "60px", marginRight: "5px", marginBottom: "5px" }}
-          />
-          <Typography
-            variant="h4"
-            sx={{
-              fontFamily: "'Lexend Zetta', sans-serif",
-              fontWeight: "200",
-              fontSize: { xs: "1.5rem", md: "2rem" },
-            }}
-          >
-            BIENVENIDO A VUMMY
-          </Typography>
-        </Box>
-
+        <Title text="BIENVENIDO A VUMMY" sizeXs="1.5rem" sizeMd="2rem" />
         <form onSubmit={handleSubmit}>
           <Box mb={2}>
             <TextField
@@ -183,6 +129,7 @@ export const Login = () => {
               fontFamily: "'Poppins', sans-serif",
               fontSize: { xs: "0.75rem", md: "1rem" },
               borderRadius: "8px",
+              color: "white",
             }}
           >
             ¿NO TIENES CUENTA? REGISTRATE
