@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { createUsuario } from "../api/userApi";
 import { Usuario } from "../types/user";
 import {
@@ -94,10 +94,6 @@ export const Register = () => {
     }
   };
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <>
       <NavBar arrow={true} path="/" />
@@ -108,10 +104,12 @@ export const Register = () => {
           left: "50%",
           transform: "translateX(-50%)",
           opacity: 0.5,
+          display: { xs: "none", sm: "block" },
         }}
       >
         <img src={logo} alt="Logo" style={{ height: 150 }} />
       </Stack>
+
       <Stack
         sx={{
           display: "flex",

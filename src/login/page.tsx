@@ -37,6 +37,7 @@ export const Login = () => {
           left: "50%",
           transform: "translateX(-50%)",
           opacity: 0.5,
+          display: { xs: "none", sm: "block" },
         }}
       >
         <img src={logo} alt="Logo" style={{ height: 150 }} />

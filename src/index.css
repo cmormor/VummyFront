@@ -17,28 +17,3 @@ body {
   background-size: cover;
   background-position: center;
 }
-
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-.logo {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  opacity: 0.5;
-  z-index: 2;
-}
-
-.form-container {
-  margin-top: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  border-radius: 8px;
-  position: relative;
-  width: 100%;
-}
