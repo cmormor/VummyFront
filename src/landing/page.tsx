@@ -10,14 +10,14 @@ export const Landing = () => {
 
   return (
     <Stack
-      spacing={3}
       sx={{
-        p: 3,
-        alignItems: "center",
-        minHeight: "100vh",
+        height: "100vh",
         background: "linear-gradient(to bottom, #000000 70%, #0077b6 100%)",
         color: "white",
-        paddingTop: "40px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
       <Stack
@@ -33,7 +33,6 @@ export const Landing = () => {
           color: "white",
           paddingY: 1.5,
           paddingX: 3,
-          borderRadius: "5px",
         }}
       >
         <Stack
@@ -50,13 +49,21 @@ export const Landing = () => {
         </Stack>
       </Stack>
       <Layout>
-        <Stack sx={{ display: "flex", alignItems: "center" }}>
+        <Stack
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            height: "100%",
+          }}
+        >
           <Title
             text="DEJA DE IMAGINAR Y VIVE TU ESTILO"
             sizeXs="1.5rem"
             sizeMd="2rem"
             marginTop={0}
-            paddingTop="20px"
+            paddingTop="0px"
           />
 
           <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -69,7 +76,6 @@ export const Landing = () => {
               textAlign: "center",
               mt: 3,
               color: "lightgrey",
-              width: "100%",
               lineHeight: "1.5",
               fontFamily: "'Poppins', sans-serif",
             }}
@@ -90,7 +96,6 @@ export const Landing = () => {
               textAlign: "center",
               mt: 3,
               color: "lightgrey",
-              width: "100%",
               lineHeight: "1.5",
               fontFamily: "'Poppins', sans-serif",
             }}

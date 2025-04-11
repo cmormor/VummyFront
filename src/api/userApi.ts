@@ -46,5 +46,5 @@ export const logoutUsuario = () => {
   localStorage.removeItem("authToken");
   sessionStorage.removeItem("authToken");
 
-  window.location.href = "/login";
+  window.location.href = "/";
 };
