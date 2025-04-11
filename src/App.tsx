@@ -3,7 +3,7 @@ import { Landing } from "./landing/page";
 import { Register } from "./register/page";
 import { Login } from "./login/page";
 import { Stores } from "./stores/page";
-import { Mantenimiento } from "./components/Mantenimiento";
+import { Maintenance } from "./components/Maintenance";
 
 export const App = () => (
   <Router>
@@ -12,7 +12,7 @@ export const App = () => (
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/page" element={<Stores />} />
-      <Route path="/stores/mantenimiento" element={<Mantenimiento />} />
+      <Route path="/stores/mantenimiento" element={<Maintenance />} />
     </Routes>
   </Router>
 );
