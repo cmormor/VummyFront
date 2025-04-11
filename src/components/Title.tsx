@@ -4,14 +4,22 @@ interface Title {
   text: string;
   sizeXs?: string;
   sizeMd?: string;
+  marginTop: number;
+  paddingTop: string;
 }
 
-export const Title = ({ text, sizeXs, sizeMd }: Title) => {
+export const Title = ({
+  text,
+  sizeXs,
+  sizeMd,
+  marginTop,
+  paddingTop,
+}: Title) => {
   return (
     <Box
       sx={{
-        marginTop: 5,
-        paddingTop: "90px",
+        marginTop: { marginTop },
+        paddingTop: { paddingTop },
         marginBottom: 3,
         width: "100%",
         px: { xs: 2, md: 4 },
@@ -36,6 +44,7 @@ export const Title = ({ text, sizeXs, sizeMd }: Title) => {
             whiteSpace: "normal",
             wordBreak: "break-word",
             maxWidth: "80vw",
+            color: "white",
           }}
         >
           {text}

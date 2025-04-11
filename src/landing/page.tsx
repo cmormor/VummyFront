@@ -26,7 +26,9 @@ export const Landing = () => {
           left: 0,
           right: 0,
           zIndex: 1000,
-          background: "linear-gradient(to right, #222222 0%, #0077b6 100%)",
+          background: "rgba(34, 34, 34, 0.7)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+          backdropFilter: "blur(8px)",
           color: "white",
           paddingY: 1.5,
           paddingX: 3,
@@ -44,13 +46,6 @@ export const Landing = () => {
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <img src={logoDiamante} alt="Logo" style={{ height: 60 }} />
           </Box>
-          <Button
-            variant="soft"
-            onClick={() => navigate("/login")}
-            sx={{ mr: 2 }}
-          >
-            Inicia Sesión
-          </Button>
         </Stack>
       </Stack>
 
@@ -58,6 +53,8 @@ export const Landing = () => {
         text="DEJA DE IMAGINAR Y VIVE TU ESTILO"
         sizeXs="1.5rem"
         sizeMd="2rem"
+        marginTop={5}
+        paddingTop="90px"
       />
 
       <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -99,15 +96,18 @@ export const Landing = () => {
         ¡Haz de tus compras una experiencia más segura, rápida y cómoda con
         Vummy!
       </Typography>
-
-      <Button
-        variant="solid"
-        color="primary"
-        onClick={() => navigate("/register")}
-        sx={{ mt: 4 }}
-      >
-        REGÍSTRATE
-      </Button>
+      <Box sx={{ display: "flex", gap: 2, mt: 4 }}>
+        <Button
+          variant="solid"
+          color="primary"
+          onClick={() => navigate("/register")}
+        >
+          REGÍSTRATE
+        </Button>
+        <Button variant="soft" onClick={() => navigate("/login")}>
+          INICIA SESIÓN
+        </Button>
+      </Box>
     </Stack>
   );
 };

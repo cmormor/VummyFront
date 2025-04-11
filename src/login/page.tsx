@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import logo from "../assets/VummyLogo_Azul.png";
 import { NavBar } from "../components/NavBar";
 import { Title } from "../components/Title";
+import { OutlinedCard } from "../components/OutlinedCard";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
@@ -29,7 +30,7 @@ export const Login = () => {
 
   return (
     <>
-      <NavBar arrow={true} path="/" />
+      <NavBar />
       <Stack
         sx={{
           position: "absolute",
@@ -51,91 +52,98 @@ export const Login = () => {
           padding: "40px",
           borderRadius: "8px",
           position: "relative",
-          width: "100%",
         }}
       >
-        <Title text="BIENVENIDO A VUMMY" sizeXs="1.5rem" sizeMd="2rem" />
-        <form onSubmit={handleSubmit}>
-          <Box mb={2}>
-            <TextField
-              fullWidth
-              label="Email"
-              variant="filled"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              sx={{
-                backgroundColor: "white",
-                borderRadius: "8px",
-                borderColor: "white",
-              }}
-            />
-          </Box>
+        <OutlinedCard path="/">
+          <Title
+            text="BIENVENIDO A VUMMY"
+            sizeXs="1.25rem"
+            sizeMd="2rem"
+            marginTop={0}
+            paddingTop="20px"
+          />
+          <form onSubmit={handleSubmit}>
+            <Box m={2}>
+              <TextField
+                fullWidth
+                label="Email"
+                variant="filled"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                sx={{
+                  backgroundColor: "white",
+                  borderRadius: "8px",
+                  borderColor: "white",
+                }}
+              />
+            </Box>
 
-          <Box mb={2}>
-            <TextField
-              fullWidth
-              label="Contraseña"
-              variant="filled"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              sx={{
-                backgroundColor: "white",
-                borderRadius: "8px",
-              }}
-            />
-          </Box>
+            <Box m={2}>
+              <TextField
+                fullWidth
+                label="Contraseña"
+                variant="filled"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                sx={{
+                  backgroundColor: "white",
+                  borderRadius: "8px",
+                }}
+              />
+            </Box>
 
-          {error && (
-            <Typography
-              sx={{
-                color: "red",
-                textAlign: "center",
-                marginBottom: 2,
-                fontWeight: "bold",
-                fontFamily: "'Poppins', sans-serif",
-              }}
-            >
-              {error}
-            </Typography>
-          )}
-
-          <Button
-            fullWidth
-            type="submit"
-            variant="contained"
-            color="primary"
-            sx={{
-              marginTop: 2,
-              lineHeight: "1.5",
-              fontFamily: "'Poppins', sans-serif",
-              fontSize: { xs: "0.75rem", md: "1rem" },
-              borderRadius: "8px",
-            }}
-          >
-            INICIAR SESIÓN
-          </Button>
-          <Button
-            onClick={() => navigate("/register")}
-            fullWidth
-            type="submit"
-            variant="outlined"
-            color="primary"
-            sx={{
-              marginTop: 2,
-              lineHeight: "1.5",
-              fontFamily: "'Poppins', sans-serif",
-              fontSize: { xs: "0.75rem", md: "1rem" },
-              borderRadius: "8px",
-              color: "white",
-            }}
-          >
-            ¿NO TIENES CUENTA? REGISTRATE
-          </Button>
-        </form>
+            {error && (
+              <Typography
+                sx={{
+                  color: "red",
+                  textAlign: "center",
+                  margin: 2,
+                  fontWeight: "bold",
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+              >
+                {error}
+              </Typography>
+            )}
+            <Box m={2}>
+              <Button
+                fullWidth
+                type="submit"
+                variant="contained"
+                color="primary"
+                sx={{
+                  marginTop: 2,
+                  lineHeight: "1.5",
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: { xs: "0.75rem", md: "1rem" },
+                  borderRadius: "8px",
+                }}
+              >
+                INICIAR SESIÓN
+              </Button>
+              <Button
+                onClick={() => navigate("/register")}
+                fullWidth
+                variant="outlined"
+                color="primary"
+                sx={{
+                  marginTop: 2,
+                  lineHeight: "1.5",
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: { xs: "0.75rem", md: "1rem" },
+                  borderRadius: "8px",
+                  color: "white",
+                }}
+              >
+                ¿NO TIENES CUENTA? REGISTRATE
+              </Button>
+            </Box>
+          </form>
+        </OutlinedCard>
       </Stack>
     </>
   );
