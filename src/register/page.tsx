@@ -13,7 +13,8 @@ import { useNavigate } from "react-router-dom";
 import { NavBar } from "../components/NavBar";
 import { Title } from "../components/Title";
 import logo from "../assets/VummyLogo_Azul.png";
-import { OutlinedCard } from "../components/OutlinedCard";
+import { FormCard } from "../components/FormCard";
+import { Layout } from "../components/Layout";
 
 export const Register = () => {
   const [nombre, setNombre] = useState("");
@@ -91,271 +92,272 @@ export const Register = () => {
       setCadera("");
       setEntrepierna("");
       setError(null);
-      navigate("/welcome");
+      navigate("/page");
     }
   };
 
   return (
     <>
       <NavBar />
-      <Stack
-        sx={{
-          position: "absolute",
-          bottom: 20,
-          left: "50%",
-          transform: "translateX(-50%)",
-          opacity: 0.5,
-          display: { xs: "none", sm: "block" },
-        }}
-      >
-        <img src={logo} alt="Logo" style={{ height: 150 }} />
-      </Stack>
+      <Layout>
+        <Stack
+          sx={{
+            position: "absolute",
+            bottom: 20,
+            left: "50%",
+            transform: "translateX(-50%)",
+            opacity: 0.5,
+            display: { xs: "none", sm: "block" },
+          }}
+        >
+          <img src={logo} alt="Logo" style={{ height: 150 }} />
+        </Stack>
 
-      <Stack
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "15px",
-          borderRadius: "8px",
-          maxWidth: "600px",
-          width: "100%",
-          margin: "auto",
-        }}
-      >
-        <OutlinedCard path="/">
-          <Stack
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "20px",
-              borderRadius: "8px",
-            }}
-          >
-            <Title
-              text="UNETE A VUMMY"
-              sizeXs="1.25rem"
-              sizeMd="2rem"
-              marginTop={0}
-              paddingTop="20px"
-            />
-            <Box
+        <Stack
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "15px",
+            borderRadius: "8px",
+            maxWidth: "600px",
+            width: "100%",
+            margin: "auto",
+          }}
+        >
+          <FormCard path="/">
+            <Stack
               sx={{
-                textAlign: "center",
-                maxWidth: "90%",
-                margin: "0 auto",
-                marginBottom: 2,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "20px",
+                borderRadius: "8px",
               }}
             >
-              <Typography
-                variant="body1"
+              <Title
+                text="UNETE A VUMMY"
+                sizeXs="1.25rem"
+                sizeMd="2rem"
+                marginTop={0}
+                paddingTop="20px"
+              />
+              <Box
                 sx={{
-                  fontSize: { xs: "0.9rem", sm: "1rem" },
-                  color: "gray",
+                  textAlign: "center",
+                  maxWidth: "90%",
+                  margin: "0 auto",
+                  marginBottom: 2,
                 }}
               >
-                Es necesario que ingrese sus medidas para poder brindarle una
-                mejor experiencia en la app.
-              </Typography>
-            </Box>
-
-            {error && <Alert severity="error">{error}</Alert>}
-            <form onSubmit={handleSubmit}>
-              <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                gap={3}
-              >
-                <Box
-                  display="flex"
-                  flexDirection={{ xs: "column", sm: "row" }}
-                  gap={2}
-                  justifyContent="center"
-                >
-                  <TextField
-                    fullWidth
-                    label="Username"
-                    variant="filled"
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
-                    required
-                    sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
-                      width: { xs: "100%", sm: "250px" },
-                    }}
-                  />
-                  <TextField
-                    fullWidth
-                    label="Email"
-                    variant="filled"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
-                      width: { xs: "100%", sm: "250px" },
-                    }}
-                  />
-                  <TextField
-                    fullWidth
-                    label="Contraseña"
-                    variant="filled"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
-                      width: { xs: "100%", sm: "250px" },
-                    }}
-                  />
-                </Box>
-
-                <Box
-                  display="flex"
-                  flexDirection={{ xs: "column", sm: "row" }}
-                  gap={2}
-                  justifyContent="center"
-                >
-                  <TextField
-                    fullWidth
-                    label="Altura (cm)"
-                    variant="filled"
-                    type="number"
-                    value={altura}
-                    onChange={(e) => setAltura(e.target.value)}
-                    required
-                    sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
-                      width: { xs: "100%", sm: "250px" },
-                    }}
-                  />
-                  <TextField
-                    fullWidth
-                    label="Cuello/Manga (cm)"
-                    variant="filled"
-                    type="number"
-                    value={cuelloManga}
-                    onChange={(e) => setCuelloManga(e.target.value)}
-                    required
-                    sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
-                      width: { xs: "100%", sm: "250px" },
-                    }}
-                  />
-                  <TextField
-                    fullWidth
-                    label="Pecho (cm)"
-                    variant="filled"
-                    type="number"
-                    value={pecho}
-                    onChange={(e) => setPecho(e.target.value)}
-                    required
-                    sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
-                      width: { xs: "100%", sm: "250px" },
-                    }}
-                  />
-                </Box>
-
-                <Box
-                  display="flex"
-                  flexDirection={{ xs: "column", sm: "row" }}
-                  gap={2}
-                  justifyContent="center"
-                >
-                  <TextField
-                    fullWidth
-                    label="Cintura (cm)"
-                    variant="filled"
-                    type="number"
-                    value={cintura}
-                    onChange={(e) => setCintura(e.target.value)}
-                    required
-                    sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
-                      width: { xs: "100%", sm: "250px" },
-                    }}
-                  />
-                  <TextField
-                    fullWidth
-                    label="Cadera (cm)"
-                    variant="filled"
-                    type="number"
-                    value={cadera}
-                    onChange={(e) => setCadera(e.target.value)}
-                    required
-                    sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
-                      width: { xs: "100%", sm: "250px" },
-                    }}
-                  />
-                  <TextField
-                    fullWidth
-                    label="Entrepierna (cm)"
-                    variant="filled"
-                    type="number"
-                    value={entrepierna}
-                    onChange={(e) => setEntrepierna(e.target.value)}
-                    required
-                    sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
-                      width: { xs: "100%", sm: "250px" },
-                    }}
-                  />
-                </Box>
-
-                <Button
-                  type="submit"
-                  variant="contained"
+                <Typography
+                  variant="body1"
                   sx={{
-                    backgroundColor: "#2196F3",
-                    color: "#fff",
-                    width: "100%",
-                    padding: "10px",
-                    fontSize: "1.1rem",
-                    "&:hover": {
-                      backgroundColor: "#1976D2",
-                    },
-                    borderRadius: "8px",
+                    fontSize: { xs: "0.9rem", sm: "1rem" },
+                    color: "gray",
                   }}
                 >
-                  REGISTRATE
-                </Button>
+                  Es necesario que ingrese sus medidas para poder brindarle una
+                  mejor experiencia en la app.
+                </Typography>
               </Box>
-              <Button
-                onClick={() => navigate("/login")}
-                fullWidth
-                type="submit"
-                variant="outlined"
-                color="primary"
-                sx={{
-                  marginTop: 2,
-                  lineHeight: "1.5",
-                  fontFamily: "'Poppins', sans-serif",
-                  fontSize: { xs: "0.75rem", md: "1rem" },
-                  borderRadius: "8px",
-                  color: "white",
-                }}
-              >
-                ¿YA TIENES CUENTA? INICIA SESIÓN
-              </Button>
-            </form>
-          </Stack>
-        </OutlinedCard>
-      </Stack>
+
+              {error && <Alert severity="error">{error}</Alert>}
+              <form onSubmit={handleSubmit}>
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                  gap={3}
+                >
+                  <Box
+                    display="flex"
+                    flexDirection={{ xs: "column", sm: "row" }}
+                    gap={2}
+                    justifyContent="center"
+                  >
+                    <TextField
+                      fullWidth
+                      label="Username"
+                      variant="filled"
+                      value={nombre}
+                      onChange={(e) => setNombre(e.target.value)}
+                      required
+                      sx={{
+                        backgroundColor: "white",
+                        borderRadius: "8px",
+                        width: { xs: "100%", sm: "250px" },
+                      }}
+                    />
+                    <TextField
+                      fullWidth
+                      label="Email"
+                      variant="filled"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      sx={{
+                        backgroundColor: "white",
+                        borderRadius: "8px",
+                        width: { xs: "100%", sm: "250px" },
+                      }}
+                    />
+                    <TextField
+                      fullWidth
+                      label="Contraseña"
+                      variant="filled"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      sx={{
+                        backgroundColor: "white",
+                        borderRadius: "8px",
+                        width: { xs: "100%", sm: "250px" },
+                      }}
+                    />
+                  </Box>
+
+                  <Box
+                    display="flex"
+                    flexDirection={{ xs: "column", sm: "row" }}
+                    gap={2}
+                    justifyContent="center"
+                  >
+                    <TextField
+                      fullWidth
+                      label="Altura (cm)"
+                      variant="filled"
+                      type="number"
+                      value={altura}
+                      onChange={(e) => setAltura(e.target.value)}
+                      required
+                      sx={{
+                        backgroundColor: "white",
+                        borderRadius: "8px",
+                        width: { xs: "100%", sm: "250px" },
+                      }}
+                    />
+                    <TextField
+                      fullWidth
+                      label="Cuello/Manga (cm)"
+                      variant="filled"
+                      type="number"
+                      value={cuelloManga}
+                      onChange={(e) => setCuelloManga(e.target.value)}
+                      required
+                      sx={{
+                        backgroundColor: "white",
+                        borderRadius: "8px",
+                        width: { xs: "100%", sm: "250px" },
+                      }}
+                    />
+                    <TextField
+                      fullWidth
+                      label="Pecho (cm)"
+                      variant="filled"
+                      type="number"
+                      value={pecho}
+                      onChange={(e) => setPecho(e.target.value)}
+                      required
+                      sx={{
+                        backgroundColor: "white",
+                        borderRadius: "8px",
+                        width: { xs: "100%", sm: "250px" },
+                      }}
+                    />
+                  </Box>
+
+                  <Box
+                    display="flex"
+                    flexDirection={{ xs: "column", sm: "row" }}
+                    gap={2}
+                    justifyContent="center"
+                  >
+                    <TextField
+                      fullWidth
+                      label="Cintura (cm)"
+                      variant="filled"
+                      type="number"
+                      value={cintura}
+                      onChange={(e) => setCintura(e.target.value)}
+                      required
+                      sx={{
+                        backgroundColor: "white",
+                        borderRadius: "8px",
+                        width: { xs: "100%", sm: "250px" },
+                      }}
+                    />
+                    <TextField
+                      fullWidth
+                      label="Cadera (cm)"
+                      variant="filled"
+                      type="number"
+                      value={cadera}
+                      onChange={(e) => setCadera(e.target.value)}
+                      required
+                      sx={{
+                        backgroundColor: "white",
+                        borderRadius: "8px",
+                        width: { xs: "100%", sm: "250px" },
+                      }}
+                    />
+                    <TextField
+                      fullWidth
+                      label="Entrepierna (cm)"
+                      variant="filled"
+                      type="number"
+                      value={entrepierna}
+                      onChange={(e) => setEntrepierna(e.target.value)}
+                      required
+                      sx={{
+                        backgroundColor: "white",
+                        borderRadius: "8px",
+                        width: { xs: "100%", sm: "250px" },
+                      }}
+                    />
+                  </Box>
+
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                      backgroundColor: "#2196F3",
+                      color: "#fff",
+                      width: "100%",
+                      fontSize: "1.1rem",
+                      "&:hover": {
+                        backgroundColor: "#1976D2",
+                      },
+                      borderRadius: "8px",
+                    }}
+                  >
+                    REGISTRATE
+                  </Button>
+                </Box>
+                <Button
+                  onClick={() => navigate("/login")}
+                  fullWidth
+                  type="submit"
+                  variant="outlined"
+                  color="primary"
+                  sx={{
+                    marginTop: 2,
+                    lineHeight: "1.5",
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: { xs: "0.75rem", md: "1rem" },
+                    borderRadius: "8px",
+                    color: "white",
+                  }}
+                >
+                  ¿YA TIENES CUENTA? INICIA SESIÓN
+                </Button>
+              </form>
+            </Stack>
+          </FormCard>
+        </Stack>
+      </Layout>
     </>
   );
 };

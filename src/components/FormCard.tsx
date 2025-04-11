@@ -7,7 +7,7 @@ import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
-export const OutlinedCard = ({
+export const FormCard = ({
   children,
   path,
 }: {
@@ -24,7 +24,7 @@ export const OutlinedCard = ({
           backgroundColor: "transparent",
           boxShadow: "none",
           borderRadius: "8px",
-          marginTop: 15,
+          marginBottom: 10,
         }}
       >
         <CardContent sx={{ margin: 2 }}>

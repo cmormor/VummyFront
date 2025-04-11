@@ -41,3 +41,10 @@ export const loginUsuario = async (
     return null;
   }
 };
+
+export const logoutUsuario = () => {
+  localStorage.removeItem("authToken");
+  sessionStorage.removeItem("authToken");
+
+  window.location.href = "/login";
+};

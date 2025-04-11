@@ -1,7 +1,16 @@
 import { Box, Stack } from "@mui/joy";
+import { IconButton } from "@mui/material";
+import { useLocation } from "react-router-dom";
 import logoDiamante from "../assets/VummyLogo_Azul_Diamante.png";
+import { logoutUsuario } from "../api/userApi";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 export const NavBar = () => {
+  const location = useLocation();
+
+  const isDisabled =
+    location.pathname === "/register" || location.pathname === "/login";
+
   return (
     <Stack
       sx={{
@@ -31,6 +40,12 @@ export const NavBar = () => {
             style={{ height: 60, objectFit: "contain" }}
           />
         </Box>
+
+        {!isDisabled && (
+          <IconButton onClick={() => logoutUsuario()}>
+            <LogoutIcon sx={{ color: "white", fontSize: { xs: 25, md: 30 } }} />
+          </IconButton>
+        )}
       </Stack>
     </Stack>
   );
