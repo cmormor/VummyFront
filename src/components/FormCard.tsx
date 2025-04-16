@@ -16,7 +16,7 @@ export const FormCard = ({
 }) => {
   const navigate = useNavigate();
   return (
-    <Box sx={{ minWidth: 275 }}>
+    <Box sx={{ minWidth: 275, maxWidth: 900, }}>
       <Card
         variant="outlined"
         sx={{
@@ -24,7 +24,6 @@ export const FormCard = ({
           backgroundColor: "transparent",
           boxShadow: "none",
           borderRadius: "8px",
-          marginBottom: 10,
         }}
       >
         <CardContent sx={{ margin: 2 }}>

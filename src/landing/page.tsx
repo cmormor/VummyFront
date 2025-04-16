@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Typography, Stack } from "@mui/joy";
 import logo from "../assets/VummyLogo_Azul.png";
-import logoDiamante from "../assets/VummyLogo_Azul_Diamante.png";
 import { Title } from "../components/Title";
 import { Layout } from "../components/Layout";
+import { NavBar } from "../components/NavBar";
 
 export const Landing = () => {
   const navigate = useNavigate();
@@ -11,43 +11,13 @@ export const Landing = () => {
   return (
     <Stack
       sx={{
-        height: "100vh",
-        background: "linear-gradient(to bottom, #000000 70%, #0077b6 100%)",
         color: "white",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
       }}
     >
-      <Stack
-        sx={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1000,
-          background: "rgba(34, 34, 34, 0.7)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-          backdropFilter: "blur(8px)",
-          color: "white",
-          paddingY: 1.5,
-          paddingX: 3,
-        }}
-      >
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{
-            width: "100%",
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <img src={logoDiamante} alt="Logo" style={{ height: 60 }} />
-          </Box>
-        </Stack>
-      </Stack>
+      <NavBar />
       <Layout>
         <Stack
           sx={{
@@ -55,29 +25,37 @@ export const Landing = () => {
             alignItems: "center",
             justifyContent: "center",
             textAlign: "center",
-            height: "100%",
+            flexDirection: "column",
+            gap: { xs: 2, md: 3 },
+            px: { xs: 2, md: 4 },
           }}
         >
           <Title
             text="DEJA DE IMAGINAR Y VIVE TU ESTILO"
             sizeXs="1.5rem"
             sizeMd="2rem"
-            marginTop={0}
+            marginTop={80}
             paddingTop="0px"
           />
 
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <img src={logo} alt="Logo" style={{ height: 200 }} />
-          </Box>
+          <Box
+            component="img"
+            src={logo}
+            alt="Logo"
+            sx={{
+              maxHeight: { xs: 100, md: 140 },
+              maxWidth: "70%",
+            }}
+          />
 
           <Typography
             level="body-lg"
             sx={{
               textAlign: "center",
-              mt: 3,
               color: "lightgrey",
               lineHeight: "1.5",
               fontFamily: "'Poppins', sans-serif",
+              fontSize: { xs: "0.9rem", md: "1rem" },
             }}
           >
             En Vummy App, transformamos tu experiencia de compra online para
@@ -94,24 +72,38 @@ export const Landing = () => {
             level="body-lg"
             sx={{
               textAlign: "center",
-              mt: 3,
               color: "lightgrey",
               lineHeight: "1.5",
               fontFamily: "'Poppins', sans-serif",
+              fontSize: { xs: "0.9rem", md: "1rem" },
             }}
           >
             ¡Haz de tus compras una experiencia más segura, rápida y cómoda con
             Vummy!
           </Typography>
-          <Box sx={{ display: "flex", gap: 2, mt: 4 }}>
+
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              flexDirection: { xs: "column", md: "row" },
+              justifyContent: "center",
+              mt: 3,
+            }}
+          >
             <Button
               variant="solid"
               color="primary"
               onClick={() => navigate("/register")}
+              sx={{ width: { xs: "100%", md: "auto" } }}
             >
               REGÍSTRATE
             </Button>
-            <Button variant="soft" onClick={() => navigate("/login")}>
+            <Button
+              variant="soft"
+              onClick={() => navigate("/login")}
+              sx={{ width: { xs: "100%", md: "auto" } }}
+            >
               INICIA SESIÓN
             </Button>
           </Box>

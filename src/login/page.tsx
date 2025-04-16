@@ -2,7 +2,6 @@ import { useState } from "react";
 import { loginUsuario } from "../api/userApi";
 import { Box, TextField, Button, Typography, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/VummyLogo_Azul.png";
 import { NavBar } from "../components/NavBar";
 import { Title } from "../components/Title";
 import { FormCard } from "../components/FormCard";
@@ -35,31 +34,17 @@ export const Login = () => {
       <Layout>
         <Stack
           sx={{
-            position: "absolute",
-            bottom: 20,
-            left: "50%",
-            transform: "translateX(-50%)",
-            opacity: 0.5,
-            display: { xs: "none", sm: "block" },
-          }}
-        >
-          <img src={logo} alt="Logo" style={{ height: 150 }} />
-        </Stack>
-
-        <Stack
-          sx={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "40px",
             borderRadius: "8px",
-            position: "relative",
+            marginTop: 8,
           }}
         >
           <FormCard path="/">
             <Title
               text="BIENVENIDO A VUMMY"
-              sizeXs="1.25rem"
+              sizeXs="1rem"
               sizeMd="2rem"
               marginTop={0}
               paddingTop="20px"

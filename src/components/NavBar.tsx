@@ -1,15 +1,16 @@
 import { Box, Stack } from "@mui/joy";
 import { IconButton } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import logoDiamante from "../assets/VummyLogo_Azul_Diamante.png";
 import { logoutUsuario } from "../api/userApi";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 export const NavBar = () => {
+  const navigate = useNavigate();
   const location = useLocation();
 
   const isDisabled =
-    location.pathname === "/register" || location.pathname === "/login";
+    location.pathname === "/register" || location.pathname === "/login" || location.pathname === "/";
 
   return (
     <Stack
@@ -21,7 +22,7 @@ export const NavBar = () => {
         zIndex: 1000,
         background: "rgba(34, 34, 34, 0.7)",
         color: "white",
-        paddingY: 1.5,
+        paddingY: 1,
         paddingX: 3,
         borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
         backdropFilter: "blur(8px)",
@@ -37,7 +38,8 @@ export const NavBar = () => {
           <img
             src={logoDiamante}
             alt="Logo"
-            style={{ height: 60, objectFit: "contain" }}
+            style={{ height: 60, objectFit: "contain", cursor: "pointer" }}
+            onClick={() => navigate("/")}
           />
         </Box>
 

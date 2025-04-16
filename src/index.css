@@ -4,13 +4,14 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
 }
 
 body {
-  background: linear-gradient(to bottom, #000000 70%, #0077b6 100%);
+  background: #000000 0%;
   color: white;
   font-family: Arial, sans-serif;
   background-attachment: fixed;
