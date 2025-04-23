@@ -14,6 +14,7 @@ import { NavBar } from "../components/NavBar";
 import { Title } from "../components/Title";
 import { FormCard } from "../components/FormCard";
 import { Layout } from "../components/Layout";
+import { Loading } from "../components/Loading";
 
 export const Register = () => {
   const [nombre, setNombre] = useState("");
@@ -26,6 +27,7 @@ export const Register = () => {
   const [cadera, setCadera] = useState<number | string>("");
   const [entrepierna, setEntrepierna] = useState<number | string>("");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, isSetLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -76,7 +78,11 @@ export const Register = () => {
       entrepierna: +entrepierna,
     };
 
+    isSetLoading(true);
+
     const result = await createUsuario(newUser);
+
+    isSetLoading(false);
 
     if (typeof result === "string") {
       setError(result);
@@ -91,7 +97,7 @@ export const Register = () => {
       setCadera("");
       setEntrepierna("");
       setError(null);
-      navigate("/page");
+      navigate("/page", { replace: true });
     }
   };
 
@@ -302,22 +308,26 @@ export const Register = () => {
                   />
                 </Box>
 
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#2196F3",
-                    color: "#fff",
-                    width: "100%",
-                    fontSize: { xs: "0.50rem", md: "0.75rem" },
-                    "&:hover": {
-                      backgroundColor: "#1976D2",
-                    },
-                    borderRadius: "8px",
-                  }}
-                >
-                  REGISTRATE
-                </Button>
+                {isLoading ? (
+                  <Loading />
+                ) : (
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                      backgroundColor: "#2196F3",
+                      color: "#fff",
+                      width: "100%",
+                      fontSize: { xs: "0.50rem", md: "0.75rem" },
+                      "&:hover": {
+                        backgroundColor: "#1976D2",
+                      },
+                      borderRadius: "8px",
+                    }}
+                  >
+                    REGISTRATE
+                  </Button>
+                )}
               </Box>
               <Button
                 onClick={() => navigate("/login")}

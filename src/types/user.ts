@@ -9,4 +9,5 @@ export interface Usuario {
   cintura: number;
   cadera: number;
   entrepierna: number;
+  token?: string;
 }

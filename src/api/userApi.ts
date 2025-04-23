@@ -11,7 +11,13 @@ export const createUsuario = async (
   usuario: Usuario
 ): Promise<Usuario | string> => {
   try {
-    const response = await API.post<Usuario>("/users", usuario);
+    const response = await API.post<Usuario>("/users/auth/register", usuario);
+
+    const token = response.data.token;
+    if (token) {
+      localStorage.setItem("authToken", token);
+    }
+
     return response.data;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -19,10 +25,10 @@ export const createUsuario = async (
     if (err.response?.status === 409) {
       return "El nombre o el correo electrónico ya están en uso.";
     }
-    if (err.response?.data?.message) {
-      return err.response.data.message;
-    }
-    return "Hubo un error al registrar el usuario.";
+
+    return (
+      err.response?.data?.message || "Hubo un error al registrar el usuario."
+    );
   }
 };
 
@@ -31,20 +37,30 @@ export const loginUsuario = async (
   password: string
 ): Promise<Usuario | null> => {
   try {
-    const response = await API.post<Usuario>(
-      `/users/login?email=${encodeURIComponent(
-        email
-      )}&password=${encodeURIComponent(password)}`
-    );
+    const response = await API.post<Usuario>("/users/auth/login", {
+      email,
+      password,
+    });
+
+    const token = response.data.token;
+    if (token) {
+      localStorage.setItem("authToken", token);
+    } else {
+      console.warn("No se recibió token de autenticación");
+    }
+
     return response.data;
-  } catch {
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    console.error(
+      "Error al iniciar sesión:",
+      err.response?.data?.message || error
+    );
     return null;
   }
 };
 
 export const logoutUsuario = () => {
   localStorage.removeItem("authToken");
-  sessionStorage.removeItem("authToken");
-
   window.location.href = "/";
 };

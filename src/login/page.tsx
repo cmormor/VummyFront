@@ -6,23 +6,27 @@ import { NavBar } from "../components/NavBar";
 import { Title } from "../components/Title";
 import { FormCard } from "../components/FormCard";
 import { Layout } from "../components/Layout";
+import { Loading } from "../components/Loading";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setError("");
+    setIsLoading(true);
 
     const user = await loginUsuario(email, password);
 
+    setIsLoading(false);
+
     if (user) {
-      navigate("/page");
+      navigate("/page", { replace: true });
     } else {
       setError("Credenciales incorrectas");
     }
@@ -96,38 +100,54 @@ export const Login = () => {
                   {error}
                 </Typography>
               )}
+
               <Box m={2}>
-                <Button
-                  fullWidth
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  sx={{
-                    marginTop: 2,
-                    lineHeight: "1.5",
-                    fontFamily: "'Poppins', sans-serif",
-                    fontSize: { xs: "0.75rem", md: "1rem" },
-                    borderRadius: "8px",
-                  }}
-                >
-                  INICIAR SESIÓN
-                </Button>
-                <Button
-                  onClick={() => navigate("/register")}
-                  fullWidth
-                  variant="outlined"
-                  color="primary"
-                  sx={{
-                    marginTop: 2,
-                    lineHeight: "1.5",
-                    fontFamily: "'Poppins', sans-serif",
-                    fontSize: { xs: "0.75rem", md: "1rem" },
-                    borderRadius: "8px",
-                    color: "white",
-                  }}
-                >
-                  ¿NO TIENES CUENTA? REGISTRATE
-                </Button>
+                {isLoading ? (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginTop: 2,
+                    }}
+                  >
+                    <Loading />
+                  </Box>
+                ) : (
+                  <>
+                    <Button
+                      fullWidth
+                      type="submit"
+                      variant="contained"
+                      color="primary"
+                      sx={{
+                        marginTop: 2,
+                        lineHeight: "1.5",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: { xs: "0.75rem", md: "1rem" },
+                        borderRadius: "8px",
+                      }}
+                    >
+                      INICIAR SESIÓN
+                    </Button>
+                    <Button
+                      onClick={() => navigate("/register")}
+                      fullWidth
+                      variant="outlined"
+                      color="primary"
+                      sx={{
+                        marginTop: 2,
+                        lineHeight: "1.5",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: { xs: "0.75rem", md: "1rem" },
+                        borderRadius: "8px",
+                        color: "white",
+                      }}
+                    >
+                      ¿NO TIENES CUENTA? REGISTRATE
+                    </Button>
+                  </>
+                )}
               </Box>
             </form>
           </FormCard>
