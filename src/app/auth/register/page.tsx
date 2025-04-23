@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { createUsuario } from "../api/userApi";
-import { Usuario } from "../types/user";
+import { createUsuario } from "../../../api/userApi";
+import { Usuario } from "../../../types/user";
 import {
   Box,
   TextField,
@@ -10,11 +10,11 @@ import {
   Alert,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { NavBar } from "../components/NavBar";
-import { Title } from "../components/Title";
-import { FormCard } from "../components/FormCard";
-import { Layout } from "../components/Layout";
-import { Loading } from "../components/Loading";
+import { NavBar } from "../../../components/NavBar";
+import { Title } from "../../../components/Title";
+import { FormCard } from "../../../components/FormCard";
+import { Layout } from "../../../components/Layout";
+import { Loading } from "../../../components/Loading";
 
 export const Register = () => {
   const [nombre, setNombre] = useState("");

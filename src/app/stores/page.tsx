@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { getStores } from "../api/storeApi";
-import { Store as StoreType } from "../types/store";
+import { getStores } from "../../api/storeApi";
+import { Store as StoreType } from "../../types/store";
 import { Stack, CircularProgress, Box } from "@mui/material";
-import { NavBar } from "../components/NavBar";
-import { StoreCard } from "../components/StoreCard";
-import { Title } from "../components/Title";
-import { Layout } from "../components/Layout";
-import { Description } from "../components/Description";
+import { NavBar } from "../../components/NavBar";
+import { StoreCard } from "../../components/StoreCard";
+import { Title } from "../../components/Title";
+import { Layout } from "../../components/Layout";
+import { Description } from "../../components/Description";
 
 export const Stores = () => {
   const [stores, setStores] = useState<StoreType[]>([]);

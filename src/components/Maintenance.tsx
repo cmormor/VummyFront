@@ -1,5 +1,5 @@
 import { Box, Button, Stack } from "@mui/joy";
-import logo from "../assets/VummyLogo_Azul.png";
+import logo from "../../public/VummyLogo_Azul.png";
 import { Title } from "./Title";
 import { Layout } from "./Layout";
 import { useNavigate } from "react-router-dom";

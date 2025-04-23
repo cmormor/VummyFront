@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { ReactNode, useEffect, useState } from "react";
-import { Loading } from "../components/Loading";
+import { Loading } from "../../components/Loading";
 
 interface ProtectedRouteProps {
   children: ReactNode;

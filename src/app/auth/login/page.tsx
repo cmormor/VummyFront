@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { loginUsuario } from "../api/userApi";
+import { loginUsuario } from "../../../api/userApi";
 import { Box, TextField, Button, Typography, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { NavBar } from "../components/NavBar";
-import { Title } from "../components/Title";
-import { FormCard } from "../components/FormCard";
-import { Layout } from "../components/Layout";
-import { Loading } from "../components/Loading";
+import { NavBar } from "../../../components/NavBar";
+import { Title } from "../../../components/Title";
+import { FormCard } from "../../../components/FormCard";
+import { Layout } from "../../../components/Layout";
+import { Loading } from "../../../components/Loading";
 
 export const Login = () => {
   const [email, setEmail] = useState("");

@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Typography, Stack } from "@mui/joy";
-import logo from "../assets/VummyLogo_Azul.png";
-import { Title } from "../components/Title";
-import { Layout } from "../components/Layout";
-import { NavBar } from "../components/NavBar";
+import logo from "../../../public/VummyLogo_Azul.png";
+import { Title } from "../../components/Title";
+import { Layout } from "../../components/Layout";
+import { NavBar } from "../../components/NavBar";
 
 export const Landing = () => {
   const navigate = useNavigate();

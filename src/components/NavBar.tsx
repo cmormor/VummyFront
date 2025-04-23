@@ -1,7 +1,7 @@
 import { Box, Stack } from "@mui/joy";
 import { IconButton } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
-import logoDiamante from "../assets/VummyLogo_Azul_Diamante.png";
+import logoDiamante from "../../public/VummyLogo_Azul_Diamante.png";
 import { logoutUsuario } from "../api/userApi";
 import LogoutIcon from "@mui/icons-material/Logout";
 
@@ -10,7 +10,9 @@ export const NavBar = () => {
   const location = useLocation();
 
   const isDisabled =
-    location.pathname === "/register" || location.pathname === "/login" || location.pathname === "/";
+    location.pathname === "/register" ||
+    location.pathname === "/login" ||
+    location.pathname === "/";
 
   return (
     <Stack
