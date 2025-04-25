@@ -53,7 +53,6 @@ export const NavBar = () => {
               } else {
                 navigate("/home");
               }
-              window.location.reload();
             }}
           />
         </Box>
