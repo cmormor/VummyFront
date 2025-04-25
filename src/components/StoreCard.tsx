@@ -24,6 +24,7 @@ export const StoreCard = ({
         variant="outlined"
         sx={{
           borderColor: "#1976d2",
+          borderWidth: "2px",
           backgroundColor: "transparent",
           boxShadow: "none",
           borderRadius: "8px",

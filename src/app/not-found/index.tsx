@@ -15,10 +15,20 @@ export const NotFound = () => {
         textAlign: "center",
       }}
     >
-      <Typography variant="h1" sx={{ fontSize: "4rem", marginBottom: 2 }}>
+      <Typography
+        variant="h1"
+        sx={{
+          fontSize: "4rem",
+          marginBottom: 2,
+          color: (theme) => theme.palette.text.primary,
+        }}
+      >
         404
       </Typography>
-      <Typography variant="h6" sx={{ marginBottom: 4 }}>
+      <Typography
+        variant="h6"
+        sx={{ marginBottom: 4, color: (theme) => theme.palette.text.primary }}
+      >
         La página que buscas no existe.
       </Typography>
       <Button

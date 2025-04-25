@@ -26,7 +26,7 @@ export const Login = () => {
     setIsLoading(false);
 
     if (user) {
-      navigate("/page", { replace: true });
+      navigate("/home", { replace: true });
     } else {
       setError("Credenciales incorrectas");
     }
@@ -35,7 +35,7 @@ export const Login = () => {
   return (
     <>
       <NavBar />
-      <Layout>
+      <Layout color>
         <Stack
           sx={{
             display: "flex",
@@ -63,11 +63,6 @@ export const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  sx={{
-                    backgroundColor: "white",
-                    borderRadius: "8px",
-                    borderColor: "white",
-                  }}
                 />
               </Box>
 
@@ -80,10 +75,6 @@ export const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  sx={{
-                    backgroundColor: "white",
-                    borderRadius: "8px",
-                  }}
                 />
               </Box>
 
@@ -141,7 +132,6 @@ export const Login = () => {
                         fontFamily: "'Poppins', sans-serif",
                         fontSize: { xs: "0.75rem", md: "1rem" },
                         borderRadius: "8px",
-                        color: "white",
                       }}
                     >
                       ¿NO TIENES CUENTA? REGISTRATE

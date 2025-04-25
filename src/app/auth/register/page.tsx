@@ -97,14 +97,14 @@ export const Register = () => {
       setCadera("");
       setEntrepierna("");
       setError(null);
-      navigate("/page", { replace: true });
+      navigate("/home", { replace: true });
     }
   };
 
   return (
     <>
       <NavBar />
-      <Layout>
+      <Layout color>
         <Stack
           sx={{
             display: "flex",
@@ -164,8 +164,6 @@ export const Register = () => {
                     onChange={(e) => setNombre(e.target.value)}
                     required
                     sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
                     }}
@@ -179,8 +177,6 @@ export const Register = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
                     }}
@@ -194,8 +190,6 @@ export const Register = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
                     }}
@@ -217,8 +211,6 @@ export const Register = () => {
                     onChange={(e) => setAltura(e.target.value)}
                     required
                     sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
                     }}
@@ -232,8 +224,6 @@ export const Register = () => {
                     onChange={(e) => setCuelloManga(e.target.value)}
                     required
                     sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
                     }}
@@ -247,8 +237,6 @@ export const Register = () => {
                     onChange={(e) => setPecho(e.target.value)}
                     required
                     sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
                     }}
@@ -270,8 +258,6 @@ export const Register = () => {
                     onChange={(e) => setCintura(e.target.value)}
                     required
                     sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
                     }}
@@ -285,8 +271,6 @@ export const Register = () => {
                     onChange={(e) => setCadera(e.target.value)}
                     required
                     sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
                     }}
@@ -300,8 +284,6 @@ export const Register = () => {
                     onChange={(e) => setEntrepierna(e.target.value)}
                     required
                     sx={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
                     }}
@@ -316,7 +298,6 @@ export const Register = () => {
                     variant="contained"
                     sx={{
                       backgroundColor: "#2196F3",
-                      color: "#fff",
                       width: "100%",
                       fontSize: { xs: "0.50rem", md: "0.75rem" },
                       "&:hover": {
@@ -341,7 +322,6 @@ export const Register = () => {
                   fontFamily: "'Poppins', sans-serif",
                   fontSize: { xs: "0.50rem", md: "0.75rem" },
                   borderRadius: "8px",
-                  color: "white",
                 }}
               >
                 ¿YA TIENES CUENTA? INICIA SESIÓN

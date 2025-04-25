@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/joy";
+import { Box, Typography } from "@mui/material";
 
 interface Title {
   text: string;
@@ -25,11 +25,11 @@ export const Description = ({ text, sizeXs, sizeMd }: Title) => {
         }}
       >
         <Typography
-          level="body-lg"
+          variant="body1"
           sx={{
             textAlign: "center",
             mt: 3,
-            color: "lightgrey",
+            color: (theme) => theme.palette.text.primary,
             width: "100%",
             lineHeight: "1.5",
             fontFamily: "'Poppins', sans-serif",

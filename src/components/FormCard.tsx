@@ -16,7 +16,7 @@ export const FormCard = ({
 }) => {
   const navigate = useNavigate();
   return (
-    <Box sx={{ minWidth: 275, maxWidth: 900, }}>
+    <Box sx={{ minWidth: 275, maxWidth: 900 }}>
       <Card
         variant="outlined"
         sx={{
@@ -31,7 +31,7 @@ export const FormCard = ({
             onClick={() => navigate(path)}
             sx={{
               color: "gray",
-              "&:hover": { color: "#fff" },
+              "&:hover": { color: (theme) => theme.palette.text.primary },
               padding: 0,
               minWidth: "auto",
               mr: 1,

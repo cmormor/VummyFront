@@ -1,13 +1,16 @@
-import { Box, Stack } from "@mui/joy";
-import { IconButton } from "@mui/material";
+import { Box, Stack, IconButton } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
-import logoDiamante from "../../public/VummyLogo_Azul_Diamante.png";
-import { logoutUsuario } from "../api/userApi";
+import { useThemeContext } from "../style/ThemeContext";
+import logoDiamante from "/VummyLogo_Azul_Diamante.png";
 import LogoutIcon from "@mui/icons-material/Logout";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { logoutUsuario } from "../api/userApi";
 
 export const NavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { toggleTheme, mode } = useThemeContext();
 
   const isDisabled =
     location.pathname === "/register" ||
@@ -22,11 +25,14 @@ export const NavBar = () => {
         left: 0,
         right: 0,
         zIndex: 1000,
-        background: "rgba(34, 34, 34, 0.7)",
-        color: "white",
+        backgroundColor: (theme) => theme.palette.background.default,
+        color: (theme) => theme.palette.text.primary,
         paddingY: 1,
         paddingX: 3,
-        borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+        borderBottom: (theme) =>
+          theme.palette.mode === "dark"
+            ? "1px solid rgba(255, 255, 255, 0.2)"
+            : "1px solid rgba(0, 0, 0, 0.2)",
         backdropFilter: "blur(8px)",
       }}
     >
@@ -41,15 +47,26 @@ export const NavBar = () => {
             src={logoDiamante}
             alt="Logo"
             style={{ height: 60, objectFit: "contain", cursor: "pointer" }}
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/home")}
           />
         </Box>
 
-        {!isDisabled && (
-          <IconButton onClick={() => logoutUsuario()}>
-            <LogoutIcon sx={{ color: "white", fontSize: { xs: 25, md: 30 } }} />
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <IconButton onClick={toggleTheme} color="inherit">
+            {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
           </IconButton>
-        )}
+
+          {!isDisabled && (
+            <IconButton onClick={() => logoutUsuario()}>
+              <LogoutIcon
+                sx={{
+                  color: (theme) => theme.palette.text.primary,
+                  fontSize: { xs: 25, md: 30 },
+                }}
+              />
+            </IconButton>
+          )}
+        </Stack>
       </Stack>
     </Stack>
   );

@@ -1,5 +1,5 @@
-import { Box, Button, Stack } from "@mui/joy";
-import logo from "../../public/VummyLogo_Azul.png";
+import { Box, Button, Stack } from "@mui/material";
+import logo from "/VummyLogo_Azul.png";
 import { Title } from "./Title";
 import { Layout } from "./Layout";
 import { useNavigate } from "react-router-dom";
@@ -23,16 +23,16 @@ export const Maintenance = () => {
         </Box>
         <Stack sx={{ display: "flex", alignItems: "center" }}>
           <Title
-            text="EN MANTENIMIENTO... "
+            text="EN MANTENIMIENTO"
             sizeXs="1.5rem"
             sizeMd="2rem"
             marginTop={0}
             paddingTop="20px"
           />
           <Button
-            variant="solid"
+            variant="contained"
             color="primary"
-            onClick={() => navigate("/page")}
+            onClick={() => navigate("/home")}
           >
             VOLVER
           </Button>

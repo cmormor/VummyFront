@@ -15,7 +15,7 @@ export const App = () => (
       <Route path="/login" element={<Login />} />
 
       <Route
-        path="/page"
+        path="/home"
         element={
           <ProtectedRoute>
             <Stores />

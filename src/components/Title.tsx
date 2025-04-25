@@ -44,7 +44,7 @@ export const Title = ({
             whiteSpace: "normal",
             wordBreak: "break-word",
             maxWidth: "80vw",
-            color: "white",
+            color: (theme) => theme.palette.text.primary,
           }}
         >
           {text}

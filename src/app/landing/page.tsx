@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { Box, Button, Typography, Stack } from "@mui/joy";
-import logo from "../../../public/VummyLogo_Azul.png";
+import { Box, Button, Typography, Stack } from "@mui/material";
+import logo from "/VummyLogo_Azul.png";
 import { Title } from "../../components/Title";
 import { Layout } from "../../components/Layout";
 import { NavBar } from "../../components/NavBar";
@@ -18,7 +18,7 @@ export const Landing = () => {
       }}
     >
       <NavBar />
-      <Layout>
+      <Layout color>
         <Stack
           sx={{
             display: "flex",
@@ -49,10 +49,10 @@ export const Landing = () => {
           />
 
           <Typography
-            level="body-lg"
+            variant="body1"
             sx={{
               textAlign: "center",
-              color: "lightgrey",
+              color: (theme) => theme.palette.text.primary,
               lineHeight: "1.5",
               fontFamily: "'Poppins', sans-serif",
               fontSize: { xs: "0.9rem", md: "1rem" },
@@ -69,10 +69,10 @@ export const Landing = () => {
           </Typography>
 
           <Typography
-            level="body-lg"
+            variant="body1"
             sx={{
               textAlign: "center",
-              color: "lightgrey",
+              color: (theme) => theme.palette.text.primary,
               lineHeight: "1.5",
               fontFamily: "'Poppins', sans-serif",
               fontSize: { xs: "0.9rem", md: "1rem" },
@@ -92,15 +92,18 @@ export const Landing = () => {
             }}
           >
             <Button
-              variant="solid"
+              variant="contained"
               color="primary"
               onClick={() => navigate("/register")}
-              sx={{ width: { xs: "100%", md: "auto" } }}
+              sx={{
+                width: { xs: "100%", md: "auto" },
+                boxShadow: "none",
+              }}
             >
               REGÍSTRATE
             </Button>
             <Button
-              variant="soft"
+              variant="outlined"
               onClick={() => navigate("/login")}
               sx={{ width: { xs: "100%", md: "auto" } }}
             >

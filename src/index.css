@@ -8,11 +8,11 @@ html,
 body {
   height: 100%;
   width: 100%;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 body {
-  background: #000000 0%;
-  color: white;
   font-family: Arial, sans-serif;
   background-attachment: fixed;
   background-size: cover;
