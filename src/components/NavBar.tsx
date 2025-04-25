@@ -47,7 +47,14 @@ export const NavBar = () => {
             src={logoDiamante}
             alt="Logo"
             style={{ height: 60, objectFit: "contain", cursor: "pointer" }}
-            onClick={() => navigate("/home")}
+            onClick={() => {
+              if (isDisabled) {
+                navigate("/");
+              } else {
+                navigate("/home");
+              }
+              window.location.reload();
+            }}
           />
         </Box>
 
