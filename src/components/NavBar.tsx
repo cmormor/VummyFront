@@ -1,21 +1,63 @@
-import { Box, Stack, IconButton } from "@mui/material";
+import {
+  Box,
+  Stack,
+  IconButton,
+  Avatar,
+  Popover,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton,
+  ListItemIcon,
+  Divider,
+} from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useThemeContext } from "../style/ThemeContext";
 import logoDiamante from "/VummyLogo_Azul_Diamante.png";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
-import { logoutUsuario } from "../api/userApi";
+import { logoutUsuario, perfilUsuario } from "../api/userApi";
+import { useState, useEffect } from "react";
+import { Usuario } from "../types/user";
+import SettingsIcon from "@mui/icons-material/Settings";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 export const NavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toggleTheme, mode } = useThemeContext();
 
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
   const isDisabled =
     location.pathname === "/register" ||
     location.pathname === "/login" ||
     location.pathname === "/";
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const data = await perfilUsuario();
+        setUsuario(data);
+      } catch (error) {
+        console.error("Error al obtener el perfil del usuario:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClosePopover = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
 
   return (
     <Stack
@@ -63,17 +105,121 @@ export const NavBar = () => {
           </IconButton>
 
           {!isDisabled && (
-            <IconButton onClick={() => logoutUsuario()}>
-              <LogoutIcon
-                sx={{
-                  color: (theme) => theme.palette.text.primary,
-                  fontSize: { xs: 25, md: 30 },
-                }}
-              />
-            </IconButton>
+            <>
+              {usuario && (
+                <>
+                  <Divider
+                    orientation="vertical"
+                    flexItem
+                    sx={{ borderColor: "divider" }}
+                  />
+                  <Avatar
+                    sx={{
+                      width: 36,
+                      height: 36,
+                      backgroundColor: (theme) => theme.palette.primary.main,
+                      cursor: "pointer",
+                    }}
+                    onClick={handleAvatarClick}
+                  >
+                    {usuario.nombre.charAt(0).toUpperCase()}
+                  </Avatar>
+                </>
+              )}
+            </>
           )}
         </Stack>
       </Stack>
+
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClosePopover}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+        PaperProps={{
+          elevation: 2,
+          sx: {
+            borderRadius: 2,
+            overflow: "hidden",
+            backgroundColor: (theme) => theme.palette.background.paper,
+            boxShadow: (theme) =>
+              theme.palette.mode === "dark"
+                ? "0px 4px 20px rgba(0, 0, 0, 0.5)"
+                : "0px 4px 20px rgba(0, 0, 0, 0.1)",
+            padding: 0,
+            minWidth: 220,
+          },
+        }}
+      >
+        <Box sx={{ padding: 2 }}>
+          {usuario && (
+            <>
+              <Box
+                sx={{
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  fontSize: "1.1rem",
+                  color: (theme) => theme.palette.text.primary,
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+              >
+                {usuario.nombre.toUpperCase()}
+              </Box>
+              <List>
+                <ListItem disablePadding sx={{ paddingY: 0.5 }}>
+                  <ListItemButton
+                    sx={{ paddingY: 1 }}
+                    onClick={() => navigate("/profile")}
+                  >
+                    <ListItemIcon sx={{ minWidth: 32 }}>
+                      <AccountCircleIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={usuario.email}
+                      sx={{ margin: 0, marginTop: 0.5, marginLeft: 0.5 }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding sx={{ paddingY: 0.5 }}>
+                  <ListItemButton
+                    sx={{ paddingY: 1 }}
+                    onClick={() => navigate("/settings")}
+                  >
+                    <ListItemIcon sx={{ minWidth: 32 }}>
+                      <SettingsIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Ajustes"
+                      sx={{ margin: 0, marginTop: 0.5, marginLeft: 0.5 }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding sx={{ paddingY: 0.5 }}>
+                  <ListItemButton
+                    sx={{ paddingY: 1 }}
+                    onClick={() => logoutUsuario()}
+                  >
+                    <ListItemIcon sx={{ minWidth: 32 }}>
+                      <LogoutIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Cerrar Sesión"
+                      sx={{ margin: 0, marginTop: 0.5, marginLeft: 0.5 }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              </List>
+            </>
+          )}
+        </Box>
+      </Popover>
     </Stack>
   );
 };

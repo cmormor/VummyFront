@@ -64,3 +64,8 @@ export const logoutUsuario = () => {
   localStorage.removeItem("authToken");
   window.location.href = "/";
 };
+
+export const perfilUsuario = async () => {
+  const response = await API.get<Usuario>("/users/perfil");
+  return response.data;
+};
