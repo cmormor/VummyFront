@@ -34,7 +34,7 @@ export const NotFound = () => {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/home")}
         sx={{ borderRadius: "8px" }}
       >
         Volver al inicio

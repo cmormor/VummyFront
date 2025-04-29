@@ -22,6 +22,7 @@ import { useState, useEffect } from "react";
 import { Usuario } from "../types/user";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { ModalConfirmation } from "./ModalConfirmation";
 
 export const NavBar = () => {
   const navigate = useNavigate();
@@ -30,6 +31,8 @@ export const NavBar = () => {
 
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [openModal, setOpenModal] = useState(false);
+  const [mensaje, setMensaje] = useState("");
 
   const isDisabled =
     location.pathname === "/register" ||
@@ -58,6 +61,16 @@ export const NavBar = () => {
   };
 
   const open = Boolean(anchorEl);
+
+  const handleLogout = async () => {
+    try {
+      await logoutUsuario();
+      setUsuario(null);
+      navigate("/login");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
 
   return (
     <Stack
@@ -183,7 +196,15 @@ export const NavBar = () => {
                     </ListItemIcon>
                     <ListItemText
                       primary={usuario.email}
-                      sx={{ margin: 0, marginTop: 0.5, marginLeft: 0.5 }}
+                      primaryTypographyProps={{
+                        fontSize: "0.9rem",
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
+                      sx={{
+                        margin: 0,
+                        marginTop: 0.5,
+                        marginLeft: 0.5,
+                      }}
                     />
                   </ListItemButton>
                 </ListItem>
@@ -197,21 +218,41 @@ export const NavBar = () => {
                     </ListItemIcon>
                     <ListItemText
                       primary="Ajustes"
-                      sx={{ margin: 0, marginTop: 0.5, marginLeft: 0.5 }}
+                      primaryTypographyProps={{
+                        fontSize: "0.9rem",
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
+                      sx={{
+                        margin: 0,
+                        marginTop: 0.5,
+                        marginLeft: 0.5,
+                      }}
                     />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding sx={{ paddingY: 0.5 }}>
                   <ListItemButton
                     sx={{ paddingY: 1 }}
-                    onClick={() => logoutUsuario()}
+                    onClick={() => {
+                      handleClosePopover();
+                      setOpenModal(true);
+                      setMensaje("¿Estás seguro de que deseas cerrar sesión?");
+                    }}
                   >
                     <ListItemIcon sx={{ minWidth: 32 }}>
                       <LogoutIcon />
                     </ListItemIcon>
                     <ListItemText
                       primary="Cerrar Sesión"
-                      sx={{ margin: 0, marginTop: 0.5, marginLeft: 0.5 }}
+                      primaryTypographyProps={{
+                        fontSize: "0.9rem",
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
+                      sx={{
+                        margin: 0,
+                        marginTop: 0.5,
+                        marginLeft: 0.5,
+                      }}
                     />
                   </ListItemButton>
                 </ListItem>
@@ -220,6 +261,13 @@ export const NavBar = () => {
           )}
         </Box>
       </Popover>
+
+      <ModalConfirmation
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        onConfirm={handleLogout}
+        mensaje={mensaje}
+      />
     </Stack>
   );
 };
