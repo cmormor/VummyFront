@@ -66,7 +66,6 @@ export const NavBar = () => {
     try {
       await logoutUsuario();
       setUsuario(null);
-      navigate("/login");
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
     }
