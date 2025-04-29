@@ -18,7 +18,7 @@ export const StoreCard = ({
   };
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ width: "90%" }}>
       <Card
         onClick={handleClick}
         variant="outlined"

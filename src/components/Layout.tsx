@@ -1,12 +1,16 @@
 import { ReactNode } from "react";
-import { Box } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 interface LayoutProps {
   children: ReactNode;
   color?: boolean;
+  arrow?: boolean;
 }
 
-export const Layout = ({ children, color }: LayoutProps) => {
+export const Layout = ({ children, color, arrow }: LayoutProps) => {
+  const navigate = useNavigate();
   return (
     <Box
       sx={{
@@ -44,6 +48,19 @@ export const Layout = ({ children, color }: LayoutProps) => {
           },
         }}
       >
+        {arrow && (
+          <IconButton
+            onClick={() => navigate("/home")}
+            sx={{
+              color: "gray",
+              "&:hover": { color: (theme) => theme.palette.text.primary },
+              padding: 0,
+              minWidth: "auto",
+            }}
+          >
+            <ArrowBackIcon sx={{ fontSize: { xs: 22, md: 28 } }} />
+          </IconButton>
+        )}
         {children}
       </Box>
 

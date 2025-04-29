@@ -1,17 +1,15 @@
 import { Box, Typography } from "@mui/material";
 
-interface Title {
-  text: string;
-  sizeXs?: string;
-  sizeMd?: string;
+interface Details {
+  detail: string | number;
+  fontSize?: number;
 }
 
-export const Description = ({ text, sizeXs, sizeMd }: Title) => {
+export const Details = ({ detail, fontSize }: Details) => {
   return (
     <Box
       sx={{
         width: "100%",
-        px: { xs: sizeXs, md: sizeMd },
         display: "flex",
         justifyContent: "center",
       }}
@@ -25,17 +23,18 @@ export const Description = ({ text, sizeXs, sizeMd }: Title) => {
         }}
       >
         <Typography
-          variant="body1"
+          variant="h6"
           sx={{
             textAlign: "center",
-            mt: 3,
+            mt: 2,
             color: (theme) => theme.palette.text.primary,
             width: "100%",
             lineHeight: "1.5",
             fontFamily: "'Poppins', sans-serif",
+            fontSize: { fontSize },
           }}
         >
-          {text}
+          {detail}
         </Typography>
       </Box>
     </Box>

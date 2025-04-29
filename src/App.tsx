@@ -6,6 +6,7 @@ import { Login } from "./app/auth/login/page";
 import { Stores } from "./app/stores/page";
 import { Maintenance } from "./components/Maintenance";
 import { NotFound } from "./app/not-found";
+import { Clothes } from "./app/stores/clothes/page";
 
 export const App = () => (
   <Router>
@@ -23,7 +24,31 @@ export const App = () => (
         }
       />
       <Route
-        path="/stores/mantenimiento"
+        path="/stores/:storeId/clothes"
+        element={
+          <ProtectedRoute>
+            <Clothes />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/stores/maintenance"
+        element={
+          <ProtectedRoute>
+            <Maintenance />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Maintenance />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
         element={
           <ProtectedRoute>
             <Maintenance />

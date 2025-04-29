@@ -19,7 +19,7 @@ export const Maintenance = () => {
             width: "100%",
           }}
         >
-          <img src={logo} alt="Logo" style={{ height: 200 }} />
+          <img src={logo} alt="Logo" style={{ height: 150 }} />
         </Box>
         <Stack sx={{ display: "flex", alignItems: "center" }}>
           <Title
@@ -30,11 +30,11 @@ export const Maintenance = () => {
             paddingTop="20px"
           />
           <Button
-            variant="contained"
+            variant="outlined"
             color="primary"
             onClick={() => navigate("/home")}
           >
-            VOLVER
+            VOLVER AL INICIO
           </Button>
         </Stack>
       </Layout>

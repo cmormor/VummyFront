@@ -79,7 +79,11 @@ export const NavBar = () => {
         left: 0,
         right: 0,
         zIndex: 1000,
-        backgroundColor: (theme) => theme.palette.background.default,
+        backgroundColor: (theme) =>
+          theme.palette.mode === "dark"
+            ? "rgba(26, 26, 26, 0.75)"
+            : "rgba(255, 255, 255, 0.75)",
+
         color: (theme) => theme.palette.text.primary,
         paddingY: 1,
         paddingX: 3,

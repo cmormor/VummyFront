@@ -3,10 +3,10 @@ import { getStores } from "../../api/storeApi";
 import { Store as StoreType } from "../../types/store";
 import { Stack, CircularProgress, Box } from "@mui/material";
 import { NavBar } from "../../components/NavBar";
-import { StoreCard } from "../../components/StoreCard";
+import { StoreCard } from "./StoreCard";
 import { Title } from "../../components/Title";
 import { Layout } from "../../components/Layout";
-import { Description } from "../../components/Description";
+import { Details } from "../../components/Details";
 
 export const Stores = () => {
   const [stores, setStores] = useState<StoreType[]>([]);
@@ -51,10 +51,10 @@ export const Stores = () => {
             </Box>
           ) : (
             stores.map((store) => (
-              <StoreCard key={store.id} path="/stores/mantenimiento">
+              <StoreCard key={store.id} path={`/stores/${store.id}/clothes`}>
                 <>
                   <Title text={store.nombre} marginTop={2} paddingTop="20px" />
-                  <Description text={store.descripcion} />
+                  <Details detail={store.descripcion} />
                 </>
               </StoreCard>
             ))

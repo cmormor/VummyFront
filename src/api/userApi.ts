@@ -66,6 +66,6 @@ export const logoutUsuario = () => {
 };
 
 export const perfilUsuario = async () => {
-  const response = await API.get<Usuario>("/users/perfil");
+  const response = await API.get<Usuario>("/users/profile");
   return response.data;
 };
