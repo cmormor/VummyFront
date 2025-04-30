@@ -16,7 +16,7 @@ import { useThemeContext } from "../style/ThemeContext";
 import logoDiamante from "/VummyLogo_Azul_Diamante.png";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
+import BrightnessLowIcon from "@mui/icons-material/BrightnessLow";
 import { logoutUsuario, perfilUsuario } from "../api/userApi";
 import { useState, useEffect } from "react";
 import { Usuario } from "../types/user";
@@ -117,7 +117,7 @@ export const NavBar = () => {
 
         <Stack direction="row" alignItems="center" spacing={2}>
           <IconButton onClick={toggleTheme} color="inherit">
-            {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+            {mode === "dark" ? <BrightnessLowIcon /> : <Brightness4Icon />}
           </IconButton>
 
           {!isDisabled && (
@@ -192,7 +192,7 @@ export const NavBar = () => {
                 <ListItem disablePadding sx={{ paddingY: 0.5 }}>
                   <ListItemButton
                     sx={{ paddingY: 1 }}
-                    onClick={() => navigate("/profile")}
+                    onClick={() => navigate("/settings/?opcion=Perfil")}
                   >
                     <ListItemIcon sx={{ minWidth: 32 }}>
                       <AccountCircleIcon />

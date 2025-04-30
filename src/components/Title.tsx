@@ -40,7 +40,7 @@ export const Title = ({
           sx={{
             fontFamily: "'Lexend Zetta', sans-serif",
             fontWeight: 200,
-            fontSize: { xs: sizeXs || "1.2rem", md: sizeMd || "2.2rem" },
+            fontSize: { xs: sizeXs || "1.2rem", md: sizeMd || "2.5rem" },
             whiteSpace: "normal",
             wordBreak: "break-word",
             maxWidth: "80vw",

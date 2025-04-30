@@ -19,6 +19,8 @@ API.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("authToken");
+      alert("Tu sesión ha caducado. Por favor, inicia sesión de nuevo.");
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }

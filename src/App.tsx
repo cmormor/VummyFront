@@ -7,6 +7,7 @@ import { Stores } from "./app/stores/page";
 import { Maintenance } from "./components/Maintenance";
 import { NotFound } from "./app/not-found";
 import { Clothes } from "./app/stores/clothes/page";
+import { Settings } from "./app/settings/page";
 
 export const App = () => (
   <Router>
@@ -43,15 +44,7 @@ export const App = () => (
         path="/settings"
         element={
           <ProtectedRoute>
-            <Maintenance />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <Maintenance />
+            <Settings />
           </ProtectedRoute>
         }
       />
