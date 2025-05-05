@@ -2,8 +2,8 @@ import { Box, Typography } from "@mui/material";
 
 interface Title {
   text: string;
-  sizeXs?: string;
-  sizeMd?: string;
+  sizeXs?: string | number;
+  sizeMd?: string | number;
   marginTop: number;
   paddingTop: string;
 }
