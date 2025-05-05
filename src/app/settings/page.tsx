@@ -513,6 +513,7 @@ export const Settings = () => {
               Menú de Opciones
             </Typography>
           </Box>
+
           <List component="nav" sx={{ p: 1 }}>
             {menuOptions.map((option) => (
               <ListItemButton
