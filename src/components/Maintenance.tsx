@@ -3,13 +3,11 @@ import logo from "/VummyLogo_Azul.png";
 import { Title } from "./Title";
 import { Layout } from "./Layout";
 import { useNavigate } from "react-router-dom";
-import { NavBar } from "./NavBar";
 
 export const Maintenance = () => {
   const navigate = useNavigate();
   return (
     <>
-      <NavBar />
       <Layout>
         <Box
           sx={{

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { getStores } from "../../api/storeApi";
 import { Store as StoreType } from "../../types/store";
 import { Stack, CircularProgress, Box } from "@mui/material";
-import { NavBar } from "../../components/NavBar";
 import { StoreCard } from "./StoreCard";
 import { Title } from "../../components/Title";
 import { Layout } from "../../components/Layout";
@@ -23,7 +22,6 @@ export const Stores = () => {
 
   return (
     <>
-      <NavBar />
       <Layout>
         <Title
           text="TIENDAS DISPONIBLES EN VUMMY"

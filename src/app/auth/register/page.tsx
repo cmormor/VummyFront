@@ -10,7 +10,6 @@ import {
   Alert,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { NavBar } from "../../../components/NavBar";
 import { Title } from "../../../components/Title";
 import { FormCard } from "../../../components/FormCard";
 import { Layout } from "../../../components/Layout";
@@ -103,7 +102,6 @@ export const Register = () => {
 
   return (
     <>
-      <NavBar />
       <Layout color>
         <Stack
           sx={{

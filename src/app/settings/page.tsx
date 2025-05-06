@@ -24,7 +24,6 @@ import {
   ChevronRight,
 } from "@mui/icons-material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { NavBar } from "../../components/NavBar";
 import { Title } from "../../components/Title";
 import { Layout } from "../../components/Layout";
 import { useSearchParams } from "react-router-dom";
@@ -53,6 +52,11 @@ export const Settings = () => {
   const [opcionSeleccionada, setOpcionSeleccionada] = useState(opcionURL);
   const [mostrarDetalle, setMostrarDetalle] = useState(false);
   const isMobile = useMobile();
+
+  useEffect(() => {
+    const opcionURL = searchParams.get("opcion") || "General";
+    setOpcionSeleccionada(opcionURL);
+  }, [searchParams]);
 
   const handleSeleccionarOpcion = (opcion: string) => {
     if (isMobile) {
@@ -573,7 +577,6 @@ export const Settings = () => {
 
   return (
     <>
-      <NavBar />
       <Layout>
         <Title text="AJUSTES" marginTop={50} paddingTop="0px" />
         {isMobile ? (

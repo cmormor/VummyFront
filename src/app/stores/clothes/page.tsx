@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Clothe } from "../../../types/clothe";
 import { CircularProgress, Box, Typography } from "@mui/material";
-import { NavBar } from "../../../components/NavBar";
 import { Title } from "../../../components/Title";
 import { Layout } from "../../../components/Layout";
 import { getClotheByStoreId } from "../../../api/clotheApi";
@@ -46,7 +45,6 @@ export const Clothes = () => {
 
   return (
     <>
-      <NavBar />
       <Layout arrow>
         {!loading && storeName && (
           <Title
@@ -95,6 +93,7 @@ export const Clothes = () => {
                 path={`/stores/maintenance`}
                 nombre={clothe.nombre}
                 precio={clothe.precio}
+                imagen=""
               />
             ))
           )}

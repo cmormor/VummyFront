@@ -23,6 +23,7 @@ import { Usuario } from "../types/user";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { ModalConfirmation } from "./ModalConfirmation";
+import { HomeFilled } from "@mui/icons-material";
 
 export const NavBar = () => {
   const navigate = useNavigate();
@@ -41,16 +42,17 @@ export const NavBar = () => {
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      try {
-        const data = await perfilUsuario();
-        setUsuario(data);
-      } catch (error) {
-        console.error("Error al obtener el perfil del usuario:", error);
-      }
+      if (!isDisabled)
+        try {
+          const data = await perfilUsuario();
+          setUsuario(data);
+        } catch (error) {
+          console.error("Error al obtener el perfil del usuario:", error);
+        }
     };
 
     fetchUserProfile();
-  }, []);
+  }, [isDisabled]);
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -189,6 +191,8 @@ export const NavBar = () => {
                 {usuario.nombre.toUpperCase()}
               </Box>
               <List>
+                <Divider />
+
                 <ListItem disablePadding sx={{ paddingY: 0.5 }}>
                   <ListItemButton
                     sx={{ paddingY: 1 }}
@@ -199,6 +203,29 @@ export const NavBar = () => {
                     </ListItemIcon>
                     <ListItemText
                       primary={usuario.email}
+                      primaryTypographyProps={{
+                        fontSize: "0.9rem",
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
+                      sx={{
+                        margin: 0,
+                        marginTop: 0.5,
+                        marginLeft: 0.5,
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+                <Divider />
+                <ListItem disablePadding sx={{ paddingY: 0.5 }}>
+                  <ListItemButton
+                    sx={{ paddingY: 1 }}
+                    onClick={() => navigate("/home")}
+                  >
+                    <ListItemIcon sx={{ minWidth: 32 }}>
+                      <HomeFilled />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Home"
                       primaryTypographyProps={{
                         fontSize: "0.9rem",
                         fontFamily: "'Poppins', sans-serif",

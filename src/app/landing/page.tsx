@@ -3,7 +3,6 @@ import { Box, Button, Typography, Stack } from "@mui/material";
 import logo from "/VummyLogo_Azul.png";
 import { Title } from "../../components/Title";
 import { Layout } from "../../components/Layout";
-import { NavBar } from "../../components/NavBar";
 
 export const Landing = () => {
   const navigate = useNavigate();
@@ -17,7 +16,6 @@ export const Landing = () => {
         alignItems: "center",
       }}
     >
-      <NavBar />
       <Layout color>
         <Stack
           sx={{
