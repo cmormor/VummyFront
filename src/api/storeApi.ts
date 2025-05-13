@@ -1,5 +1,6 @@
 import { API } from "./api";
 import { Store } from "../types/store";
+import { Size } from "../types/size";
 
 export const getStores = async (): Promise<Store[]> => {
   const response = await API.get<Store[]>("/stores");
@@ -58,4 +59,9 @@ export const deleteStore = async (id: number): Promise<boolean> => {
   } catch {
     return false;
   }
+};
+
+export const sizesStore = async (id: number): Promise<Size[]> => {
+  const response = await API.get<Size[]>(`stores/${id}/sizes`);
+  return response.data;
 };

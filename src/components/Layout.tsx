@@ -53,7 +53,7 @@ export const Layout = ({ children, color, arrow }: LayoutProps) => {
         >
           {arrow && (
             <IconButton
-              onClick={() => navigate("/home")}
+              onClick={() => navigate(-1)}
               sx={{
                 color: "gray",
                 "&:hover": { color: (theme) => theme.palette.text.primary },

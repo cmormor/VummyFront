@@ -90,7 +90,7 @@ export const Clothes = () => {
             clothes.map((clothe) => (
               <ClotheCard
                 key={clothe.id}
-                path={`/stores/maintenance`}
+                path={`/clothes/${clothe.id}`}
                 nombre={clothe.nombre}
                 precio={clothe.precio}
                 imagen=""

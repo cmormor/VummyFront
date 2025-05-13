@@ -8,6 +8,7 @@ import { Maintenance } from "./components/Maintenance";
 import { NotFound } from "./app/not-found";
 import { Clothes } from "./app/stores/clothes/page";
 import { Settings } from "./app/settings/page";
+import { Clothe } from "./app/stores/clothes/[id]/page";
 
 export const App = () => (
   <Router>
@@ -29,6 +30,14 @@ export const App = () => (
         element={
           <ProtectedRoute>
             <Clothes />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/clothes/:clotheId"
+        element={
+          <ProtectedRoute>
+            <Clothe />
           </ProtectedRoute>
         }
       />
