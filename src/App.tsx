@@ -42,7 +42,15 @@ export const App = () => (
         }
       />
       <Route
-        path="/stores/maintenance"
+        path="/shoppingcart"
+        element={
+          <ProtectedRoute>
+            <Maintenance />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/orders"
         element={
           <ProtectedRoute>
             <Maintenance />
@@ -54,6 +62,14 @@ export const App = () => (
         element={
           <ProtectedRoute>
             <Settings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/stores/maintenance"
+        element={
+          <ProtectedRoute>
+            <Maintenance />
           </ProtectedRoute>
         }
       />

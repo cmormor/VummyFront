@@ -10,6 +10,7 @@ import {
   ListItemButton,
   ListItemIcon,
   Divider,
+  Tooltip,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useThemeContext } from "../style/ThemeContext";
@@ -22,6 +23,8 @@ import { useState, useEffect } from "react";
 import { Usuario } from "../types/user";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import InventoryIcon from "@mui/icons-material/Inventory";
 import { ModalConfirmation } from "./ModalConfirmation";
 import { HomeFilled } from "@mui/icons-material";
 
@@ -118,19 +121,47 @@ export const NavBar = () => {
         </Box>
 
         <Stack direction="row" alignItems="center" spacing={2}>
-          <IconButton onClick={toggleTheme} color="inherit">
-            {mode === "dark" ? <BrightnessLowIcon /> : <Brightness4Icon />}
-          </IconButton>
+          <Tooltip title={mode === "dark" ? "Modo Claro" : "Modo Oscuro"}>
+            <IconButton onClick={toggleTheme} color="inherit">
+              {mode === "dark" ? (
+                <BrightnessLowIcon sx={{ fontSize: 30 }} />
+              ) : (
+                <Brightness4Icon sx={{ fontSize: 30 }} />
+              )}
+            </IconButton>
+          </Tooltip>
 
           {!isDisabled && (
             <>
-              {usuario && (
-                <>
-                  <Divider
-                    orientation="vertical"
-                    flexItem
-                    sx={{ borderColor: "divider" }}
+              <Tooltip title="Ver Carrito">
+                <IconButton onClick={() => navigate("/shoppingcart")}>
+                  <ShoppingCartIcon
+                    sx={{
+                      color: mode === "light" ? "black" : "white",
+                      fontSize: 30,
+                    }}
                   />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Mis Pedidos">
+                <IconButton onClick={() => navigate("/orders")}>
+                  <InventoryIcon
+                    sx={{
+                      color: mode === "light" ? "black" : "white",
+                      fontSize: 30,
+                    }}
+                  />
+                </IconButton>
+              </Tooltip>
+
+              <Divider
+                orientation="vertical"
+                flexItem
+                sx={{ borderColor: "divider" }}
+              />
+              {usuario ? (
+                <>
                   <Avatar
                     sx={{
                       width: 36,
@@ -142,6 +173,17 @@ export const NavBar = () => {
                   >
                     {usuario.nombre.charAt(0).toUpperCase()}
                   </Avatar>
+                </>
+              ) : (
+                <>
+                  <Avatar
+                    sx={{
+                      width: 36,
+                      height: 36,
+                      backgroundColor: (theme) => theme.palette.primary.main,
+                      cursor: "pointer",
+                    }}
+                  ></Avatar>
                 </>
               )}
             </>
