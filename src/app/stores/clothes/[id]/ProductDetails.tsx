@@ -283,29 +283,34 @@ export default function ProductDetails() {
               </TableHead>
               <TableBody>
                 {sizes.length > 0 ? (
-                  sizes.map((size) => (
-                    <TableRow key={size.id || size.nombre}>
-                      <TableCell align="center">{size.nombre}</TableCell>
-                      <TableCell align="center">
-                        {size.altura || "N/A"}
-                      </TableCell>
-                      <TableCell align="center">
-                        {size.cuelloManga || "N/A"}
-                      </TableCell>
-                      <TableCell align="center">
-                        {size.pecho || "N/A"}
-                      </TableCell>
-                      <TableCell align="center">
-                        {size.cintura || "N/A"}
-                      </TableCell>
-                      <TableCell align="center">
-                        {size.cadera || "N/A"}
-                      </TableCell>
-                      <TableCell align="center">
-                        {size.entrepierna || "N/A"}
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  sizes
+                    .sort((a, b) => {
+                      const order = ["S", "M", "L", "XL"];
+                      return order.indexOf(a.nombre) - order.indexOf(b.nombre);
+                    })
+                    .map((size) => (
+                      <TableRow key={size.id || size.nombre}>
+                        <TableCell align="center">{size.nombre}</TableCell>
+                        <TableCell align="center">
+                          {size.altura || "N/A"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {size.cuelloManga || "N/A"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {size.pecho || "N/A"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {size.cintura || "N/A"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {size.cadera || "N/A"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {size.entrepierna || "N/A"}
+                        </TableCell>
+                      </TableRow>
+                    ))
                 ) : (
                   <TableRow>
                     <TableCell colSpan={7} align="center">
