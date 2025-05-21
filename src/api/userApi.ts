@@ -7,6 +7,17 @@ export const getUsuarios = async (): Promise<Usuario[]> => {
   return response.data;
 };
 
+export const getUsuarioById = async (id: number): Promise<Usuario> => {
+  const response = await API.get<Usuario>(`/users/${id}`);
+  return response.data;
+};
+
+export const getRol = async (): Promise<string> => {
+  const user = await perfilUsuario();
+  const response = await API.get<string>(`/users/${user.id}/role`);
+  return response.data;
+};
+
 export const createUsuario = async (
   usuario: Usuario
 ): Promise<Usuario | string> => {

@@ -87,15 +87,18 @@ export const Clothes = () => {
               </Typography>
             </Box>
           ) : (
-            clothes.map((clothe) => (
-              <ClotheCard
-                key={clothe.id}
-                path={`/clothes/${clothe.id}`}
-                nombre={clothe.nombre}
-                precio={clothe.precio}
-                imagen=""
-              />
-            ))
+            clothes
+              .filter((clothe) => typeof clothe.id === "number")
+              .map((clothe) => (
+                <ClotheCard
+                  key={clothe.id}
+                  id={clothe.id as number}
+                  path={`/clothes/${clothe.id}`}
+                  nombre={clothe.nombre}
+                  precio={clothe.precio}
+                  imagen={clothe.imagen ?? ""}
+                />
+              ))
           )}
         </Box>
       </Layout>
