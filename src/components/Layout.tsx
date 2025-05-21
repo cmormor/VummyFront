@@ -8,9 +8,10 @@ interface LayoutProps {
   children: ReactNode;
   color?: boolean;
   arrow?: boolean;
+  path?: string;
 }
 
-export const Layout = ({ children, color, arrow }: LayoutProps) => {
+export const Layout = ({ children, color, arrow, path }: LayoutProps) => {
   const navigate = useNavigate();
   return (
     <>
@@ -53,7 +54,13 @@ export const Layout = ({ children, color, arrow }: LayoutProps) => {
         >
           {arrow && (
             <IconButton
-              onClick={() => navigate(-1)}
+              onClick={() => {
+                if (path) {
+                  navigate(path);
+                } else {
+                  navigate(-1);
+                }
+              }}
               sx={{
                 color: "gray",
                 "&:hover": { color: (theme) => theme.palette.text.primary },
