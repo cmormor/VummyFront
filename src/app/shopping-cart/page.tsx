@@ -5,7 +5,7 @@ import { ShoppingCartList } from "./ShoppingCartList";
 export const ShoppingCart = () => {
   return (
     <Layout arrow path="/home">
-      <Title text="TU CARRITO" marginTop={0} paddingTop="0" />
+      <Title text="TU CARRITO" marginTop={20} paddingTop="0" />
       <ShoppingCartList />
     </Layout>
   );

@@ -1,225 +1,354 @@
-"use client";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  Card,
-  CardHeader,
-  CardContent,
-  CardActions,
   Typography,
   Button,
   IconButton,
   Divider,
-  Badge,
   Box,
   Paper,
   Stack,
+  Avatar,
+  LinearProgress,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-}
+import { getOrdersByUser } from "../../api/orderApi";
+import { CartItem } from "../../types/cart-item";
+import logoDiamante from "/VummyLogo_Azul_Diamante.png";
+import { Loading } from "../../components/Loading";
+import { updateOrderItemQuantity } from "../../api/order-clotheApi";
 
 export const ShoppingCartList = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: "1",
-      name: "Camiseta Premium",
-      price: 29.99,
-      quantity: 1,
-      image: "/placeholder.svg?height=80&width=80",
-    },
-    {
-      id: "2",
-      name: "Pantalones Vaqueros",
-      price: 49.99,
-      quantity: 2,
-      image: "/placeholder.svg?height=80&width=80",
-    },
-    {
-      id: "3",
-      name: "Zapatillas Deportivas",
-      price: 89.99,
-      quantity: 1,
-      image: "/placeholder.svg?height=80&width=80",
-    },
-  ]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [orderTotal, setOrderTotal] = useState(0);
+  const [updatingItemId, setUpdatingItemId] = useState<number | null>(null);
 
-  const totalPrice = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
-  );
+  useEffect(() => {
+    handleGetCartItems();
+  }, []);
 
-  const updateQuantity = (id: string, newQty: number) => {
+  const handleGetCartItems = async () => {
+    setIsLoading(true);
+    try {
+      const orders = await getOrdersByUser();
+      const cartItems: CartItem[] = [];
+      let total = 0;
+
+      orders.forEach((order) => {
+        total += order.total;
+        order.prendas.forEach((prenda) => {
+          cartItems.push({
+            id: prenda.id,
+            name: prenda.prenda.nombre,
+            image: prenda.prenda.imagen?.toString() || "",
+            price: prenda.prenda.precio,
+            tallaName: prenda.talla.nombre,
+            quantity: prenda.cantidad,
+          });
+        });
+      });
+
+      setCartItems(cartItems);
+      setOrderTotal(total);
+    } catch (error) {
+      console.error("Error al obtener los pedidos del usuario:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateQuantity = async (id: number, newQty: number) => {
     if (newQty < 1) return;
-    setCartItems((items) =>
-      items.map((item) =>
-        item.id === id ? { ...item, quantity: newQty } : item
-      )
-    );
+
+    try {
+      // Marcamos el item como actualizando
+      setUpdatingItemId(id);
+
+      await updateOrderItemQuantity(id, newQty);
+
+      setCartItems((items) =>
+        items.map((item) =>
+          item.id === id ? { ...item, quantity: newQty } : item
+        )
+      );
+
+      setOrderTotal((prevTotal) => {
+        const item = cartItems.find((item) => item.id === id);
+        if (!item) return prevTotal;
+        return prevTotal - item.price * item.quantity + item.price * newQty;
+      });
+    } catch (error) {
+      console.error("Error al actualizar la cantidad:", error);
+    } finally {
+      // Quitamos el estado de actualizando
+      setUpdatingItemId(null);
+    }
   };
 
-  const removeItem = (id: string) => {
-    setCartItems((items) => items.filter((item) => item.id !== id));
-  };
+  if (isLoading) {
+    return (
+      <Box textAlign="center" py={6}>
+        <Loading />
+        <Typography
+          mt={2}
+          sx={{
+            color: (theme) => theme.palette.text.primary,
+            fontFamily: "'Poppins', sans-serif",
+            fontSize: { xs: "0.75rem", md: "1rem" },
+          }}
+        >
+          Cargando pedidos...
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
-    <Card sx={{ maxWidth: 800, mx: "auto", width: "100%", p: 2 }}>
-      <CardHeader
-        title={
-          <Box display="flex" justifyContent="center" alignItems="center">
-            <Typography variant="h5" fontWeight="bold" textAlign="center">
-              Tu Carrito
-            </Typography>
-          </Box>
-        }
-        action={
-          <Badge
-            badgeContent={cartItems.reduce(
-              (sum, item) => sum + item.quantity,
-              0
-            )}
-            color="primary"
-            sx={{ mr: 2, "& .MuiBadge-badge": { fontSize: "0.8rem" } }}
-          >
-            <ShoppingCartIcon />
-          </Badge>
-        }
-        sx={{ pb: 2 }}
-      />
-
-      <CardContent sx={{ pt: 0 }}>
-        {cartItems.length === 0 ? (
-          <Box textAlign="center" py={4}>
-            <ShoppingCartIcon
-              sx={{ fontSize: 48, color: "text.secondary", mb: 2 }}
-            />
-            <Typography variant="h6">Tu carrito está vacío</Typography>
-            <Typography color="text.secondary">
-              Añade algunos productos para continuar con la compra
-            </Typography>
-          </Box>
-        ) : (
-          <Paper
+    <Stack sx={{ maxWidth: 800, mx: "auto", width: "100%", p: 3 }}>
+      {cartItems.length === 0 ? (
+        <Box
+          textAlign="center"
+          py={6}
+          sx={{
+            backgroundColor: (theme) => theme.palette.background.paper,
+            borderRadius: 2,
+          }}
+        >
+          <ShoppingCartIcon
             sx={{
-              maxHeight: 320,
-              overflow: "auto",
-              pr: 1,
-              px: 2,
-              py: 1,
-              "&::-webkit-scrollbar": { width: 8 },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "rgba(0,0,0,0.2)",
-                borderRadius: 4,
-              },
+              fontSize: 64,
+              color: (theme) => theme.palette.primary.main,
+              mb: 2,
+            }}
+          />
+          <Typography
+            sx={{
+              color: (theme) => theme.palette.text.primary,
+              fontFamily: "'Poppins', sans-serif",
+              fontSize: { xs: "0.75rem", md: "1rem" },
+              p: 1,
             }}
           >
-            <Stack spacing={2}>
-              {cartItems.map((item) => (
-                <Box
-                  key={item.id}
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  sx={{ py: 1 }}
-                >
-                  <Box flex={1}>
-                    <Typography fontWeight="medium">{item.name}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {item.price.toLocaleString("es-ES", {
-                        style: "currency",
-                        currency: "EUR",
-                      })}
-                    </Typography>
-                  </Box>
+            Añade algunos productos para continuar con la compra
+          </Typography>
+        </Box>
+      ) : (
+        <Paper
+          elevation={3}
+          sx={{
+            maxHeight: 350,
+            overflow: "auto",
+            p: 2,
+            mb: 2,
+            borderRadius: 3,
+            "&::-webkit-scrollbar": { width: 8 },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: (theme) => theme.palette.background.paper,
+              borderRadius: 4,
+            },
+          }}
+        >
+          <Stack spacing={2}>
+            {cartItems.map((item) => (
+              <Box
+                key={item.id}
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+                sx={{ py: 1 }}
+              >
+                <Avatar
+                  src={logoDiamante}
+                  alt="Vummy Logo"
+                  variant="rounded"
+                  sx={{ width: 64, height: 64, mr: 2 }}
+                />
 
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <IconButton
-                      size="small"
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    >
-                      <RemoveIcon fontSize="small" />
-                    </IconButton>
-                    <Typography width={32} textAlign="center">
-                      {item.quantity}
-                    </Typography>
-                    <IconButton
-                      size="small"
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    >
-                      <AddIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
+                <Box flex={1}>
+                  <Typography
+                    fontWeight="medium"
+                    sx={{
+                      color: (theme) => theme.palette.text.primary,
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: { xs: "0.75rem", md: "1rem" },
+                    }}
+                  >
+                    {item.name}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: (theme) => theme.palette.text.primary,
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: { xs: "0.75rem", md: "1rem" },
+                    }}
+                  >
+                    {item.price.toLocaleString("es-ES", {
+                      style: "currency",
+                      currency: "EUR",
+                    })}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: (theme) => theme.palette.text.secondary,
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: { xs: "0.7rem", md: "0.9rem" },
+                    }}
+                  >
+                    Talla: {item.tallaName}
+                  </Typography>
+                </Box>
 
-                  <Box textAlign="right" minWidth={110}>
-                    <Typography fontWeight="medium">
-                      {(item.price * item.quantity).toLocaleString("es-ES", {
-                        style: "currency",
-                        currency: "EUR",
-                      })}
-                    </Typography>
-                  </Box>
-
+                <Box display="flex" alignItems="center" gap={1}>
                   <IconButton
                     size="small"
-                    color="error"
-                    onClick={() => removeItem(item.id)}
-                    sx={{ ml: 1 }}
+                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
                   >
+                    <RemoveIcon fontSize="small" />
+                  </IconButton>
+
+                  <Typography
+                    width={24}
+                    textAlign="center"
+                    sx={{
+                      color: (theme) => theme.palette.text.primary,
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: { xs: "0.75rem", md: "1rem" },
+                    }}
+                  >
+                    {item.quantity}
+                  </Typography>
+                  <IconButton
+                    size="small"
+                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                  >
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+
+                <Box textAlign="right" minWidth={90}>
+                  <Typography
+                    fontWeight="medium"
+                    sx={{
+                      color: updatingItemId === item.id ? "primary.main" : "text.primary",
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: { xs: "0.75rem", md: "1rem" },
+                    }}
+                  >
+                    {(item.price * item.quantity).toLocaleString("es-ES", {
+                      style: "currency",
+                      currency: "EUR",
+                    })}
+                  </Typography>
+                  {updatingItemId === item.id}
+                </Box>
+
+                <Box ml={2}>
+                  <IconButton size="small" color="error">
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </Box>
-              ))}
-            </Stack>
-          </Paper>
-        )}
-      </CardContent>
+              </Box>
+            ))}
+          </Stack>
+        </Paper>
+      )}
 
       {cartItems.length > 0 && (
         <>
-          <Divider />
-          <CardContent>
-            <Stack spacing={1}>
-              <Box display="flex" justifyContent="space-between">
-                <Typography color="text.secondary">Subtotal</Typography>
-                <Typography>
-                  {totalPrice.toLocaleString("es-ES", {
-                    style: "currency",
-                    currency: "EUR",
-                  })}
-                </Typography>
-              </Box>
-              <Box display="flex" justifyContent="space-between">
-                <Typography color="text.secondary">Envío</Typography>
-                <Typography>Gratis</Typography>
-              </Box>
-              <Box display="flex" justifyContent="space-between" mt={1}>
-                <Typography variant="h6">Total</Typography>
-                <Typography variant="h6">
-                  {totalPrice.toLocaleString("es-ES", {
-                    style: "currency",
-                    currency: "EUR",
-                  })}
-                </Typography>
-              </Box>
-            </Stack>
-          </CardContent>
-
-          <CardActions sx={{ px: 2, pt: 0 }}>
-            <Button variant="contained" color="primary" fullWidth size="large">
-              Proceder al pago
-            </Button>
-          </CardActions>
+          <Divider sx={{ my: 2 }} />
+          <Stack spacing={1} mb={2}>
+            <Box display="flex" justifyContent="space-between">
+              <Typography
+                sx={{
+                  color: (theme) => theme.palette.text.primary,
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: { xs: "0.75rem", md: "1rem" },
+                }}
+              >
+                Subtotal
+              </Typography>
+              <Typography
+                sx={{
+                  color: (theme) => theme.palette.text.primary,
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: { xs: "0.75rem", md: "1rem" },
+                }}
+              >
+                {orderTotal.toLocaleString("es-ES", {
+                  style: "currency",
+                  currency: "EUR",
+                })}
+              </Typography>
+            </Box>
+            <Box display="flex" justifyContent="space-between">
+              <Typography
+                sx={{
+                  color: (theme) => theme.palette.text.primary,
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: { xs: "0.75rem", md: "1rem" },
+                }}
+              >
+                Envío
+              </Typography>
+              <Typography
+                sx={{
+                  color: (theme) => theme.palette.text.primary,
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: { xs: "0.75rem", md: "1rem" },
+                }}
+              >
+                Gratis
+              </Typography>
+            </Box>
+            <Box display="flex" justifyContent="space-between" mt={1}>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: (theme) => theme.palette.text.primary,
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: { xs: "0.75rem", md: "1rem" },
+                }}
+              >
+                Total
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: updatingItemId !== null ? "primary.main" : "text.primary",
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: { xs: "0.75rem", md: "1rem" },
+                }}
+              >
+                {orderTotal.toLocaleString("es-ES", {
+                  style: "currency",
+                  currency: "EUR",
+                })}
+              </Typography>
+            </Box>
+          </Stack>
+          {updatingItemId !== null && (
+            <LinearProgress
+              sx={{
+                mb: 2,
+              }}
+            />
+          )}
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            size="large"
+            sx={{ borderRadius: 2, py: 1.5, fontWeight: "bold" }}
+          >
+            REALIZAR PEDIDO
+          </Button>
         </>
       )}
-    </Card>
+    </Stack>
   );
 };
