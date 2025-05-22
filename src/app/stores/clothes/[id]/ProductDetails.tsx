@@ -22,18 +22,22 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import StraightenIcon from "@mui/icons-material/Straighten";
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import { useParams } from "react-router-dom";
 import { getClotheById } from "../../../../api/clotheApi";
 import { Clothe } from "../../../../types/clothe";
 import { Size } from "../../../../types/size";
 import { sizesStore } from "../../../../api/storeApi";
 import { Loading } from "../../../../components/Loading";
+import { postItemToCart } from "../../../../api/cart-items";
 
 export default function ProductDetails() {
   const { clotheId } = useParams();
   const [clothe, setClothe] = useState<Clothe | null>(null);
   const [sizes, setSizes] = useState<Size[]>([]);
   const [size, setSize] = useState("M");
+  const [cantidad, setCantidad] = useState(1);
   const [stock, setStock] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -56,19 +60,39 @@ export default function ProductDetails() {
             }
           }
         })
-        .catch(() => {})
+        .catch(() => { })
         .finally(() => {
           isSetLoading(false);
         });
     }
   }, [clothe?.stock, clotheId]);
 
-  const handleAddToCart = () => {
-    setIsAdding(true);
-    setTimeout(() => {
+  const handleAddToCart = async () => {
+    if (!clothe) return;
+
+    const selectedSize = sizes.find((s) => s.nombre === size);
+    if (!selectedSize) return;
+
+    const itemToPost = {
+      prenda: {
+        id: clothe.id!,
+      },
+      talla: {
+        id: selectedSize.id!,
+      },
+      cantidad: cantidad,
+    };
+
+    try {
+      setIsAdding(true);
+      await postItemToCart(itemToPost);
+    } catch (error) {
+      console.error("Error al añadir al carrito:", error);
+    } finally {
       setIsAdding(false);
-    }, 1000);
+    }
   };
+
 
   return isLoading ? (
     <Box height="60vh">
@@ -87,11 +111,22 @@ export default function ProductDetails() {
         sx={{
           fontFamily: "'Lexend Zetta', sans-serif",
           fontSize: { xs: "1.1rem", md: "2rem" },
-          mb: 5,
+          mb: 2,
           textTransform: "uppercase",
         }}
       >
         {clothe?.nombre}
+      </Typography>
+
+      <Typography
+        color="text.secondary"
+        sx={{
+          fontFamily: "'Poppins', sans-serif",
+          fontSize: { xs: "0.95rem", md: "1rem" },
+          mb: 5,
+        }}
+      >
+        {clothe?.descripcion || `No disponible.`}
       </Typography>
 
       <Typography
@@ -100,34 +135,13 @@ export default function ProductDetails() {
         sx={{
           fontFamily: "'Poppins', sans-serif",
           fontSize: { xs: "1rem", md: "1.75rem" },
-          mb: 5,
+          mb: 3,
         }}
       >
         {clothe?.precio} €
       </Typography>
 
-      <Box mb={4}>
-        <Typography
-          variant="h6"
-          sx={{
-            fontFamily: "'Poppins', sans-serif",
-            fontSize: { xs: "1rem", md: "1.5rem" },
-          }}
-        >
-          Descripción
-        </Typography>
-        <Typography
-          color="text.secondary"
-          sx={{
-            fontFamily: "'Poppins', sans-serif",
-            fontSize: { xs: "0.95rem", md: "1rem" },
-          }}
-        >
-          {clothe?.descripcion || `No disponible.`}
-        </Typography>
-      </Box>
-
-      <Box mb={4}>
+      <Box mb={3}>
         <Box
           display="flex"
           justifyContent="space-between"
@@ -179,22 +193,55 @@ export default function ProductDetails() {
             onChange={(e) => setSize(e.target.value)}
             sx={{ flexWrap: "wrap", gap: 2 }}
           >
-            {["S", "M", "L", "XL"].map((option) => (
-              <FormControlLabel
-                key={option}
-                value={option}
-                control={<Radio />}
-                label={option}
-                sx={{
-                  "& .MuiFormControlLabel-label": {
-                    fontSize: "20px",
-                  },
-                }}
-              />
-            ))}
+            {["S", "M", "L", "XL"].map((option) => {
+              const tallaDisponible = sizes.find((s) => s.nombre === option);
+              return (
+                <FormControlLabel
+                  key={option}
+                  value={option}
+                  control={<Radio disabled={!tallaDisponible} />}
+                  label={option}
+                  sx={{
+                    "& .MuiFormControlLabel-label": {
+                      fontSize: "20px",
+                      color: (theme) =>
+                        tallaDisponible
+                          ? theme.palette.text.primary
+                          : theme.palette.text.disabled,
+                    },
+                  }}
+                />
+              );
+            })}
           </RadioGroup>
         </FormControl>
       </Box>
+
+      <Box display="flex" alignItems="center" mb={5}>
+        <Typography
+          variant="h6"
+          sx={{
+            fontFamily: "'Poppins', sans-serif",
+            fontSize: { xs: "1rem", md: "1.5rem" },
+          }}
+        >
+          Cantidad
+        </Typography>
+        <Button
+          onClick={() => setCantidad((prev) => Math.max(1, prev - 1))}
+          sx={{ color: (theme) => theme.palette.text.primary }}
+        >
+          <RemoveIcon />
+        </Button>
+        <Typography variant="h6">{cantidad}</Typography>
+        <Button
+          onClick={() => setCantidad((prev) => prev + 1)}
+          sx={{ color: (theme) => theme.palette.text.primary }}
+        >
+          <AddIcon />
+        </Button>
+      </Box>
+
 
       <Box mb={4}>
         {stock ? (

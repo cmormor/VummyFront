@@ -1,8 +1,7 @@
+import { Clothe } from "./clothe";
+
 export interface CartItem {
-    id: number;
-    name: string;
-    price: number;
-    quantity: number;
-    tallaName: string;
-    image: string;
+    id?: number;
+    prenda: Clothe;
+    cantidad: number;
 }

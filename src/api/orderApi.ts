@@ -10,5 +10,3 @@ export const postOrder = async (order: Order) => {
   const response = await API.post<Order>("/orders", order);
   return response.data;
 }
-
-// TODO: MANDAR LAS PRENDAS AL CARRITO DESDE LA SELCCION DE PRENDAS
