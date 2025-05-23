@@ -22,8 +22,8 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import StraightenIcon from "@mui/icons-material/Straighten";
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 import { useParams } from "react-router-dom";
 import { getClotheById } from "../../../../api/clotheApi";
 import { Clothe } from "../../../../types/clothe";
@@ -60,7 +60,7 @@ export default function ProductDetails() {
             }
           }
         })
-        .catch(() => { })
+        .catch(() => {})
         .finally(() => {
           isSetLoading(false);
         });
@@ -92,7 +92,6 @@ export default function ProductDetails() {
       setIsAdding(false);
     }
   };
-
 
   return isLoading ? (
     <Box height="60vh">
@@ -241,7 +240,6 @@ export default function ProductDetails() {
           <AddIcon />
         </Button>
       </Box>
-
 
       <Box mb={4}>
         {stock ? (
