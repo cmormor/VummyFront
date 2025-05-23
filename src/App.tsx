@@ -10,6 +10,7 @@ import { Clothes } from "./app/stores/clothes/page";
 import { Settings } from "./app/settings/page";
 import { Clothe } from "./app/stores/clothes/[id]/page";
 import { ShoppingCart } from "./app/shopping-cart/page";
+import { Orders } from "./app/orders/page";
 
 export const App = () => (
   <Router>
@@ -54,7 +55,7 @@ export const App = () => (
         path="/orders"
         element={
           <ProtectedRoute>
-            <Maintenance />
+            <Orders />
           </ProtectedRoute>
         }
       />

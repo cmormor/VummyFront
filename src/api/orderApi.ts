@@ -1,4 +1,4 @@
-import { Order } from "../types/order";
+import { Order, PostOrder } from "../types/order";
 import { API } from "./api";
 
 export const getOrdersByUser = async () => {
@@ -6,7 +6,7 @@ export const getOrdersByUser = async () => {
   return response.data;
 };
 
-export const postOrder = async (order: Order) => {
-  const response = await API.post<Order>("/orders", order);
+export const postOrder = async (order: PostOrder) => {
+  const response = await API.post<PostOrder>("/orders", order);
   return response.data;
 }

@@ -9,21 +9,70 @@ import {
   Stack,
   Avatar,
   LinearProgress,
+  CircularProgress,
+  Skeleton,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { ApiCartItem, CartItem } from "../../types/cart-item";
-import { Loading } from "../../components/Loading";
-import { getCartItems, putQuantity } from "../../api/cart-items";
+import { deleteCart, deleteCartPorId, getCartItems, putQuantity } from "../../api/cart-items";
 import logoDiamante from "/VummyLogo_Azul_Diamante.png";
+import { PostOrder } from "../../types/order";
+import { postOrder } from "../../api/orderApi";
+
+const CartItemSkeleton = () => (
+  <Box sx={{ py: 1 }}>
+    <Box display="flex" alignItems="center" justifyContent="space-between">
+      <Skeleton variant="rounded" width={64} height={64} sx={{ mr: 2 }} />
+
+      <Box flex={1}>
+        <Skeleton variant="text" width="60%" height={24} sx={{ mb: 0.5 }} />
+        <Skeleton variant="text" width="40%" height={20} sx={{ mb: 0.5 }} />
+        <Skeleton variant="text" width="30%" height={18} />
+      </Box>
+
+      <Box display="flex" alignItems="center" gap={1} sx={{ mx: 2 }}>
+        <Skeleton variant="circular" width={32} height={32} />
+        <Skeleton variant="text" width={24} height={20} />
+        <Skeleton variant="circular" width={32} height={32} />
+      </Box>
+
+      <Box textAlign="right" minWidth={90}>
+        <Skeleton variant="text" width="100%" height={24} />
+      </Box>
+
+      <Box ml={2}>
+        <Skeleton variant="circular" width={32} height={32} />
+      </Box>
+    </Box>
+  </Box>
+);
+
+const CartSummarySkeleton = () => (
+  <>
+    <Divider sx={{ my: 2 }} />
+    <Stack spacing={2} mb={2}>
+      <Box display="flex" justifyContent="space-between">
+        <Skeleton variant="text" width={60} height={20} />
+        <Skeleton variant="text" width={50} height={20} />
+      </Box>
+      <Box display="flex" justifyContent="space-between" mt={1}>
+        <Skeleton variant="text" width={80} height={28} />
+        <Skeleton variant="text" width={100} height={28} />
+      </Box>
+    </Stack>
+    <Skeleton variant="rounded" width="100%" height={56} />
+  </>
+);
 
 export const ShoppingCartList = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [orderTotal, setOrderTotal] = useState(0);
   const [updatingItemId, setUpdatingItemId] = useState<number | null>(null);
+  const [isPostingOrder, setIsPostingOrder] = useState(false);
 
   useEffect(() => {
     handleGetCartItems();
@@ -50,8 +99,6 @@ export const ShoppingCartList = () => {
         return sum + precio * cantidad;
       }, 0);
 
-      console.log(mappedItems);
-
       setOrderTotal(total);
     } catch (error) {
       console.error("Error al obtener el carrito:", error);
@@ -60,7 +107,29 @@ export const ShoppingCartList = () => {
     }
   };
 
-  const updateQuantity = async (id: number, newQty: number) => {
+  const handlePostItems = async () => {
+    setIsPostingOrder(true);
+    const itemsToPost: PostOrder = {
+      prendas: cartItems
+        .filter(item => item.prenda.id !== undefined && item.prenda.tallaId !== undefined)
+        .map(item => ({
+          prenda: { id: item.prenda.id as number },
+          talla: { id: item.prenda.tallaId as number },
+          cantidad: item.cantidad,
+        })),
+    };
+
+    try {
+      await postOrder(itemsToPost);
+      await handleClearCart();
+    } catch (error) {
+      console.error("Error al realizar el pedido:", error);
+    } finally {
+      setIsPostingOrder(false);
+    }
+  };
+
+  const handleUpdateQuantity = async (id: number, newQty: number) => {
     if (newQty < 1) return;
 
     try {
@@ -87,25 +156,48 @@ export const ShoppingCartList = () => {
     }
   };
 
-  // const clearCart = async () => {
-  //   deleteCart();
-  // };
+  const handleClearCart = async () => {
+    await deleteCart();
+    await handleGetCartItems();
+  };
 
+  const handleDeleteItem = async (id: number) => {
+    try {
+      setUpdatingItemId(id);
+      await deleteCartPorId(id);
+      await handleGetCartItems();
+    } catch (error) {
+      console.error("Error al eliminar el item:", error);
+    } finally {
+      setUpdatingItemId(null);
+    }
+  };
+
+  // Skeleton loading state
   if (isLoading) {
     return (
-      <Box textAlign="center" py={6}>
-        <Loading />
-        <Typography
-          mt={2}
+      <Stack sx={{ maxWidth: 800, mx: "auto", width: "100%", p: 3 }}>
+        <Paper
+          elevation={3}
           sx={{
-            color: (theme) => theme.palette.text.primary,
-            fontFamily: "'Poppins', sans-serif",
-            fontSize: { xs: "0.75rem", md: "1rem" },
+            maxHeight: 350,
+            overflow: "auto",
+            p: 2,
+            mb: 2,
+            borderRadius: 3,
           }}
         >
-          Cargando carrito...
-        </Typography>
-      </Box>
+          <Stack spacing={2}>
+            {/* Renderizar 3 skeletons de items */}
+            {Array.from({ length: 3 }).map((_, index) => (
+              <CartItemSkeleton key={index} />
+            ))}
+          </Stack>
+        </Paper>
+
+        {/* Skeleton del resumen */}
+        <CartSummarySkeleton />
+      </Stack>
     );
   }
 
@@ -212,8 +304,8 @@ export const ShoppingCartList = () => {
                     <Box display="flex" alignItems="center" gap={1}>
                       <IconButton
                         size="small"
-                        onClick={() => updateQuantity(item.id!, cantidad - 1)}
-                        disabled={updatingItemId === item.id}
+                        onClick={() => handleUpdateQuantity(item.id!, cantidad - 1)}
+                        disabled={updatingItemId === item.id || isPostingOrder}
                       >
                         <RemoveIcon fontSize="small" />
                       </IconButton>
@@ -231,8 +323,8 @@ export const ShoppingCartList = () => {
                       </Typography>
                       <IconButton
                         size="small"
-                        onClick={() => updateQuantity(item.id!, cantidad + 1)}
-                        disabled={updatingItemId === item.id}
+                        onClick={() => handleUpdateQuantity(item.id!, cantidad + 1)}
+                        disabled={updatingItemId === item.id || isPostingOrder}
                       >
                         <AddIcon fontSize="small" />
                       </IconButton>
@@ -261,7 +353,8 @@ export const ShoppingCartList = () => {
                       <IconButton
                         size="small"
                         color="error"
-                        disabled={updatingItemId === item.id}
+                        disabled={updatingItemId === item.id || isPostingOrder}
+                        onClick={() => handleDeleteItem(item.id!)}
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
@@ -276,7 +369,7 @@ export const ShoppingCartList = () => {
 
       {cartItems.length > 0 && (
         <>
-          {updatingItemId != null && <LinearProgress sx={{ mt: 1 }} />}
+          {(updatingItemId != null) && <LinearProgress sx={{ mt: 1 }} />}
           <Divider sx={{ my: 2 }} />
           <Stack spacing={2} mb={2}>
             <Box display="flex" justifyContent="space-between">
@@ -324,12 +417,27 @@ export const ShoppingCartList = () => {
             </Box>
           </Stack>
           <Button
+            disabled={isPostingOrder}
             variant="contained"
             color="primary"
+            size="large"
             fullWidth
-            // onClick={() => clearCart()}
+            onClick={handlePostItems}
+            sx={{
+              fontFamily: "'Poppins', sans-serif",
+              fontWeight: "bold",
+              py: 1.5,
+              fontSize: { xs: "0.875rem", md: "1rem" },
+            }}
           >
-            Finalizar compra
+            {isPostingOrder ? (
+              <Box display="flex" alignItems="center" gap={1} justifyContent="center" width="100%">
+                <CircularProgress size={20} color="inherit" />
+                Realizando compra...
+              </Box>
+            ) : (
+              "Realizar compra"
+            )}
           </Button>
         </>
       )}

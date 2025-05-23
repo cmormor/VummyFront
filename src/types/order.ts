@@ -11,3 +11,12 @@ export interface Order {
     total: number;
     prendas: OrderClothe[];
 }
+
+export interface PostOrder {
+    prendas: {
+        prenda: { id: number };
+        talla: { id: number };
+        cantidad: number;
+        tienda?: { id: number };
+    }[];
+}

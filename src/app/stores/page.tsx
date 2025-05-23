@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getStores } from "../../api/storeApi";
 import { Store as StoreType } from "../../types/store";
-import { Stack, CircularProgress, Box } from "@mui/material";
+import { Stack, Box, Skeleton } from "@mui/material";
 import { StoreCard } from "./StoreCard";
 import { Title } from "../../components/Title";
 import { Layout } from "../../components/Layout";
@@ -19,6 +19,52 @@ export const Stores = () => {
     };
     fetchStores();
   }, []);
+
+  const StoreSkeleton = () => (
+    <StoreCard path="#">
+      <Box>
+        <Box sx={{ marginTop: 2, paddingTop: '20px' }}>
+          <Skeleton
+            variant="text"
+            height={40}
+            width="70%"
+            sx={{
+              backgroundColor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(255, 255, 255, 0.1)"
+                  : "rgba(0, 0, 0, 0.05)",
+              fontSize: '1.8rem'
+            }}
+          />
+        </Box>
+        <Box sx={{ marginTop: 2 }}>
+          <Skeleton
+            variant="text"
+            height={24}
+            width="90%"
+            sx={{
+              backgroundColor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(255, 255, 255, 0.1)"
+                  : "rgba(0, 0, 0, 0.05)",
+              marginBottom: 1
+            }}
+          />
+          <Skeleton
+            variant="text"
+            height={24}
+            width="75%"
+            sx={{
+              backgroundColor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(255, 255, 255, 0.1)"
+                  : "rgba(0, 0, 0, 0.05)",
+            }}
+          />
+        </Box>
+      </Box>
+    </StoreCard>
+  );
 
   return (
     <>
@@ -38,15 +84,11 @@ export const Stores = () => {
           }}
         >
           {loading ? (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                width: "100%",
-              }}
-            >
-              <CircularProgress />
-            </Box>
+            <>
+              <StoreSkeleton />
+              <StoreSkeleton />
+              <StoreSkeleton />
+            </>
           ) : (
             stores.map((store) => (
               <StoreCard key={store.id} path={`/stores/${store.id}/clothes`}>

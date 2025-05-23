@@ -11,6 +11,7 @@ import {
   ListItemIcon,
   Divider,
   Tooltip,
+  Badge,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useThemeContext } from "../style/ThemeContext";
@@ -25,18 +26,26 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import InventoryIcon from "@mui/icons-material/Inventory";
+import InfoIcon from '@mui/icons-material/Info';
+import StoreIcon from '@mui/icons-material/Store';
 import { ModalConfirmation } from "./ModalConfirmation";
 import { HomeFilled } from "@mui/icons-material";
+import { getCartItems } from "../api/cart-items";
 
-export const NavBar = () => {
+interface NavBarProps {
+  recarga?: boolean;
+}
+
+export const NavBar = (recarga: NavBarProps) => {
+
   const navigate = useNavigate();
   const location = useLocation();
   const { toggleTheme, mode } = useThemeContext();
-
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openModal, setOpenModal] = useState(false);
   const [mensaje, setMensaje] = useState("");
+  const [cartItemCount, setCartItemCount] = useState(0);
 
   const isDisabled =
     location.pathname === "/register" ||
@@ -45,17 +54,30 @@ export const NavBar = () => {
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      if (!isDisabled)
+      if (!isDisabled) {
         try {
           const data = await perfilUsuario();
           setUsuario(data);
         } catch (error) {
           console.error("Error al obtener el perfil del usuario:", error);
         }
+      }
+    };
+
+    const fetchCart = async () => {
+      if (!isDisabled) {
+        try {
+          const cartData = await getCartItems();
+          setCartItemCount(cartData.length);
+        } catch (error) {
+          console.error("Error al obtener el carrito:", error);
+        }
+      }
     };
 
     fetchUserProfile();
-  }, [isDisabled]);
+    fetchCart();
+  }, [isDisabled, recarga]);
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -65,8 +87,6 @@ export const NavBar = () => {
     setAnchorEl(null);
   };
 
-  const open = Boolean(anchorEl);
-
   const handleLogout = async () => {
     try {
       await logoutUsuario();
@@ -75,6 +95,8 @@ export const NavBar = () => {
       console.error("Error al cerrar sesión:", error);
     }
   };
+
+  const open = Boolean(anchorEl);
 
   return (
     <Stack
@@ -88,7 +110,6 @@ export const NavBar = () => {
           theme.palette.mode === "dark"
             ? "rgba(26, 26, 26, 0.75)"
             : "rgba(255, 255, 255, 0.75)",
-
         color: (theme) => theme.palette.text.primary,
         paddingY: 1,
         paddingX: 3,
@@ -109,13 +130,9 @@ export const NavBar = () => {
           <img
             src={logoDiamante}
             alt="Logo"
-            style={{ height: 60, objectFit: "contain", cursor: "pointer" }}
+            style={{ height: 60, cursor: "pointer" }}
             onClick={() => {
-              if (isDisabled) {
-                navigate("/");
-              } else {
-                navigate("/home");
-              }
+              navigate(isDisabled ? "/" : "/home");
             }}
           />
         </Box>
@@ -133,14 +150,46 @@ export const NavBar = () => {
 
           {!isDisabled && (
             <>
-              <Tooltip title="Ver Carrito">
-                <IconButton onClick={() => navigate("/shoppingcart")}>
-                  <ShoppingCartIcon
+              <Tooltip title="Tiendas">
+                <IconButton onClick={() => navigate("/home")}>
+                  <StoreIcon
                     sx={{
-                      color: mode === "light" ? "black" : "white",
                       fontSize: 30,
+                      color: (theme) =>
+                        location.pathname === "/home"
+                          ? theme.palette.primary.main
+                          : "none",
+                      borderBottom: (theme) =>
+                        location.pathname === "/home"
+                          ? `2px solid ${theme.palette.primary.main}`
+                          : "none",
                     }}
                   />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Ver Carrito">
+                <IconButton onClick={() => navigate("/shoppingcart")}>
+                  <Badge
+                    badgeContent={cartItemCount > 0 ? <InfoIcon sx={{ fontSize: 12 }} /> : null}
+                    color="error"
+                    overlap="circular"
+                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                  >
+                    <ShoppingCartIcon
+                      sx={{
+                        fontSize: 30,
+                        color: (theme) =>
+                          location.pathname === "/shoppingcart"
+                            ? theme.palette.primary.main
+                            : "none",
+                        borderBottom: (theme) =>
+                          location.pathname === "/shoppingcart"
+                            ? `2px solid ${theme.palette.primary.main}`
+                            : "none",
+                      }}
+                    />
+                  </Badge>
                 </IconButton>
               </Tooltip>
 
@@ -148,8 +197,15 @@ export const NavBar = () => {
                 <IconButton onClick={() => navigate("/orders")}>
                   <InventoryIcon
                     sx={{
-                      color: mode === "light" ? "black" : "white",
                       fontSize: 30,
+                      color: (theme) =>
+                        location.pathname === "/orders"
+                          ? theme.palette.primary.main
+                          : "none",
+                      borderBottom: (theme) =>
+                        location.pathname === "/orders"
+                          ? `2px solid ${theme.palette.primary.main}`
+                          : "none",
                     }}
                   />
                 </IconButton>
@@ -160,32 +216,18 @@ export const NavBar = () => {
                 flexItem
                 sx={{ borderColor: "divider" }}
               />
-              {usuario ? (
-                <>
-                  <Avatar
-                    sx={{
-                      width: 36,
-                      height: 36,
-                      backgroundColor: (theme) => theme.palette.primary.main,
-                      cursor: "pointer",
-                    }}
-                    onClick={handleAvatarClick}
-                  >
-                    {usuario.nombre.charAt(0).toUpperCase()}
-                  </Avatar>
-                </>
-              ) : (
-                <>
-                  <Avatar
-                    sx={{
-                      width: 36,
-                      height: 36,
-                      backgroundColor: (theme) => theme.palette.primary.main,
-                      cursor: "pointer",
-                    }}
-                  ></Avatar>
-                </>
-              )}
+
+              <Avatar
+                sx={{
+                  width: 36,
+                  height: 36,
+                  backgroundColor: (theme) => theme.palette.primary.main,
+                  cursor: "pointer",
+                }}
+                onClick={handleAvatarClick}
+              >
+                {usuario?.nombre?.charAt(0).toUpperCase() || ""}
+              </Avatar>
             </>
           )}
         </Stack>

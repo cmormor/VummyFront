@@ -5,13 +5,12 @@ import IconButton from "@mui/material/IconButton";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import { useNavigate } from "react-router-dom";
 import { Details } from "../../../components/Details";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { useThemeContext } from "../../../style/ThemeContext";
 import {
   eliminarImagenClothe,
   subirImagenClothe,
 } from "../../../api/clotheApi";
-import { getRol } from "../../../api/userApi";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { Loading } from "../../../components/Loading";
 
@@ -21,6 +20,7 @@ interface ClotheCardProps {
   precio: number;
   path: string;
   imagen: string;
+  rol: string;
 }
 
 export const ClotheCard = ({
@@ -29,6 +29,7 @@ export const ClotheCard = ({
   path,
   id,
   imagen: imagenProp,
+  rol
 }: ClotheCardProps) => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -36,24 +37,6 @@ export const ClotheCard = ({
 
   const [imagen, setImagen] = useState(imagenProp);
   const [loading, setLoading] = useState(false);
-
-  const [rol, setRol] = useState<string | null>(null);
-  const [loadingRol, setLoadingRol] = useState(true);
-
-  useEffect(() => {
-    const fetchRol = async () => {
-      try {
-        const rolUsuario = await getRol();
-        setRol(rolUsuario);
-      } catch (error) {
-        console.error("Error al obtener el rol:", error);
-        setRol(null);
-      } finally {
-        setLoadingRol(false);
-      }
-    };
-    fetchRol();
-  }, []);
 
   const handleClick = () => {
     navigate(path);
@@ -100,27 +83,6 @@ export const ClotheCard = ({
       console.error("Error al eliminar la imagen", error);
     }
   };
-
-  if (loadingRol) {
-    return (
-      <Box
-        sx={{
-          width: {
-            xs: "100%",
-            sm: "48%",
-            md: "23%",
-          },
-          minWidth: "200px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: 200,
-        }}
-      >
-        <Loading />
-      </Box>
-    );
-  }
 
   return (
     <Box

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Typography, Paper } from "@mui/material";
-import { Loading } from "../../../../components/Loading";
+import { Box, Typography, Paper, Skeleton } from "@mui/material";
 
 export default function ProductViewer() {
   const [isLoading, setIsLoading] = useState(true);
@@ -27,8 +26,11 @@ export default function ProductViewer() {
       }}
     >
       {isLoading ? (
-        <Box textAlign="center">
-          <Loading />
+        <Box textAlign="center" width="100%" maxWidth={400}>
+          <Skeleton variant="rectangular" height={40} sx={{ mb: 2, borderRadius: 1 }} />
+          <Skeleton variant="text" sx={{ fontSize: '1.5rem', mb: 1 }} />
+          <Skeleton variant="text" sx={{ fontSize: '1rem', mb: 1 }} />
+          <Skeleton variant="text" sx={{ fontSize: '0.75rem' }} />
           <Typography
             variant="body1"
             mt={2}
@@ -58,20 +60,10 @@ export default function ProductViewer() {
           >
             Modelo 3D Blender
           </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              fontFamily: "'Poppins', sans-serif",
-            }}
-          >
+          <Typography variant="body2" sx={{ fontFamily: "'Poppins', sans-serif" }}>
             El maniquí 3D estará disponible próximamente
           </Typography>
-          <Typography
-            variant="caption"
-            sx={{
-              fontFamily: "'Poppins', sans-serif",
-            }}
-          >
+          <Typography variant="caption" sx={{ fontFamily: "'Poppins', sans-serif" }}>
             Aquí se integrará un modelo de Blender cuando esté listo
           </Typography>
         </Paper>

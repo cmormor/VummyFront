@@ -17,6 +17,7 @@ import {
   TableHead,
   TableRow,
   Box,
+  Skeleton,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -29,7 +30,6 @@ import { getClotheById } from "../../../../api/clotheApi";
 import { Clothe } from "../../../../types/clothe";
 import { Size } from "../../../../types/size";
 import { sizesStore } from "../../../../api/storeApi";
-import { Loading } from "../../../../components/Loading";
 import { postItemToCart } from "../../../../api/cart-items";
 
 export default function ProductDetails() {
@@ -41,31 +41,40 @@ export default function ProductDetails() {
   const [stock, setStock] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
-  const [isLoading, isSetLoading] = useState(false);
+  const [loadingClothe, setLoadingClothe] = useState(false);
+  const [loadingSizes, setLoadingSizes] = useState(false);
 
   useEffect(() => {
     if (clotheId) {
-      isSetLoading(true);
+      setLoadingClothe(true);
       getClotheById(Number(clotheId))
         .then((res) => {
           if (res) {
             setClothe(res);
+            setStock(res.stock !== undefined && res.stock > 0);
+
             if (res.tiendaId) {
-              sizesStore(res.tiendaId).then((sizesData) => {
-                setSizes(sizesData || []);
-              });
-            }
-            if (clothe?.stock !== undefined && clothe.stock > 0) {
-              setStock(true);
+              setLoadingSizes(true);
+              sizesStore(res.tiendaId)
+                .then((sizesData) => {
+                  setSizes(sizesData || []);
+                })
+                .catch(() => setSizes([]))
+                .finally(() => setLoadingSizes(false));
+            } else {
+              setSizes([]);
             }
           }
         })
-        .catch(() => {})
+        .catch(() => {
+          setClothe(null);
+          setSizes([]);
+        })
         .finally(() => {
-          isSetLoading(false);
+          setLoadingClothe(false);
         });
     }
-  }, [clothe?.stock, clotheId]);
+  }, [clotheId]);
 
   const handleAddToCart = async () => {
     if (!clothe) return;
@@ -86,6 +95,8 @@ export default function ProductDetails() {
     try {
       setIsAdding(true);
       await postItemToCart(itemToPost);
+      setCantidad(1);
+      window.location.reload();
     } catch (error) {
       console.error("Error al añadir al carrito:", error);
     } finally {
@@ -93,11 +104,21 @@ export default function ProductDetails() {
     }
   };
 
-  return isLoading ? (
-    <Box height="60vh">
-      <Loading />
-    </Box>
-  ) : (
+  // Mientras carga prenda o tallas, mostrar skeleton
+  if (loadingClothe || loadingSizes) {
+    return (
+      <Box px={{ xs: 2, md: 4 }}>
+        <Skeleton variant="text" width="40%" height={40} sx={{ mb: 2 }} />
+        <Skeleton variant="text" width="80%" height={30} sx={{ mb: 5 }} />
+        <Skeleton variant="rectangular" width="100%" height={200} sx={{ mb: 3 }} />
+        <Skeleton variant="text" width="20%" height={30} sx={{ mb: 1 }} />
+        <Skeleton variant="rectangular" width="100%" height={50} sx={{ mb: 5 }} />
+        <Skeleton variant="rectangular" width="100%" height={50} />
+      </Box>
+    );
+  }
+
+  return (
     <Box
       display="flex"
       flexDirection="column"
@@ -262,7 +283,7 @@ export default function ProductDetails() {
       <Box mt="auto">
         <Button
           onClick={handleAddToCart}
-          disabled={isAdding}
+          disabled={isAdding || !stock}
           fullWidth
           variant="contained"
           size="large"
@@ -328,34 +349,17 @@ export default function ProductDetails() {
               </TableHead>
               <TableBody>
                 {sizes.length > 0 ? (
-                  sizes
-                    .sort((a, b) => {
-                      const order = ["S", "M", "L", "XL"];
-                      return order.indexOf(a.nombre) - order.indexOf(b.nombre);
-                    })
-                    .map((size) => (
-                      <TableRow key={size.id || size.nombre}>
-                        <TableCell align="center">{size.nombre}</TableCell>
-                        <TableCell align="center">
-                          {size.altura || "N/A"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {size.cuelloManga || "N/A"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {size.pecho || "N/A"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {size.cintura || "N/A"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {size.cadera || "N/A"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {size.entrepierna || "N/A"}
-                        </TableCell>
-                      </TableRow>
-                    ))
+                  sizes.map((row) => (
+                    <TableRow key={row.id}>
+                      <TableCell align="center">{row.nombre}</TableCell>
+                      <TableCell align="center">{row.altura}</TableCell>
+                      <TableCell align="center">{row.cuelloManga}</TableCell>
+                      <TableCell align="center">{row.pecho}</TableCell>
+                      <TableCell align="center">{row.cintura}</TableCell>
+                      <TableCell align="center">{row.cadera}</TableCell>
+                      <TableCell align="center">{row.entrepierna}</TableCell>
+                    </TableRow>
+                  ))
                 ) : (
                   <TableRow>
                     <TableCell colSpan={7} align="center">
