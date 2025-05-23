@@ -19,8 +19,8 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { ApiCartItem, CartItem } from "../../types/cart-item";
 import { deleteCart, deleteCartPorId, getCartItems, putQuantity } from "../../api/cart-items";
 import logoDiamante from "/VummyLogo_Azul_Diamante.png";
-import { PostOrder } from "../../types/order";
 import { postOrder } from "../../api/orderApi";
+import { PostOrder } from "../../types/order";
 
 const CartItemSkeleton = () => (
   <Box sx={{ py: 1 }}>
@@ -109,18 +109,22 @@ export const ShoppingCartList = () => {
 
   const handlePostItems = async () => {
     setIsPostingOrder(true);
-    const itemsToPost: PostOrder = {
+
+    const postCartItems: PostOrder = {
       prendas: cartItems
-        .filter(item => item.prenda.id !== undefined && item.prenda.tallaId !== undefined)
+        .filter(item => item.prenda.id !== undefined && item.talla?.id !== undefined)
         .map(item => ({
-          prenda: { id: item.prenda.id as number },
-          talla: { id: item.prenda.tallaId as number },
+          prenda: { id: item.prenda.id! },
+          talla: { id: item.talla!.id! },
           cantidad: item.cantidad,
         })),
     };
 
+
+    console.log("Items a enviar:", postCartItems);
+
     try {
-      await postOrder(itemsToPost);
+      await postOrder(postCartItems);
       await handleClearCart();
     } catch (error) {
       console.error("Error al realizar el pedido:", error);

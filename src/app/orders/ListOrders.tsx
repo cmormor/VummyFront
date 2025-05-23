@@ -156,7 +156,7 @@ export const ListOrders = () => {
     <Container maxWidth="md" sx={{ mt: 5 }}>
       <Paper elevation={2} sx={{ overflow: "hidden" }}>
         <Box sx={{
-          p: 3,
+          p: 2.5,
           bgcolor: "primary.main",
           color: "primary.contrastText",
         }}>
@@ -185,7 +185,7 @@ export const ListOrders = () => {
             fontFamily: "'Poppins', sans-serif",
             fontSize: { xs: "0.75rem", md: "1rem" },
           }}>
-            {orders.length} {orders.length === 1 ? "pedido encontrado" : "pedidos encontrados"}
+            {orders.length} {orders.length === 1 ? "PEDIDO ENCONTRADO" : "PEDIDO ENCONTRADOS"}
           </Typography>
         </Box>
 

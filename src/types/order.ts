@@ -17,6 +17,5 @@ export interface PostOrder {
         prenda: { id: number };
         talla: { id: number };
         cantidad: number;
-        tienda?: { id: number };
     }[];
 }

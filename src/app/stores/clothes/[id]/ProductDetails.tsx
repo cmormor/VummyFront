@@ -29,14 +29,15 @@ import { useParams } from "react-router-dom";
 import { getClotheById } from "../../../../api/clotheApi";
 import { Clothe } from "../../../../types/clothe";
 import { Size } from "../../../../types/size";
-import { sizesStore } from "../../../../api/storeApi";
 import { postItemToCart } from "../../../../api/cart-items";
+import { getSizeClothe } from "../../../../api/size-clothe";
 
 export default function ProductDetails() {
   const { clotheId } = useParams();
   const [clothe, setClothe] = useState<Clothe | null>(null);
   const [sizes, setSizes] = useState<Size[]>([]);
-  const [size, setSize] = useState("M");
+  const [size, setSize] = useState("");
+  const [sizeAvailable, setSizeAvailable] = useState<Clothe[]>([]);
   const [cantidad, setCantidad] = useState(1);
   const [stock, setStock] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -53,17 +54,12 @@ export default function ProductDetails() {
             setClothe(res);
             setStock(res.stock !== undefined && res.stock > 0);
 
-            if (res.tiendaId) {
-              setLoadingSizes(true);
-              sizesStore(res.tiendaId)
-                .then((sizesData) => {
-                  setSizes(sizesData || []);
-                })
-                .catch(() => setSizes([]))
-                .finally(() => setLoadingSizes(false));
-            } else {
-              setSizes([]);
-            }
+            loadAvailableSizes(res.id!)
+              .then((availableSizes) => {
+                setSizeAvailable(availableSizes || []);
+              })
+              .catch(() => setSizes([]))
+              .finally(() => setLoadingSizes(false));
           }
         })
         .catch(() => {
@@ -79,7 +75,7 @@ export default function ProductDetails() {
   const handleAddToCart = async () => {
     if (!clothe) return;
 
-    const selectedSize = sizes.find((s) => s.nombre === size);
+    const selectedSize = sizeAvailable.find((s) => s.tallaNombre === size);
     if (!selectedSize) return;
 
     const itemToPost = {
@@ -87,7 +83,7 @@ export default function ProductDetails() {
         id: clothe.id!,
       },
       talla: {
-        id: selectedSize.id!,
+        id: selectedSize.tallaId!,
       },
       cantidad: cantidad,
     };
@@ -104,7 +100,17 @@ export default function ProductDetails() {
     }
   };
 
-  // Mientras carga prenda o tallas, mostrar skeleton
+  const loadAvailableSizes = async (id: number) => {
+    try {
+      const availableSizes: Clothe[] = await getSizeClothe(id);
+      console.log("Tallas disponibles:", availableSizes);
+      return availableSizes;
+    } catch (error) {
+      console.error("Error cargando tallas disponibles", error);
+      return [];
+    }
+  };
+
   if (loadingClothe || loadingSizes) {
     return (
       <Box px={{ xs: 2, md: 4 }}>
@@ -214,7 +220,7 @@ export default function ProductDetails() {
             sx={{ flexWrap: "wrap", gap: 2 }}
           >
             {["S", "M", "L", "XL"].map((option) => {
-              const tallaDisponible = sizes.find((s) => s.nombre === option);
+              const tallaDisponible = sizeAvailable.find((s) => s.tallaNombre === option);
               return (
                 <FormControlLabel
                   key={option}
