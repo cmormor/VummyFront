@@ -471,16 +471,16 @@ export const ListOrders = () => {
                         overflow: 'hidden',
                       }}
                     >
-                      <Box sx={{ flexShrink: 0 }}>
+                      <Box>
                         <Box
                           component="img"
                           src={logoDiamante}
                           alt={prenda.prenda.nombre}
                           sx={{
-                            width: { xs: 60, sm: 80 },
-                            height: { xs: 60, sm: 80 },
-                            borderRadius: 1,
-                            objectFit: 'cover',
+                            width: { xs: 75, sm: 90 },
+                            height: { xs: 75, sm: 90 },
+                            ml: -1.5,
+                            mt: 1.5
                           }}
                         />
                       </Box>
