@@ -22,7 +22,6 @@ export const Clothes = () => {
         const id = Number(storeId);
         if (isNaN(id)) throw new Error("El storeId no es válido");
 
-        // Traemos datos de ropa, tienda y rol de usuario en paralelo
         const [clothesData, storeData, rolUsuario] = await Promise.all([
           getClotheByStoreId(id),
           getStoreById(id),

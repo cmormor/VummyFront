@@ -103,7 +103,6 @@ export default function ProductDetails() {
   const loadAvailableSizes = async (id: number) => {
     try {
       const availableSizes: Clothe[] = await getSizeClothe(id);
-      console.log("Tallas disponibles:", availableSizes);
       return availableSizes;
     } catch (error) {
       console.error("Error cargando tallas disponibles", error);

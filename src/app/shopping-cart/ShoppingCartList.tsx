@@ -120,9 +120,6 @@ export const ShoppingCartList = () => {
         })),
     };
 
-
-    console.log("Items a enviar:", postCartItems);
-
     try {
       await postOrder(postCartItems);
       await handleClearCart();
@@ -177,7 +174,6 @@ export const ShoppingCartList = () => {
     }
   };
 
-  // Skeleton loading state
   if (isLoading) {
     return (
       <Stack sx={{ maxWidth: 800, mx: "auto", width: "100%", p: 3 }}>
@@ -192,14 +188,11 @@ export const ShoppingCartList = () => {
           }}
         >
           <Stack spacing={2}>
-            {/* Renderizar 3 skeletons de items */}
             {Array.from({ length: 3 }).map((_, index) => (
               <CartItemSkeleton key={index} />
             ))}
           </Stack>
         </Paper>
-
-        {/* Skeleton del resumen */}
         <CartSummarySkeleton />
       </Stack>
     );

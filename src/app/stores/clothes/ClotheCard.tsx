@@ -54,7 +54,6 @@ export const ClotheCard = ({
       try {
         setLoading(true);
         await subirImagenClothe(id, file);
-        console.log("Imagen subida correctamente");
 
         const reader = new FileReader();
         reader.onloadend = () => {
