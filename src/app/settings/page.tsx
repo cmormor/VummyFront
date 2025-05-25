@@ -21,6 +21,9 @@ import {
   Help,
   ChevronRight,
   Accessibility,
+  GroupAdd,
+  AddBusiness,
+  LocalOffer,
 } from "@mui/icons-material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { Title } from "../../components/Title";
@@ -28,8 +31,12 @@ import { Layout } from "../../components/Layout";
 import { useSearchParams } from "react-router-dom";
 import { ProfileSettings } from "./ProfileSettings";
 import { SecuritySettings } from "./SecuritySettings";
-import { SoporteSettings } from "./SoportSettings";
+import { SuportSettings } from "./SuportSettings";
 import { ManiquieViewSettings } from "./ManiquieViewSettings";
+import { getRol } from "../../api/userApi";
+import { UsersSettings } from "./UsersSettings";
+import { StoresSettings } from "./StoresSettings";
+// import { ClotheSettings } from "./ClotheSettings";
 
 const useMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -54,12 +61,21 @@ export const Settings = () => {
   const opcionURL = searchParams.get("opcion") || "Perfil";
   const [opcionSeleccionada, setOpcionSeleccionada] = useState(opcionURL);
   const [mostrarDetalle, setMostrarDetalle] = useState(false);
+  const [rol, setRol] = useState("");
   const isMobile = useMobile();
 
   useEffect(() => {
     const opcionURL = searchParams.get("opcion") || "Perfil";
     setOpcionSeleccionada(opcionURL);
   }, [searchParams]);
+
+  useEffect(() => {
+    const obtenerRol = async () => {
+      const rolObtenido = await getRol();
+      setRol(rolObtenido);
+    };
+    obtenerRol();
+  }, []);
 
   const handleSeleccionarOpcion = (opcion: string) => {
     if (isMobile) {
@@ -76,7 +92,15 @@ export const Settings = () => {
     { id: "Perfil", label: "Perfil", icon: <Person /> },
     { id: "Maniquie", label: "Maniquie", icon: <Accessibility /> },
     { id: "Seguridad", label: "Seguridad", icon: <Security /> },
-    { id: "Ayuda", label: "Ayuda", icon: <Help /> },
+    ...(rol === "ADMINISTRADOR"
+      ? [
+        { id: "Usuarios", label: "Usuarios", icon: <GroupAdd /> },
+        { id: "Tiendas", label: "Tiendas", icon: <AddBusiness /> },
+        { id: "Prendas", label: "Prendas", icon: <LocalOffer /> },
+      ]
+      : []),
+    { id: "Soporte", label: "Soporte", icon: <Help /> },
+
   ];
 
   const backToList = () => {
@@ -268,7 +292,169 @@ export const Settings = () => {
           </Box>
         );
 
-      case "Ayuda":
+      case "Usuarios":
+        return (
+          <Box
+            sx={{
+              background: (theme) => `linear-gradient(135deg, ${alpha(theme.palette.info.light, 0.05)} 0%, ${alpha(theme.palette.primary.light, 0.05)} 100%)`,
+              borderRadius: 3,
+              p: 3,
+              border: (theme) => `1px solid ${alpha(theme.palette.info.main, 0.1)}`,
+            }}
+          >
+            {isMobile ? (
+              <Box display="flex" alignItems="center" mb={3}>
+                <IconButton
+                  edge="start"
+                  onClick={backToList}
+                  sx={{
+                    mr: 2,
+                    bgcolor: (theme) => alpha(theme.palette.info.main, 0.1),
+                    color: (theme) => theme.palette.info.main,
+                    '&:hover': {
+                      bgcolor: (theme) => alpha(theme.palette.info.main, 0.2),
+                    }
+                  }}
+                >
+                  <ArrowBackIosIcon sx={{ fontSize: 20 }} />
+                </IconButton>
+                <Typography sx={{
+                  ...titleProps,
+                  color: (theme) => theme.palette.info.main,
+                }}>
+                  GESTIÓN DE USUARIOS
+                </Typography>
+              </Box>
+            ) : (
+              <Typography sx={{
+                ...titleProps,
+                color: (theme) => theme.palette.info.main,
+              }} >
+                GESTIÓN DE USUARIOS
+              </Typography>
+            )}
+
+            <Divider
+              sx={{
+                mb: 3,
+                bgcolor: (theme) => alpha(theme.palette.info.main, 0.3),
+                height: 2,
+                borderRadius: 1,
+              }}
+            />
+            <UsersSettings />
+          </Box>
+        );
+
+      case "Tiendas":
+        return (
+          <Box
+            sx={{
+              background: (theme) => `linear-gradient(135deg, ${alpha(theme.palette.info.light, 0.05)} 0%, ${alpha(theme.palette.primary.light, 0.05)} 100%)`,
+              borderRadius: 3,
+              p: 3,
+              border: (theme) => `1px solid ${alpha(theme.palette.info.main, 0.1)}`,
+            }}
+          >
+            {isMobile ? (
+              <Box display="flex" alignItems="center" mb={3}>
+                <IconButton
+                  edge="start"
+                  onClick={backToList}
+                  sx={{
+                    mr: 2,
+                    bgcolor: (theme) => alpha(theme.palette.info.main, 0.1),
+                    color: (theme) => theme.palette.info.main,
+                    '&:hover': {
+                      bgcolor: (theme) => alpha(theme.palette.info.main, 0.2),
+                    }
+                  }}
+                >
+                  <ArrowBackIosIcon sx={{ fontSize: 20 }} />
+                </IconButton>
+                <Typography sx={{
+                  ...titleProps,
+                  color: (theme) => theme.palette.info.main,
+                }}>
+                  GESTIÓN DE TIENDAS
+                </Typography>
+              </Box>
+            ) : (
+              <Typography sx={{
+                ...titleProps,
+                color: (theme) => theme.palette.info.main,
+              }} >
+                GESTIÓN DE TIENDAS
+              </Typography>
+            )}
+
+            <Divider
+              sx={{
+                mb: 3,
+                bgcolor: (theme) => alpha(theme.palette.info.main, 0.3),
+                height: 2,
+                borderRadius: 1,
+              }}
+            />
+            <StoresSettings />
+          </Box>
+        );
+
+      case "Prendas":
+        return (
+          <Box
+            sx={{
+              background: (theme) => `linear-gradient(135deg, ${alpha(theme.palette.info.light, 0.05)} 0%, ${alpha(theme.palette.primary.light, 0.05)} 100%)`,
+              borderRadius: 3,
+              p: 3,
+              border: (theme) => `1px solid ${alpha(theme.palette.info.main, 0.1)}`,
+            }}
+          >
+            {isMobile ? (
+              <Box display="flex" alignItems="center" mb={3}>
+                <IconButton
+                  edge="start"
+                  onClick={backToList}
+                  sx={{
+                    mr: 2,
+                    bgcolor: (theme) => alpha(theme.palette.info.main, 0.1),
+                    color: (theme) => theme.palette.info.main,
+                    '&:hover': {
+                      bgcolor: (theme) => alpha(theme.palette.info.main, 0.2),
+                    }
+                  }}
+                >
+                  <ArrowBackIosIcon sx={{ fontSize: 20 }} />
+                </IconButton>
+                <Typography sx={{
+                  ...titleProps,
+                  color: (theme) => theme.palette.info.main,
+                }}>
+                  GESTIÓN DE PRENDAS
+                </Typography>
+              </Box>
+            ) : (
+              <Typography sx={{
+                ...titleProps,
+                color: (theme) => theme.palette.info.main,
+              }} >
+                GESTIÓN DE PRENDAS
+              </Typography>
+            )}
+
+            <Divider
+              sx={{
+                mb: 3,
+                bgcolor: (theme) => alpha(theme.palette.info.main, 0.3),
+                height: 2,
+                borderRadius: 1,
+              }}
+            />
+            {/* <ClotheSettings /> */}
+          </Box>
+        );
+
+      case "Soporte":
         return (
           <Box
             sx={{
@@ -322,9 +508,10 @@ export const Settings = () => {
               Encuentra respuestas a tus preguntas y obtén soporte técnico especializado.
               Nuestro equipo está aquí para ayudarte en todo momento.
             </Typography>
-            <SoporteSettings />
+            <SuportSettings />
           </Box>
         );
+
       default:
         return (
           <Box

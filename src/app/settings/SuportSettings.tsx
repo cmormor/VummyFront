@@ -27,7 +27,7 @@ import {
     Help,
 } from "@mui/icons-material";
 
-export const SoporteSettings = () => {
+export const SuportSettings = () => {
 
     const faqItems = [
         {

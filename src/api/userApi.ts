@@ -103,3 +103,8 @@ export const resetPassword = async (email: string, newPassword: string): Promise
   return response.data.message;
 };
 
+export const deleteUser = async (id: number) => {
+  const response = await API.delete(`/users/${id}`)
+  return response;
+}
+
