@@ -3,7 +3,7 @@ export interface Usuario {
   nombre: string;
   email: string;
   rol?: string;
-  password: string;
+  password?: string;
   altura: number;
   cuelloManga: number;
   pecho: number;

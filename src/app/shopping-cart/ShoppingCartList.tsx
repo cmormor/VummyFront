@@ -11,6 +11,8 @@ import {
   LinearProgress,
   CircularProgress,
   Skeleton,
+  Container,
+  Alert,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -73,9 +75,15 @@ export const ShoppingCartList = () => {
   const [orderTotal, setOrderTotal] = useState(0);
   const [updatingItemId, setUpdatingItemId] = useState<number | null>(null);
   const [isPostingOrder, setIsPostingOrder] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    handleGetCartItems();
+    try {
+      handleGetCartItems();
+      setError(null);
+    } catch (error) {
+      setError("Error al cargar el carrito. Por favor, inténtalo de nuevo más tarde.");
+    }
   }, []);
 
   const handleGetCartItems = async () => {
@@ -195,6 +203,25 @@ export const ShoppingCartList = () => {
         </Paper>
         <CartSummarySkeleton />
       </Stack>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container
+        maxWidth="md"
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          px: { xs: 1, sm: 3 },
+        }}
+      >
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      </Container>
     );
   }
 

@@ -80,3 +80,15 @@ export const perfilUsuario = async () => {
   const response = await API.get<Usuario>("/users/profile");
   return response.data;
 };
+
+export const updateUsuario = async (data: Partial<Usuario>) => {
+  const response = await API.put<Usuario>('/users/profile', data);
+
+  const usuarioActualizado = response.data;
+
+  if (usuarioActualizado.token) {
+    localStorage.setItem('authToken', usuarioActualizado.token);
+  }
+
+  return usuarioActualizado;
+}

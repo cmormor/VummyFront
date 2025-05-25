@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Clothe } from "../../../types/clothe";
-import { Box, Typography, Skeleton, Card, CardContent } from "@mui/material";
+import { Box, Typography, Skeleton, Card, CardContent, Container, Alert } from "@mui/material";
 import { Title } from "../../../components/Title";
 import { Layout } from "../../../components/Layout";
 import { getClotheByStoreId } from "../../../api/clotheApi";
@@ -15,6 +15,7 @@ export const Clothes = () => {
   const [loading, setLoading] = useState(true);
   const [storeName, setStoreName] = useState("");
   const [rol, setRol] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,8 +32,9 @@ export const Clothes = () => {
         setClothes(clothesData);
         setStoreName(storeData?.nombre || "");
         setRol(rolUsuario);
+        setError(null);
       } catch (error) {
-        console.error("Error al cargar los datos:", error);
+        setError("Error al cargar las prendas. Por favor, inténtalo de nuevo más tarde.");
       } finally {
         setLoading(false);
       }
@@ -103,6 +105,25 @@ export const Clothes = () => {
       </Card>
     </Box>
   );
+
+  if (error) {
+    return (
+      <Container
+        maxWidth="md"
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          px: { xs: 1, sm: 3 },
+        }}
+      >
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      </Container>
+    );
+  }
 
   return (
     <Layout arrow>

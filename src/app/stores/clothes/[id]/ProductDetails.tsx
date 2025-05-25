@@ -18,6 +18,8 @@ import {
   TableRow,
   Box,
   Skeleton,
+  Container,
+  Alert,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -44,10 +46,12 @@ export default function ProductDetails() {
   const [openDialog, setOpenDialog] = useState(false);
   const [loadingClothe, setLoadingClothe] = useState(false);
   const [loadingSizes, setLoadingSizes] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (clotheId) {
       setLoadingClothe(true);
+      setError(null);
       getClotheById(Number(clotheId))
         .then((res) => {
           if (res) {
@@ -65,6 +69,7 @@ export default function ProductDetails() {
         .catch(() => {
           setClothe(null);
           setSizes([]);
+          setError("Error al cargar la prenda.");
         })
         .finally(() => {
           setLoadingClothe(false);
@@ -120,6 +125,25 @@ export default function ProductDetails() {
         <Skeleton variant="rectangular" width="100%" height={50} sx={{ mb: 5 }} />
         <Skeleton variant="rectangular" width="100%" height={50} />
       </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container
+        maxWidth="md"
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          px: { xs: 1, sm: 3 },
+        }}
+      >
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      </Container>
     );
   }
 

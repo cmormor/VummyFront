@@ -86,7 +86,6 @@ export const ListOrders = () => {
 
         setOrders(fetchedOrders);
       } catch (error) {
-        console.error("Error al obtener las órdenes:", error);
         setError("No se pudieron cargar los pedidos. Inténtalo de nuevo más tarde.");
       } finally {
         setLoading(false);
@@ -137,7 +136,16 @@ export const ListOrders = () => {
 
   if (error) {
     return (
-      <Container maxWidth="md" sx={{ mt: 3, px: { xs: 1, sm: 3 } }}>
+      <Container
+        maxWidth="md"
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          px: { xs: 1, sm: 3 },
+        }}
+      >
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
