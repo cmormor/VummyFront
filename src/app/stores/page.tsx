@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { getStores } from "../../api/storeApi";
 import { Store as StoreType } from "../../types/store";
-import { Stack, Box, Skeleton, Container, Alert } from "@mui/material";
+import { Stack, Box, Skeleton } from "@mui/material";
 import { StoreCard } from "./StoreCard";
 import { Title } from "../../components/Title";
 import { Layout } from "../../components/Layout";
 import { Details } from "../../components/Details";
+import ErrorModal from "../../components/ErrorModal";
 
 export const Stores = () => {
   const [stores, setStores] = useState<StoreType[]>([]);
@@ -30,20 +31,7 @@ export const Stores = () => {
 
   if (error) {
     return (
-      <Container
-        maxWidth="md"
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          px: { xs: 1, sm: 3 },
-        }}
-      >
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      </Container>
+      <ErrorModal error={error} />
     );
   }
 

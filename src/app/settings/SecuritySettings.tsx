@@ -3,7 +3,6 @@ import {
     Box,
     TextField,
     Button,
-    Container,
     Alert,
     Paper,
     Typography,
@@ -20,6 +19,7 @@ import {
 } from "@mui/icons-material";
 import { perfilUsuario, updateUsuario } from "../../api/userApi";
 import { Usuario } from "../../types/user";
+import ErrorModal from "../../components/ErrorModal";
 
 export const SecuritySettings = () => {
     const [password, setPassword] = useState("");
@@ -39,12 +39,6 @@ export const SecuritySettings = () => {
 
             if (password !== confirmPassword) {
                 setError("Las contraseñas no coinciden.");
-                setLoading(false);
-                return;
-            }
-
-            if (password === perfilActual.password) {
-                setError("La contraseña no puede ser la actual.");
                 setLoading(false);
                 return;
             }
@@ -73,8 +67,6 @@ export const SecuritySettings = () => {
             setLoading(false);
         }
     };
-
-
 
     const textFieldStyles = {
         '& .MuiOutlinedInput-root': {
@@ -107,30 +99,7 @@ export const SecuritySettings = () => {
 
     if (error) {
         return (
-            <Container
-                maxWidth="md"
-                sx={{
-                    minHeight: '50vh',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    px: { xs: 1, sm: 3 },
-                }}
-            >
-                <Fade in={!!error}>
-                    <Alert
-                        severity="error"
-                        sx={{
-                            mb: 2,
-                            borderRadius: 3,
-                            fontFamily: "'Poppins', sans-serif",
-                            fontSize: { xs: "1rem", md: "1.1rem" },
-                        }}
-                    >
-                        {error}
-                    </Alert>
-                </Fade>
-            </Container>
+            <ErrorModal error={error} />
         );
     }
 
@@ -237,7 +206,7 @@ export const SecuritySettings = () => {
                 </Box>
             </Paper>
 
-            <Box display="flex" justifyContent="flex-start" gap={2}>
+            <Box display="flex" justifyContent="center" gap={2}>
                 <Button
                     variant="contained"
                     size="large"

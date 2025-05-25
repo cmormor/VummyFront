@@ -11,6 +11,7 @@ import { Settings } from "./app/settings/page";
 import { Clothe } from "./app/stores/clothes/[id]/page";
 import { ShoppingCart } from "./app/shopping-cart/page";
 import { Orders } from "./app/orders/page";
+import { ResetPassword } from "./app/auth/login/ResetPassword";
 
 export const App = () => (
   <Router>
@@ -18,6 +19,7 @@ export const App = () => (
       <Route path="/" element={<Landing />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       <Route
         path="/home"

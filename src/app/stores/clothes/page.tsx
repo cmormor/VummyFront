@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Clothe } from "../../../types/clothe";
-import { Box, Typography, Skeleton, Card, CardContent, Container, Alert } from "@mui/material";
+import { Box, Typography, Skeleton, Card, CardContent } from "@mui/material";
 import { Title } from "../../../components/Title";
 import { Layout } from "../../../components/Layout";
 import { getClotheByStoreId } from "../../../api/clotheApi";
 import { getStoreById } from "../../../api/storeApi";
 import { ClotheCard } from "./ClotheCard";
 import { getRol } from "../../../api/userApi";
+import ErrorModal from "../../../components/ErrorModal";
 
 export const Clothes = () => {
   const { storeId } = useParams();
@@ -108,20 +109,7 @@ export const Clothes = () => {
 
   if (error) {
     return (
-      <Container
-        maxWidth="md"
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          px: { xs: 1, sm: 3 },
-        }}
-      >
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      </Container>
+      <ErrorModal error={error} />
     );
   }
 

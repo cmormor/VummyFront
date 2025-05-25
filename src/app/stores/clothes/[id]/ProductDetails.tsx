@@ -17,9 +17,7 @@ import {
   TableHead,
   TableRow,
   Box,
-  Skeleton,
-  Container,
-  Alert,
+  Skeleton
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -33,6 +31,7 @@ import { Clothe } from "../../../../types/clothe";
 import { Size } from "../../../../types/size";
 import { postItemToCart } from "../../../../api/cart-items";
 import { getSizeClothe } from "../../../../api/size-clothe";
+import ErrorModal from "../../../../components/ErrorModal";
 
 export default function ProductDetails() {
   const { clotheId } = useParams();
@@ -130,20 +129,7 @@ export default function ProductDetails() {
 
   if (error) {
     return (
-      <Container
-        maxWidth="md"
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          px: { xs: 1, sm: 3 },
-        }}
-      >
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      </Container>
+      <ErrorModal error={error} />
     );
   }
 

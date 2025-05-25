@@ -11,8 +11,6 @@ import {
   LinearProgress,
   CircularProgress,
   Skeleton,
-  Container,
-  Alert,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -23,6 +21,7 @@ import { deleteCart, deleteCartPorId, getCartItems, putQuantity } from "../../ap
 import logoDiamante from "/VummyLogo_Azul_Diamante.png";
 import { postOrder } from "../../api/orderApi";
 import { PostOrder } from "../../types/order";
+import ErrorModal from "../../components/ErrorModal";
 
 const CartItemSkeleton = () => (
   <Box sx={{ py: 1 }}>
@@ -208,20 +207,7 @@ export const ShoppingCartList = () => {
 
   if (error) {
     return (
-      <Container
-        maxWidth="md"
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          px: { xs: 1, sm: 3 },
-        }}
-      >
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      </Container>
+      <ErrorModal error={error} />
     );
   }
 

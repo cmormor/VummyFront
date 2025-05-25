@@ -2,15 +2,12 @@ import { useEffect, useState } from "react";
 import {
     Box,
     TextField,
-    Button,
-    Container,
-    Alert,
     Paper,
     Typography,
     Divider,
     alpha,
-    Fade,
-    CircularProgress
+    Skeleton,
+    Button,
 } from "@mui/material";
 import {
     Person,
@@ -18,12 +15,11 @@ import {
     Height,
     Straighten,
     EmojiPeople,
-    Save,
-    CheckCircle,
-    Edit
+    Edit,
 } from "@mui/icons-material";
 import { perfilUsuario, updateUsuario } from "../../api/userApi";
 import { Usuario } from "../../types/user";
+import ErrorModal from "../../components/ErrorModal";
 
 export const ProfileSettings = () => {
     const [nombre, setNombre] = useState("");
@@ -35,10 +31,8 @@ export const ProfileSettings = () => {
     const [cadera, setCadera] = useState("");
     const [entrepierna, setEntrepierna] = useState("");
     const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [success, setSuccess] = useState(false);
-
-    // TODO: ADD SKELETON HERE AND IN SECURITY PAGE
 
     useEffect(() => {
         handleGetPerfil();
@@ -46,7 +40,7 @@ export const ProfileSettings = () => {
 
     const handleGetPerfil = async () => {
         try {
-
+            setLoading(true);
             const perfilActual = await perfilUsuario();
             setNombre(perfilActual.nombre || "");
             setEmail(perfilActual.email || "");
@@ -56,15 +50,13 @@ export const ProfileSettings = () => {
             setCintura(perfilActual.cintura ? perfilActual.cintura.toString() : "");
             setCadera(perfilActual.cadera ? perfilActual.cadera.toString() : "");
             setEntrepierna(perfilActual.entrepierna ? perfilActual.entrepierna.toString() : "");
-
-            setLoading(true);
             setError(null);
         } catch (error) {
             setError("Error al cargar el perfil. Por favor, inténtalo de nuevo.");
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     const handleSave = async () => {
         setLoading(true);
@@ -107,62 +99,62 @@ export const ProfileSettings = () => {
     };
 
     const textFieldStyles = {
-        '& .MuiOutlinedInput-root': {
+        "& .MuiOutlinedInput-root": {
             fontFamily: "'Poppins', sans-serif",
             fontSize: { xs: "1rem", md: "1.1rem" },
             borderRadius: 2,
             backgroundColor: "background.paper",
-            transition: 'all 0.3s ease',
-            '& fieldset': {
+            transition: "all 0.3s ease",
+            "& fieldset": {
                 borderColor: "primary.main",
                 borderWidth: 2,
             },
-            '&:hover fieldset': {
+            "&:hover fieldset": {
                 borderColor: "primary.main",
             },
-            '&.Mui-focused fieldset': {
+            "&.Mui-focused fieldset": {
                 borderColor: "primary.main",
             },
         },
-        '& .MuiInputLabel-root': {
+        "& .MuiInputLabel-root": {
             fontFamily: "'Poppins', sans-serif",
             fontSize: { xs: "1rem", md: "1.1rem" },
             fontWeight: 500,
             color: "text.secondary",
-            '&.Mui-focused': {
+            "&.Mui-focused": {
                 color: "primary.main",
             },
         },
     };
 
     if (error) {
-        return (
-            <Container
-                maxWidth="md"
-                sx={{
-                    minHeight: '50vh',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    px: { xs: 1, sm: 3 },
-                }}
-            >
-                <Fade in={!!error}>
-                    <Alert
-                        severity="error"
-                        sx={{
-                            mb: 2,
-                            borderRadius: 3,
-                            fontFamily: "'Poppins', sans-serif",
-                            fontSize: { xs: "1rem", md: "1.1rem" },
-                        }}
-                    >
-                        {error}
-                    </Alert>
-                </Fade>
-            </Container>
-        );
+        return <ErrorModal error={error} />;
     }
+
+    const renderField = (
+        label: string,
+        value: string,
+        onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+        icon: React.ReactNode,
+        type = "text"
+    ) => {
+        if (loading) {
+            return <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 2 }} />;
+        }
+        return (
+            <TextField
+                label={label}
+                fullWidth
+                value={value}
+                onChange={onChange}
+                type={type}
+                sx={textFieldStyles}
+                InputProps={{
+                    startAdornment: icon,
+                }}
+            />
+        );
+    };
 
     return (
         <Box sx={{ mt: 2, maxWidth: 800 }}>
@@ -172,7 +164,11 @@ export const ProfileSettings = () => {
                     p: 3,
                     mb: 3,
                     borderRadius: 3,
-                    background: (theme) => `linear-gradient(135deg, ${alpha(theme.palette.info.light, 0.08)} 0%, ${alpha(theme.palette.primary.light, 0.05)} 100%)`,
+                    background: (theme) =>
+                        `linear-gradient(135deg, ${alpha(theme.palette.info.light, 0.08)} 0%, ${alpha(
+                            theme.palette.primary.light,
+                            0.05
+                        )} 100%)`,
                     border: (theme) => `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
                 }}
             >
@@ -181,7 +177,7 @@ export const ProfileSettings = () => {
                         sx={{
                             mr: 2,
                             color: (theme) => theme.palette.info.main,
-                            fontSize: '1.8rem',
+                            fontSize: "1.8rem",
                         }}
                     />
                     <Typography
@@ -206,49 +202,35 @@ export const ProfileSettings = () => {
                     }}
                 />
 
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: { xs: 'column', sm: 'row' },
-                        gap: 3,
-                    }}
-                >
+                <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 3 }}>
                     <Box sx={{ flex: 1 }}>
-                        <TextField
-                            label="Nombre completo"
-                            fullWidth
-                            value={nombre}
-                            onChange={(e) => setNombre(e.target.value)}
-                            sx={textFieldStyles}
-                            InputProps={{
-                                startAdornment: (
-                                    <Person sx={{
-                                        mr: 1,
-                                        color: (theme) => alpha(theme.palette.text.secondary, 0.6),
-                                        fontSize: '1.2rem'
-                                    }} />
-                                ),
-                            }}
-                        />
+                        {renderField(
+                            "Nombre completo",
+                            nombre,
+                            (e) => setNombre(e.target.value),
+                            <Person
+                                sx={{
+                                    mr: 1,
+                                    color: (theme) => alpha(theme.palette.text.secondary, 0.6),
+                                    fontSize: "1.2rem",
+                                }}
+                            />
+                        )}
                     </Box>
                     <Box sx={{ flex: 1 }}>
-                        <TextField
-                            label="Correo electrónico"
-                            type="email"
-                            fullWidth
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            sx={textFieldStyles}
-                            InputProps={{
-                                startAdornment: (
-                                    <Email sx={{
-                                        mr: 1,
-                                        color: (theme) => alpha(theme.palette.text.secondary, 0.6),
-                                        fontSize: '1.2rem'
-                                    }} />
-                                ),
-                            }}
-                        />
+                        {renderField(
+                            "Correo electrónico",
+                            email,
+                            (e) => setEmail(e.target.value),
+                            <Email
+                                sx={{
+                                    mr: 1,
+                                    color: (theme) => alpha(theme.palette.text.secondary, 0.6),
+                                    fontSize: "1.2rem",
+                                }}
+                            />,
+                            "email"
+                        )}
                     </Box>
                 </Box>
             </Paper>
@@ -259,7 +241,11 @@ export const ProfileSettings = () => {
                     p: 3,
                     mb: 3,
                     borderRadius: 3,
-                    background: (theme) => `linear-gradient(135deg, ${alpha(theme.palette.info.light, 0.08)} 0%, ${alpha(theme.palette.primary.light, 0.05)} 100%)`,
+                    background: (theme) =>
+                        `linear-gradient(135deg, ${alpha(theme.palette.info.light, 0.08)} 0%, ${alpha(
+                            theme.palette.primary.light,
+                            0.05
+                        )} 100%)`,
                     border: (theme) => `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
                 }}
             >
@@ -268,7 +254,7 @@ export const ProfileSettings = () => {
                         sx={{
                             mr: 2,
                             color: (theme) => theme.palette.info.main,
-                            fontSize: '1.8rem',
+                            fontSize: "1.8rem",
                         }}
                     />
                     <Typography
@@ -280,7 +266,7 @@ export const ProfileSettings = () => {
                             color: (theme) => theme.palette.info.main,
                         }}
                     >
-                        Medidas Corporales
+                        Medidas corporales
                     </Typography>
                 </Box>
 
@@ -295,200 +281,122 @@ export const ProfileSettings = () => {
 
                 <Box
                     sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
+                        display: "grid",
+                        gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
                         gap: 3,
                     }}
                 >
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: { xs: 'column', sm: 'row' },
-                            gap: 3,
-                        }}
-                    >
-                        <Box sx={{ flex: 1 }}>
-                            <TextField
-                                label="Altura (cm)"
-                                type="number"
-                                fullWidth
-                                value={altura}
-                                onChange={(e) => setAltura(e.target.value)}
-                                sx={textFieldStyles}
-                                InputProps={{
-                                    startAdornment: (
-                                        <Height sx={{
-                                            mr: 1,
-                                            color: (theme) => alpha(theme.palette.text.secondary, 0.6),
-                                            fontSize: '1.2rem'
-                                        }} />
-                                    ),
-                                }}
-                            />
-                        </Box>
-                        <Box sx={{ flex: 1 }}>
-                            <TextField
-                                label="Cuello/Manga (cm)"
-                                type="number"
-                                fullWidth
-                                value={cuelloManga}
-                                onChange={(e) => setCuelloManga(e.target.value)}
-                                sx={textFieldStyles}
-                                InputProps={{
-                                    startAdornment: (
-                                        <Straighten sx={{
-                                            mr: 1,
-                                            color: (theme) => alpha(theme.palette.text.secondary, 0.6),
-                                            fontSize: '1.2rem'
-                                        }} />
-                                    ),
-                                }}
-                            />
-                        </Box>
-                        <Box sx={{ flex: 1 }}>
-                            <TextField
-                                label="Pecho (cm)"
-                                type="number"
-                                fullWidth
-                                value={pecho}
-                                onChange={(e) => setPecho(e.target.value)}
-                                sx={textFieldStyles}
-                                InputProps={{
-                                    startAdornment: (
-                                        <Straighten sx={{
-                                            mr: 1,
-                                            color: (theme) => alpha(theme.palette.text.secondary, 0.6),
-                                            fontSize: '1.2rem'
-                                        }} />
-                                    ),
-                                }}
-                            />
-                        </Box>
-                    </Box>
+                    {renderField(
+                        "Altura (cm)",
+                        altura,
+                        (e) => setAltura(e.target.value),
+                        <Height
+                            sx={{
+                                mr: 1,
+                                color: (theme) => alpha(theme.palette.text.secondary, 0.6),
+                                fontSize: "1.2rem",
+                            }}
+                        />,
+                        "number"
+                    )}
 
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: { xs: 'column', sm: 'row' },
-                            gap: 3,
-                        }}
-                    >
-                        <Box sx={{ flex: 1 }}>
-                            <TextField
-                                label="Cintura (cm)"
-                                type="number"
-                                fullWidth
-                                value={cintura}
-                                onChange={(e) => setCintura(e.target.value)}
-                                sx={textFieldStyles}
-                                InputProps={{
-                                    startAdornment: (
-                                        <Straighten sx={{
-                                            mr: 1,
-                                            color: (theme) => alpha(theme.palette.text.secondary, 0.6),
-                                            fontSize: '1.2rem'
-                                        }} />
-                                    ),
-                                }}
-                            />
-                        </Box>
-                        <Box sx={{ flex: 1 }}>
-                            <TextField
-                                label="Cadera (cm)"
-                                type="number"
-                                fullWidth
-                                value={cadera}
-                                onChange={(e) => setCadera(e.target.value)}
-                                sx={textFieldStyles}
-                                InputProps={{
-                                    startAdornment: (
-                                        <Straighten sx={{
-                                            mr: 1,
-                                            color: (theme) => alpha(theme.palette.text.secondary, 0.6),
-                                            fontSize: '1.2rem'
-                                        }} />
-                                    ),
-                                }}
-                            />
-                        </Box>
-                        <Box sx={{ flex: 1 }}>
-                            <TextField
-                                label="Entrepierna (cm)"
-                                type="number"
-                                fullWidth
-                                value={entrepierna}
-                                onChange={(e) => setEntrepierna(e.target.value)}
-                                sx={textFieldStyles}
-                                InputProps={{
-                                    startAdornment: (
-                                        <Straighten sx={{
-                                            mr: 1,
-                                            color: (theme) => alpha(theme.palette.text.secondary, 0.6),
-                                            fontSize: '1.2rem'
-                                        }} />
-                                    ),
-                                }}
-                            />
-                        </Box>
-                    </Box>
+                    {renderField(
+                        "Cuello manga (cm)",
+                        cuelloManga,
+                        (e) => setCuelloManga(e.target.value),
+                        <Straighten
+                            sx={{
+                                mr: 1,
+                                color: (theme) => alpha(theme.palette.text.secondary, 0.6),
+                                fontSize: "1.2rem",
+                            }}
+                        />,
+                        "number"
+                    )}
+
+                    {renderField(
+                        "Pecho (cm)",
+                        pecho,
+                        (e) => setPecho(e.target.value),
+                        <Straighten
+                            sx={{
+                                mr: 1,
+                                color: (theme) => alpha(theme.palette.text.secondary, 0.6),
+                                fontSize: "1.2rem",
+                            }}
+                        />,
+                        "number"
+                    )}
+
+                    {renderField(
+                        "Cintura (cm)",
+                        cintura,
+                        (e) => setCintura(e.target.value),
+                        <Straighten
+                            sx={{
+                                mr: 1,
+                                color: (theme) => alpha(theme.palette.text.secondary, 0.6),
+                                fontSize: "1.2rem",
+                            }}
+                        />,
+                        "number"
+                    )}
+
+                    {renderField(
+                        "Cadera (cm)",
+                        cadera,
+                        (e) => setCadera(e.target.value),
+                        <Straighten
+                            sx={{
+                                mr: 1,
+                                color: (theme) => alpha(theme.palette.text.secondary, 0.6),
+                                fontSize: "1.2rem",
+                            }}
+                        />,
+                        "number"
+                    )}
+
+                    {renderField(
+                        "Entrepierna (cm)",
+                        entrepierna,
+                        (e) => setEntrepierna(e.target.value),
+                        <Straighten
+                            sx={{
+                                mr: 1,
+                                color: (theme) => alpha(theme.palette.text.secondary, 0.6),
+                                fontSize: "1.2rem",
+                            }}
+                        />,
+                        "number"
+                    )}
                 </Box>
             </Paper>
 
-            <Box display="flex" justifyContent="flex-start" gap={2}>
+            <Box textAlign="center" mt={4}>
                 <Button
                     variant="contained"
+                    color="primary"
                     size="large"
                     onClick={handleSave}
                     disabled={loading}
-                    startIcon={
-                        loading ?
-                            <CircularProgress size={20} color="inherit" /> :
-                            success ? <CheckCircle /> : <Save />
-                    }
                     sx={{
                         fontFamily: "'Poppins', sans-serif",
-                        fontSize: { xs: "1rem", md: "1.1rem" },
                         fontWeight: 600,
-                        px: 4,
-                        py: 1.5,
-                        borderRadius: 3,
-                        textTransform: 'none',
-                        letterSpacing: '0.5px',
-                        background: success ?
-                            (theme) => `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)` :
-                            (theme) => `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        '&:hover': {
-                            transform: 'translateY(-2px)',
-                        },
-                        '&:active': {
-                            transform: 'translateY(0)',
-                        },
-                        '&:disabled': {
-                            background: (theme) => alpha(theme.palette.action.disabled, 0.12),
-                            color: (theme) => theme.palette.action.disabled,
-                        }
-                    }}
-                >
-                    {loading ? 'Guardando...' : success ? '¡Guardado!' : 'Guardar Cambios'}
-                </Button>
-            </Box>
-
-            <Fade in={success}>
-                <Alert
-                    severity="success"
-                    sx={{
-                        mt: 3,
-                        borderRadius: 3,
-                        fontFamily: "'Poppins', sans-serif",
                         fontSize: { xs: "1rem", md: "1.1rem" },
-                        background: (theme) => `linear-gradient(135deg, ${alpha(theme.palette.success.light, 0.1)} 0%, ${alpha(theme.palette.success.main, 0.05)} 100%)`,
-                        border: (theme) => `1px solid ${alpha(theme.palette.success.main, 0.3)}`,
+                        paddingX: 4,
+                        borderRadius: 3,
                     }}
                 >
-                    ¡Perfil actualizado correctamente!
-                </Alert>
-            </Fade>
+                    Guardar cambios
+                </Button>
+                {success && (
+                    <Typography
+                        sx={{ mt: 2, color: "success.main", fontWeight: 600, fontSize: "1rem" }}
+                    >
+                        ¡Perfil actualizado correctamente!
+                    </Typography>
+                )}
+            </Box>
         </Box>
     );
 };

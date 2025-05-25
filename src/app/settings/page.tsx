@@ -18,9 +18,9 @@ import {
 import {
   Person,
   Security,
-  Language,
   Help,
   ChevronRight,
+  Accessibility,
 } from "@mui/icons-material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { Title } from "../../components/Title";
@@ -28,6 +28,8 @@ import { Layout } from "../../components/Layout";
 import { useSearchParams } from "react-router-dom";
 import { ProfileSettings } from "./ProfileSettings";
 import { SecuritySettings } from "./SecuritySettings";
+import { SoporteSettings } from "./SoportSettings";
+import { ManiquieViewSettings } from "./ManiquieViewSettings";
 
 const useMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -72,8 +74,8 @@ export const Settings = () => {
 
   const menuOptions: { id: string; label: string; icon: React.ReactNode }[] = [
     { id: "Perfil", label: "Perfil", icon: <Person /> },
+    { id: "Maniquie", label: "Maniquie", icon: <Accessibility /> },
     { id: "Seguridad", label: "Seguridad", icon: <Security /> },
-    { id: "Idioma", label: "Idioma", icon: <Language /> },
     { id: "Ayuda", label: "Ayuda", icon: <Help /> },
   ];
 
@@ -84,7 +86,7 @@ export const Settings = () => {
   const renderContenido = () => {
     const textProps = {
       fontFamily: "'Poppins', sans-serif",
-      fontSize: { xs: "1rem", md: "1.25rem" },
+      fontSize: { xs: "1rem", md: "1.4rem" },
       color: "text.primary",
     };
 
@@ -127,7 +129,7 @@ export const Settings = () => {
                 </Typography>
               </Box>
             ) : (
-              <Typography sx={titleProps} gutterBottom>
+              <Typography sx={{ ...titleProps, color: (theme) => theme.palette.primary.main }} >
                 PERFIL DE USUARIO
               </Typography>
             )}
@@ -151,11 +153,68 @@ export const Settings = () => {
           </Box>
         );
 
+      case "Maniquie":
+        return (
+          <Box
+            sx={{
+              background: (theme) => `linear-gradient(135deg, ${alpha(theme.palette.info.light, 0.05)} 0%, ${alpha(theme.palette.info.light, 0.05)} 100%)`,
+              borderRadius: 3,
+              p: 3,
+              border: (theme) => `1px solid ${alpha(theme.palette.info.main, 0.1)}`,
+            }}
+          >
+            {isMobile ? (
+              <Box display="flex" alignItems="center" mb={3}>
+                <IconButton
+                  edge="start"
+                  onClick={backToList}
+                  sx={{
+                    mr: 2,
+                    bgcolor: (theme) => alpha(theme.palette.info.main, 0.1),
+                    color: (theme) => theme.palette.info.main,
+                    '&:hover': {
+                      bgcolor: (theme) => alpha(theme.palette.info.main, 0.2),
+                    }
+                  }}
+                >
+                  <ArrowBackIosIcon sx={{ fontSize: 20 }} />
+                </IconButton>
+                <Typography sx={{
+                  ...titleProps,
+                  color: (theme) => theme.palette.info.main,
+                }}>
+                  VISTA MANIQUÍ
+                </Typography>
+              </Box>
+            ) : (
+              <Typography sx={{
+                ...titleProps,
+                color: (theme) => theme.palette.info.main,
+              }} >
+                VISTA MANIQUÍ
+              </Typography>
+            )}
+
+            <Divider
+              sx={{
+                mb: 3,
+                bgcolor: (theme) => alpha(theme.palette.info.main, 0.3),
+                height: 2,
+                borderRadius: 1,
+              }}
+            />
+            <Typography variant="body1" sx={textProps}>
+              Visualiza tu maniquí desde todas las perspectivas.
+            </Typography>
+            <ManiquieViewSettings />
+          </Box>
+        );
+
       case "Seguridad":
         return (
           <Box
             sx={{
-              background: (theme) => `linear-gradient(135deg, ${alpha(theme.palette.error.light, 0.05)} 0%, ${alpha(theme.palette.warning.light, 0.05)} 100%)`,
+              background: (theme) => `linear-gradient(135deg, ${alpha(theme.palette.error.light, 0.05)} 0%, ${alpha(theme.palette.info.light, 0.05)} 100%)`,
               borderRadius: 3,
               p: 3,
               border: (theme) => `1px solid ${alpha(theme.palette.error.main, 0.1)}`,
@@ -188,7 +247,7 @@ export const Settings = () => {
               <Typography sx={{
                 ...titleProps,
                 color: (theme) => theme.palette.error.main,
-              }} gutterBottom>
+              }} >
                 AJUSTES DE SEGURIDAD
               </Typography>
             )}
@@ -209,71 +268,14 @@ export const Settings = () => {
           </Box>
         );
 
-      case "Idioma":
-        return (
-          <Box
-            sx={{
-              background: (theme) => `linear-gradient(135deg, ${alpha(theme.palette.success.light, 0.05)} 0%, ${alpha(theme.palette.info.light, 0.05)} 100%)`,
-              borderRadius: 3,
-              p: 3,
-              border: (theme) => `1px solid ${alpha(theme.palette.success.main, 0.1)}`,
-            }}
-          >
-            {isMobile ? (
-              <Box display="flex" alignItems="center" mb={3}>
-                <IconButton
-                  edge="start"
-                  onClick={backToList}
-                  sx={{
-                    mr: 2,
-                    bgcolor: (theme) => alpha(theme.palette.success.main, 0.1),
-                    color: (theme) => theme.palette.success.main,
-                    '&:hover': {
-                      bgcolor: (theme) => alpha(theme.palette.success.main, 0.2),
-                    }
-                  }}
-                >
-                  <ArrowBackIosIcon sx={{ fontSize: 20 }} />
-                </IconButton>
-                <Typography sx={{
-                  ...titleProps,
-                  color: (theme) => theme.palette.success.main,
-                }}>
-                  CONFIGURACIÓN DE IDIOMA
-                </Typography>
-              </Box>
-            ) : (
-              <Typography sx={{
-                ...titleProps,
-                color: (theme) => theme.palette.success.main,
-              }} gutterBottom>
-                CONFIGURACIÓN DE IDIOMA
-              </Typography>
-            )}
-
-            <Divider
-              sx={{
-                mb: 3,
-                bgcolor: (theme) => alpha(theme.palette.success.main, 0.3),
-                height: 2,
-                borderRadius: 1,
-              }}
-            />
-            <Typography variant="body1" sx={textProps}>
-              Cambia el idioma de la aplicación según tus preferencias.
-              Disponible en múltiples idiomas para una mejor experiencia de usuario.
-            </Typography>
-          </Box>
-        );
-
       case "Ayuda":
         return (
           <Box
             sx={{
-              background: (theme) => `linear-gradient(135deg, ${alpha(theme.palette.warning.light, 0.05)} 0%, ${alpha(theme.palette.primary.light, 0.05)} 100%)`,
+              background: (theme) => `linear-gradient(135deg, ${alpha(theme.palette.info.light, 0.05)} 0%, ${alpha(theme.palette.primary.light, 0.05)} 100%)`,
               borderRadius: 3,
               p: 3,
-              border: (theme) => `1px solid ${alpha(theme.palette.warning.main, 0.1)}`,
+              border: (theme) => `1px solid ${alpha(theme.palette.info.main, 0.1)}`,
             }}
           >
             {isMobile ? (
@@ -283,10 +285,10 @@ export const Settings = () => {
                   onClick={backToList}
                   sx={{
                     mr: 2,
-                    bgcolor: (theme) => alpha(theme.palette.warning.main, 0.1),
-                    color: (theme) => theme.palette.warning.main,
+                    bgcolor: (theme) => alpha(theme.palette.info.main, 0.1),
+                    color: (theme) => theme.palette.info.main,
                     '&:hover': {
-                      bgcolor: (theme) => alpha(theme.palette.warning.main, 0.2),
+                      bgcolor: (theme) => alpha(theme.palette.info.main, 0.2),
                     }
                   }}
                 >
@@ -294,7 +296,7 @@ export const Settings = () => {
                 </IconButton>
                 <Typography sx={{
                   ...titleProps,
-                  color: (theme) => theme.palette.warning.main,
+                  color: (theme) => theme.palette.info.main,
                 }}>
                   AYUDA Y SOPORTE
                 </Typography>
@@ -302,8 +304,8 @@ export const Settings = () => {
             ) : (
               <Typography sx={{
                 ...titleProps,
-                color: (theme) => theme.palette.warning.main,
-              }} gutterBottom>
+                color: (theme) => theme.palette.info.main,
+              }} >
                 AYUDA Y SOPORTE
               </Typography>
             )}
@@ -311,7 +313,7 @@ export const Settings = () => {
             <Divider
               sx={{
                 mb: 3,
-                bgcolor: (theme) => alpha(theme.palette.warning.main, 0.3),
+                bgcolor: (theme) => alpha(theme.palette.info.main, 0.3),
                 height: 2,
                 borderRadius: 1,
               }}
@@ -320,6 +322,7 @@ export const Settings = () => {
               Encuentra respuestas a tus preguntas y obtén soporte técnico especializado.
               Nuestro equipo está aquí para ayudarte en todo momento.
             </Typography>
+            <SoporteSettings />
           </Box>
         );
       default:
@@ -375,7 +378,7 @@ export const Settings = () => {
                   letterSpacing: '0.5px',
                 }}
               >
-                Menú de Opciones
+                Menú de Ajustes
               </Typography>
             </Box>
             <List sx={{
@@ -507,7 +510,7 @@ export const Settings = () => {
                 letterSpacing: '0.5px',
               }}
             >
-              Menú de Opciones
+              Menú de Ajustes
             </Typography>
           </Box>
 

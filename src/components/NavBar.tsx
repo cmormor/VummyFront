@@ -50,7 +50,8 @@ export const NavBar = (recarga: NavBarProps) => {
   const isDisabled =
     location.pathname === "/register" ||
     location.pathname === "/login" ||
-    location.pathname === "/";
+    location.pathname === "/" ||
+    location.pathname === "/reset-password";
 
   useEffect(() => {
     const fetchUserProfile = async () => {

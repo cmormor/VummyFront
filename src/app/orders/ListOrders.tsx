@@ -10,7 +10,6 @@ import {
   Box,
   Chip,
   Skeleton,
-  Alert,
   Container,
   Avatar,
   IconButton,
@@ -31,6 +30,7 @@ import {
 import { getOrdersByUser } from "../../api/orderApi";
 import { Order } from "../../types/order";
 import logoDiamante from "/VummyLogo_Azul_Diamante.png";
+import ErrorModal from "../../components/ErrorModal";
 
 const getStatusColor = (status?: string) => {
   switch (status?.toLowerCase()) {
@@ -136,20 +136,7 @@ export const ListOrders = () => {
 
   if (error) {
     return (
-      <Container
-        maxWidth="md"
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          px: { xs: 1, sm: 3 },
-        }}
-      >
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      </Container>
+      <ErrorModal error={error} />
     );
   }
 

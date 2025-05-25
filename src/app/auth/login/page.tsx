@@ -32,115 +32,128 @@ export const Login = () => {
   };
 
   return (
-    <>
-      <Layout color>
-        <Stack
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: "8px",
-            marginTop: 8,
-          }}
-        >
-          <FormCard path="/">
-            <Title
-              text="BIENVENIDO A VUMMY"
-              sizeXs="1rem"
-              sizeMd="2rem"
-              marginTop={0}
-              paddingTop="20px"
-            />
-            <form onSubmit={handleSubmit}>
-              <Box m={2}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  variant="filled"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </Box>
+    <Layout color>
+      <Stack
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: "8px",
+          marginTop: 8,
+        }}
+      >
+        <FormCard path="/">
+          <Title
+            text="BIENVENIDO A VUMMY"
+            sizeXs="1rem"
+            sizeMd="2rem"
+            marginTop={0}
+            paddingTop="20px"
+          />
+          <form onSubmit={handleSubmit}>
+            <Box m={2}>
+              <TextField
+                fullWidth
+                label="Email"
+                variant="filled"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </Box>
 
-              <Box m={2}>
-                <TextField
-                  fullWidth
-                  label="Contraseña"
-                  variant="filled"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </Box>
+            <Box m={2}>
+              <TextField
+                fullWidth
+                label="Contraseña"
+                variant="filled"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </Box>
 
-              {error && (
-                <Typography
+            {error && (
+              <Typography
+                sx={{
+                  color: "red",
+                  textAlign: "center",
+                  margin: 2,
+                  fontWeight: "bold",
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+              >
+                {error}
+              </Typography>
+            )}
+
+            <Box m={2}>
+              {isLoading ? (
+                <Box
                   sx={{
-                    color: "red",
-                    textAlign: "center",
-                    margin: 2,
-                    fontWeight: "bold",
-                    fontFamily: "'Poppins', sans-serif",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginTop: 2,
                   }}
                 >
-                  {error}
-                </Typography>
-              )}
-
-              <Box m={2}>
-                {isLoading ? (
-                  <Box
+                  <Loading />
+                </Box>
+              ) : (
+                <>
+                  <Button
+                    fullWidth
+                    type="submit"
+                    variant="contained"
+                    color="primary"
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
                       marginTop: 2,
+                      lineHeight: "1.5",
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: { xs: "0.75rem", md: "1rem" },
+                      borderRadius: "8px",
                     }}
                   >
-                    <Loading />
-                  </Box>
-                ) : (
-                  <>
-                    <Button
-                      fullWidth
-                      type="submit"
-                      variant="contained"
-                      color="primary"
-                      sx={{
-                        marginTop: 2,
-                        lineHeight: "1.5",
-                        fontFamily: "'Poppins', sans-serif",
-                        fontSize: { xs: "0.75rem", md: "1rem" },
-                        borderRadius: "8px",
-                      }}
-                    >
-                      INICIAR SESIÓN
-                    </Button>
-                    <Button
-                      onClick={() => navigate("/register")}
-                      fullWidth
-                      variant="outlined"
-                      color="primary"
-                      sx={{
-                        marginTop: 2,
-                        lineHeight: "1.5",
-                        fontFamily: "'Poppins', sans-serif",
-                        fontSize: { xs: "0.75rem", md: "1rem" },
-                        borderRadius: "8px",
-                      }}
-                    >
-                      ¿NO TIENES CUENTA? REGISTRATE
-                    </Button>
-                  </>
-                )}
-              </Box>
-            </form>
-          </FormCard>
-        </Stack>
-      </Layout>
-    </>
+                    INICIAR SESIÓN
+                  </Button>
+                  <Button
+                    onClick={() => navigate("/register")}
+                    fullWidth
+                    variant="outlined"
+                    color="primary"
+                    sx={{
+                      marginTop: 2,
+                      lineHeight: "1.5",
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: { xs: "0.75rem", md: "1rem" },
+                      borderRadius: "8px",
+                    }}
+                  >
+                    ¿NO TIENES CUENTA? REGISTRATE
+                  </Button>
+                  <Button
+                    onClick={() => navigate("/reset-password")}
+                    fullWidth
+                    color="primary"
+                    sx={{
+                      marginTop: 2,
+                      lineHeight: "1.5",
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: { xs: "0.75rem", md: "1rem" },
+                      textDecorationLine: "underline",
+                      textUnderlineOffset: "4px",
+                    }}
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </Button>
+                </>
+              )}
+            </Box>
+          </form>
+        </FormCard>
+      </Stack>
+    </Layout>
   );
 };
