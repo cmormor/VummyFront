@@ -52,7 +52,7 @@ export default function ErrorModal({ error }: ErrorDisplayProps) {
     }
 
     const handleSupport = () => {
-        window.open('mailto:soporte@tuempresa.com', '_blank')
+        window.open('mailto:soportevummyapp@gmail.com', '_blank')
     }
 
     return (

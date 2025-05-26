@@ -759,7 +759,6 @@ export const Settings = () => {
                 ))
               )}
 
-              {/* Opción de soporte */}
               <ListItemButton
                 onClick={() => handleSeleccionarOpcion(supportOption.id)}
                 sx={(theme) => ({
@@ -1037,7 +1036,6 @@ export const Settings = () => {
                 </ListItemButton>
               ))}
 
-            {/* Opción de soporte */}
             <ListItemButton
               selected={opcionSeleccionada === supportOption.id}
               onClick={() => setOpcionSeleccionada(supportOption.id)}

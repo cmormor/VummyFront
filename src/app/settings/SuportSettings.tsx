@@ -45,7 +45,7 @@ export const SuportSettings = () => {
     ];
 
     const handleSupport = () => {
-        window.open('mailto:soporte@vummyapp.com', '_blank')
+        window.open('mailto:soportevummyapp@gmail.com', '_blank')
     }
 
     return (
@@ -120,7 +120,7 @@ export const SuportSettings = () => {
                             </ListItemIcon>
 
                             <ListItemText
-                                primary="soporte@vummyapp.com"
+                                primary="soportevummyapp@gmail.com"
                                 secondary="Email general"
                                 sx={{ ml: 1.5 }}
                             />
