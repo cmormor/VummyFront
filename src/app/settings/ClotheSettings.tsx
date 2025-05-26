@@ -224,7 +224,7 @@ export const ClotheSettings = () => {
 
     const handleDeleteClick = (clotheId: number, clothe: string) => {
         setClotheToDelete(clotheId);
-        setMensaje(`¿Estás seguro de que deseas eliminar al usuario "${clothe}"? Esta acción no se puede deshacer.`);
+        setMensaje(`¿Estás seguro de que deseas eliminar la prenda "${clothe}"? Esta acción no se puede deshacer.`);
         setOpenModal(true);
     };
 
@@ -239,9 +239,9 @@ export const ClotheSettings = () => {
             setClotheList(updatedList);
             setFilteredClothe(updatedList);
 
-            showSnackbar('Usuario eliminado exitosamente', 'success');
+            showSnackbar('Prenda eliminado exitosamente', 'success');
         } catch (error: any) {
-            showSnackbar('Error al eliminar al usuario', 'error');
+            showSnackbar('Error al eliminar la Prenda', 'error');
         } finally {
             setLoading(false);
             setOpenModal(false);
