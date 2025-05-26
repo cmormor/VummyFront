@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://api.vummyapp.com/api/v1",
-  // baseURL: "http://localhost:8080/api/v1",
+  // baseURL: import.meta.env.VITE_API_URL || "https://api.vummyapp.com/api/v1",
+  baseURL: "http://localhost:8080/api/v1",
 });
 
 API.interceptors.request.use((config) => {
@@ -12,14 +12,3 @@ API.interceptors.request.use((config) => {
   }
   return config;
 });
-
-API.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("authToken");
-      window.location.href = "/login";
-    }
-    return Promise.reject(error);
-  }
-);
