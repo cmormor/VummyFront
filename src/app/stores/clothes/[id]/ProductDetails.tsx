@@ -17,7 +17,7 @@ import {
   TableHead,
   TableRow,
   Box,
-  Skeleton
+  Skeleton,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -32,11 +32,12 @@ import { Size } from "../../../../types/size";
 import { postItemToCart } from "../../../../api/cart-items";
 import { getSizeClothe } from "../../../../api/size-clothe";
 import ErrorModal from "../../../../components/ErrorModal";
+import { sizesStore } from "../../../../api/storeApi";
 
 export default function ProductDetails() {
   const { clotheId } = useParams();
   const [clothe, setClothe] = useState<Clothe | null>(null);
-  const [sizes, setSizes] = useState<Size[]>([]);
+  const [storeSizes, setStoreSizes] = useState<Size[]>([]);
   const [size, setSize] = useState("");
   const [sizeAvailable, setSizeAvailable] = useState<Clothe[]>([]);
   const [cantidad, setCantidad] = useState(1);
@@ -61,13 +62,11 @@ export default function ProductDetails() {
               .then((availableSizes) => {
                 setSizeAvailable(availableSizes || []);
               })
-              .catch(() => setSizes([]))
               .finally(() => setLoadingSizes(false));
           }
         })
         .catch(() => {
           setClothe(null);
-          setSizes([]);
           setError("Error al cargar la prenda.");
         })
         .finally(() => {
@@ -75,6 +74,14 @@ export default function ProductDetails() {
         });
     }
   }, [clotheId]);
+
+  useEffect(() => {
+    if (clothe?.tiendaId) {
+      sizesStore(clothe.tiendaId)
+        .then((sizes) => setStoreSizes(sizes))
+        .catch(() => setStoreSizes([]));
+    }
+  }, [clothe]);
 
   const handleAddToCart = async () => {
     if (!clothe) return;
@@ -98,7 +105,7 @@ export default function ProductDetails() {
       setCantidad(1);
       window.location.reload();
     } catch (error) {
-      console.error("Error al añadir al carrito:", error);
+      setError(`Error al añadir al carrito: ${error}`);
     } finally {
       setIsAdding(false);
     }
@@ -109,7 +116,7 @@ export default function ProductDetails() {
       const availableSizes: Clothe[] = await getSizeClothe(id);
       return availableSizes;
     } catch (error) {
-      console.error("Error cargando tallas disponibles", error);
+      setError(`Error cargando tallas disponibles ${error}`);
       return [];
     }
   };
@@ -119,18 +126,26 @@ export default function ProductDetails() {
       <Box px={{ xs: 2, md: 4 }}>
         <Skeleton variant="text" width="40%" height={40} sx={{ mb: 2 }} />
         <Skeleton variant="text" width="80%" height={30} sx={{ mb: 5 }} />
-        <Skeleton variant="rectangular" width="100%" height={200} sx={{ mb: 3 }} />
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={200}
+          sx={{ mb: 3 }}
+        />
         <Skeleton variant="text" width="20%" height={30} sx={{ mb: 1 }} />
-        <Skeleton variant="rectangular" width="100%" height={50} sx={{ mb: 5 }} />
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={50}
+          sx={{ mb: 5 }}
+        />
         <Skeleton variant="rectangular" width="100%" height={50} />
       </Box>
     );
   }
 
   if (error) {
-    return (
-      <ErrorModal error={error} />
-    );
+    return <ErrorModal error={error} />;
   }
 
   return (
@@ -229,7 +244,9 @@ export default function ProductDetails() {
             sx={{ flexWrap: "wrap", gap: 2 }}
           >
             {["S", "M", "L", "XL"].map((option) => {
-              const tallaDisponible = sizeAvailable.find((s) => s.tallaNombre === option);
+              const tallaDisponible = sizeAvailable.find(
+                (s) => s.tallaNombre === option
+              );
               return (
                 <FormControlLabel
                   key={option}
@@ -363,8 +380,8 @@ export default function ProductDetails() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sizes.length > 0 ? (
-                  sizes.map((row) => (
+                {storeSizes.length > 0 ? (
+                  storeSizes.map((row) => (
                     <TableRow key={row.id}>
                       <TableCell align="center">{row.nombre}</TableCell>
                       <TableCell align="center">{row.altura}</TableCell>
