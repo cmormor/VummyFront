@@ -18,6 +18,7 @@ import {
   TableRow,
   Box,
   Skeleton,
+  alpha,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -347,13 +348,26 @@ export default function ProductDetails() {
             fontFamily: "'Lexend Zetta', sans-serif",
             fontSize: { xs: "1.1rem", md: "1.5rem" },
             fontWeight: "bold",
+            color: (theme) => theme.palette.primary.main,
+            textDecorationLine: "underline",
+            textUnderlineOffset: "10px",
           }}
         >
           GUÍA DE TALLAS
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ overflowX: "auto" }}>
-            <Table sx={{ minWidth: 650 }}>
+          <Box sx={{
+            overflowX: "auto",
+          }}>
+            <Table sx={{
+              minWidth: 650, background: (theme) =>
+                `linear-gradient(135deg, ${alpha(theme.palette.info.light, 0.08)} 0%, ${alpha(
+                  theme.palette.primary.light,
+                  0.05
+                )} 100%)`,
+              border: (theme) => `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
+              color: (theme) => theme.palette.text.primary,
+            }}>
               <TableHead>
                 <TableRow>
                   {[
@@ -381,17 +395,23 @@ export default function ProductDetails() {
               </TableHead>
               <TableBody>
                 {storeSizes.length > 0 ? (
-                  storeSizes.map((row) => (
-                    <TableRow key={row.id}>
-                      <TableCell align="center">{row.nombre}</TableCell>
-                      <TableCell align="center">{row.altura}</TableCell>
-                      <TableCell align="center">{row.cuelloManga}</TableCell>
-                      <TableCell align="center">{row.pecho}</TableCell>
-                      <TableCell align="center">{row.cintura}</TableCell>
-                      <TableCell align="center">{row.cadera}</TableCell>
-                      <TableCell align="center">{row.entrepierna}</TableCell>
-                    </TableRow>
-                  ))
+                  storeSizes
+                    .slice()
+                    .sort(
+                      (a, b) =>
+                        ["S", "M", "L", "XL"].indexOf(a.nombre) -
+                        ["S", "M", "L", "XL"].indexOf(b.nombre)
+                    ).map((row) => (
+                      <TableRow key={row.id}>
+                        <TableCell align="center">{row.nombre}</TableCell>
+                        <TableCell align="center">{row.altura}</TableCell>
+                        <TableCell align="center">{row.cuelloManga}</TableCell>
+                        <TableCell align="center">{row.pecho}</TableCell>
+                        <TableCell align="center">{row.cintura}</TableCell>
+                        <TableCell align="center">{row.cadera}</TableCell>
+                        <TableCell align="center">{row.entrepierna}</TableCell>
+                      </TableRow>
+                    ))
                 ) : (
                   <TableRow>
                     <TableCell colSpan={7} align="center">

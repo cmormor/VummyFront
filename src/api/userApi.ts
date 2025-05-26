@@ -93,6 +93,11 @@ export const updateUsuario = async (data: Partial<Usuario>) => {
   return usuarioActualizado;
 }
 
+export const updateUsuarioById = async (id: number, data: Partial<Usuario>) => {
+  const response = await API.put<Usuario>(`/users/${id}`, data);
+  return response.data;
+};
+
 export const resetPassword = async (email: string, newPassword: string): Promise<string> => {
 
   const response = await API.put<{ message: string }>("/users/auth/reset-password", {

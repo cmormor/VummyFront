@@ -42,24 +42,20 @@ export const createStore = async (tienda: Store): Promise<Store | string> => {
 
 export const updateStore = async (
   id: number,
-  tienda: Store
-): Promise<Store | null> => {
+  data: Partial<Store>
+): Promise<Partial<Store> | null> => {
   try {
-    const response = await API.put<Store>(`/stores/${id}`, tienda);
+    const response = await API.put<Store>(`/stores/${id}`, data);
     return response.data;
   } catch {
     return null;
   }
 };
 
-export const deleteStore = async (id: number): Promise<boolean> => {
-  try {
-    await API.delete(`/stores/${id}`);
-    return true;
-  } catch {
-    return false;
-  }
-};
+export const deleteStore = async (id: number) => {
+  const response = await API.delete(`/stores/${id}`)
+  return response;
+}
 
 export const sizesStore = async (id: number): Promise<Size[]> => {
   const response = await API.get<Size[]>(`stores/${id}/sizes`);

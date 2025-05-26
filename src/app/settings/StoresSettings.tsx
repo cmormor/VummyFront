@@ -36,14 +36,8 @@ import {
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { Store } from "../../types/store";
-import { createStore, deleteStore, getStoreById, getStores } from "../../api/storeApi";
-
-interface StoreFormData {
-    id?: number;
-    nombre: string;
-    descripcion: string;
-    imagenUrl?: string;
-}
+import { createStore, deleteStore, getStoreById, getStores, updateStore } from "../../api/storeApi";
+import { ModalConfirmation } from "../../components/ModalConfirmation";
 
 export const StoresSettings = () => {
     const [storeList, setStoreList] = useState<Store[]>([]);
@@ -51,9 +45,12 @@ export const StoresSettings = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
+    const [openModal, setOpenModal] = useState(false);
+    const [mensaje, setMensaje] = useState("");
+    const [storeToDelete, setStoreToDelete] = useState<number | null>(null);
     const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
-    const [selectedStore, setSelectedStore] = useState<StoreFormData | null>(null);
-    const [formData, setFormData] = useState<StoreFormData>({
+    const [selectedStore, setSelectedStore] = useState<Store | null>(null);
+    const [formData, setFormData] = useState<Store>({
         nombre: '',
         descripcion: '',
     });
@@ -71,7 +68,7 @@ export const StoresSettings = () => {
         try {
             setLoading(true);
             const stores = await getStores();
-            // stores.sort((a, b) => a.rol!.localeCompare(b.rol!));
+            stores.sort((a, b) => a.nombre!.localeCompare(b.nombre!));
             setStoreList(stores);
             setFilteredStore(stores);
         } catch (error) {
@@ -101,17 +98,19 @@ export const StoresSettings = () => {
             if (mode === 'view' || mode === 'edit') {
                 try {
                     const fullStore = await getStoreById(store.id!);
+
                     setFormData({
                         id: fullStore!.id,
                         nombre: fullStore!.nombre,
                         descripcion: fullStore!.descripcion,
+                        prendas: fullStore!.prendas || [],
                     });
                 } catch (error) {
-                    console.error('Error al cargar detalles de la tienda:', error);
                     setFormData({
                         id: store.id,
                         nombre: store.nombre,
                         descripcion: store.descripcion,
+                        prendas: store.prendas || [],
                     });
                     showSnackbar('Error al cargar detalles completos de la tienda', 'warning');
                 }
@@ -121,6 +120,7 @@ export const StoresSettings = () => {
             setFormData({
                 nombre: '',
                 descripcion: '',
+                prendas: [],
             });
         }
         setOpenDialog(true);
@@ -135,28 +135,18 @@ export const StoresSettings = () => {
         });
     };
 
-    const handleInputChange = (field: keyof StoreFormData, value: any) => {
+    const handleInputChange = (field: keyof Store, value: any) => {
         setFormData(prev => ({
             ...prev,
             [field]: value
         }));
     };
 
-    const handleCreate = async (store: Store) => {
-        const response = await createStore(store);
-        return response;
-    };
-
-    // const handleUpdate = async (data: Partial<Usuario>) => {
-    //     const response = await updateUsuario(data);
-    //     return response;
-    // };
-
     const handleSubmit = async () => {
         setLoading(true);
         try {
             if (dialogMode === "create") {
-                const response = await handleCreate(formData);
+                const response = await createStore(formData);
                 if (typeof response === "string") {
                     showSnackbar(response, "error");
                     return;
@@ -165,7 +155,7 @@ export const StoresSettings = () => {
                 const updatedList = [...storeList, newStore];
                 setStoreList(updatedList);
                 setFilteredStore(updatedList);
-                showSnackbar("Teinda creada exitosamente", "success");
+                showSnackbar("Tienda creada exitosamente", "success");
             } else if (dialogMode === "edit") {
                 if (!selectedStore) {
                     showSnackbar("No se ha seleccionado ningúna tienda para editar.", "error");
@@ -173,36 +163,13 @@ export const StoresSettings = () => {
                     return;
                 }
 
-                // const dataToUpdate: Partial<Usuario> = {};
+                const data: Partial<Store> = { id: selectedStore.id };
 
-                // if (formData.nombre && formData.nombre !== selectedUser.nombre)
-                //     dataToUpdate.nombre = formData.nombre;
-                // if (formData.email && formData.email !== selectedUser.email)
-                //     dataToUpdate.email = formData.email;
-                // if (formData.rol && formData.rol !== selectedUser.rol)
-                //     dataToUpdate.rol = formData.rol;
-                // if (formData.altura !== selectedUser.altura)
-                //     dataToUpdate.altura = formData.altura;
-                // if (formData.cuelloManga !== selectedUser.cuelloManga)
-                //     dataToUpdate.cuelloManga = formData.cuelloManga;
-                // if (formData.pecho !== selectedUser.pecho)
-                //     dataToUpdate.pecho = formData.pecho;
-                // if (formData.cintura !== selectedUser.cintura)
-                //     dataToUpdate.cintura = formData.cintura;
-                // if (formData.cadera !== selectedUser.cadera)
-                //     dataToUpdate.cadera = formData.cadera;
-                // if (formData.entrepierna !== selectedUser.entrepierna)
-                //     dataToUpdate.entrepierna = formData.entrepierna;
+                if (formData.nombre !== "") data.nombre = formData.nombre;
+                if (formData.descripcion !== "") data.descripcion = formData.descripcion;
 
-                // if (Object.keys(dataToUpdate).length === 0) {
-                //     showSnackbar("No has introducido ningún dato para actualizar.", "error");
-                //     setLoading(false);
-                //     return;
-                // }
-
-                // await handleUpdate(dataToUpdate);
+                await updateStore(selectedStore.id!, data);
                 await loadStores();
-
                 showSnackbar("Tienda actualizada exitosamente", "success");
             }
 
@@ -214,24 +181,33 @@ export const StoresSettings = () => {
         }
     };
 
+    const handleDeleteClick = (storeId: number, tienda: string) => {
+        setStoreToDelete(storeId);
+        setMensaje(`¿Estás seguro de que deseas eliminar la tienda "${tienda}"? Esta acción no se puede deshacer.`);
+        setOpenModal(true);
+    };
 
-    const handleDelete = async (id: number) => {
+    const handleConfirmDelete = async () => {
+        if (storeToDelete === null) return;
+
         setLoading(true);
         try {
-            await deleteStore(id);
+            await deleteStore(storeToDelete);
 
-            const updatedList = storeList.filter(store => store.id !== id);
+            const updatedList = storeList.filter(store => store.id !== storeToDelete);
             setStoreList(updatedList);
             setFilteredStore(updatedList);
 
-            showSnackbar('Tienda eliminada exitosamente', 'success');
+            showSnackbar('Tienda eliminado exitosamente', 'success');
         } catch (error: any) {
             showSnackbar('Error al eliminar la tienda', 'error');
         } finally {
             setLoading(false);
+            setOpenModal(false);
+            setStoreToDelete(null);
+            setMensaje("");
         }
     };
-
 
     const showSnackbar = (message: string, severity: 'success' | 'error' | 'warning' | 'info') => {
         setSnackbar({
@@ -412,7 +388,7 @@ export const StoresSettings = () => {
                                                     <IconButton
                                                         size="small"
                                                         color="error"
-                                                        onClick={() => handleDelete(store.id!)}
+                                                        onClick={() => handleDeleteClick(store.id!, store.nombre)}
                                                     >
                                                         <Delete />
                                                     </IconButton>
@@ -498,6 +474,40 @@ export const StoresSettings = () => {
 
                 <DialogContent sx={{ pt: 2 }}>
                     <Stack spacing={3} sx={{ mt: 2 }}>
+                        {dialogMode === 'view' && (
+                            <>
+                                <TextField
+                                    label="ID"
+                                    type="number"
+                                    value={formData.id}
+                                    fullWidth
+                                    disabled
+                                    required
+                                    sx={{
+                                        background: (theme) => theme.palette.background.paper,
+                                        fontFamily: "'Poppins', sans-serif",
+                                        fontSize: { xs: "0.9rem", md: "1rem" },
+                                    }}
+                                />
+
+                                <TextField
+                                    label="Prendas"
+                                    type="text"
+                                    value={formData.prendas ? formData.prendas.map(p => p.nombre).join('\n') : ''}
+                                    fullWidth
+                                    disabled
+                                    sx={{
+                                        background: (theme) => theme.palette.background.paper,
+                                        fontFamily: "'Poppins', sans-serif",
+                                        fontSize: { xs: "0.9rem", md: "1rem" },
+                                    }}
+                                    multiline
+                                    rows={Math.min(formData.prendas?.length || 2, 6)}
+                                />
+
+                            </>
+                        )}
+
                         <TextField
                             label="Nombre completo"
                             value={formData.nombre}
@@ -550,6 +560,13 @@ export const StoresSettings = () => {
                     </DialogActions>
                 )}
             </Dialog>
+
+            <ModalConfirmation
+                open={openModal}
+                onClose={() => setOpenModal(false)}
+                onConfirm={handleConfirmDelete}
+                mensaje={mensaje}
+            />
 
             <Snackbar
                 open={snackbar.open}

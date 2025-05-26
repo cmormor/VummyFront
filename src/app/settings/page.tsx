@@ -1,5 +1,3 @@
-import type React from "react";
-
 import { useState, useEffect } from "react";
 import {
   Stack,
@@ -14,6 +12,7 @@ import {
   alpha,
   IconButton,
   Slide,
+  Skeleton,
 } from "@mui/material";
 import {
   Person,
@@ -24,6 +23,7 @@ import {
   GroupAdd,
   AddBusiness,
   LocalOffer,
+  PostAdd,
 } from "@mui/icons-material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { Title } from "../../components/Title";
@@ -36,7 +36,8 @@ import { ManiquieViewSettings } from "./ManiquieViewSettings";
 import { getRol } from "../../api/userApi";
 import { UsersSettings } from "./UsersSettings";
 import { StoresSettings } from "./StoresSettings";
-// import { ClotheSettings } from "./ClotheSettings";
+import { ClotheSettings } from "./ClotheSettings";
+import { OrdersSettings } from "./OrdersSettings";
 
 const useMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -56,12 +57,33 @@ const useMobile = () => {
   return isMobile;
 };
 
+const MenuItemSkeleton = ({ isMobile = false }) => (
+  <ListItemButton
+    disabled
+    sx={{
+      py: isMobile ? 2.5 : 1.5,
+      px: isMobile ? 3 : 2,
+      mb: isMobile ? 0 : 1,
+      borderRadius: isMobile ? 0 : 2,
+    }}
+  >
+    <ListItemIcon sx={{ minWidth: isMobile ? 50 : 45 }}>
+      <Skeleton variant="circular" width={24} height={24} />
+    </ListItemIcon>
+    <ListItemText
+      primary={<Skeleton variant="text" width="60%" height={24} />}
+    />
+    {isMobile && <Skeleton variant="circular" width={20} height={20} />}
+  </ListItemButton>
+);
+
 export const Settings = () => {
   const [searchParams] = useSearchParams();
   const opcionURL = searchParams.get("opcion") || "Perfil";
   const [opcionSeleccionada, setOpcionSeleccionada] = useState(opcionURL);
   const [mostrarDetalle, setMostrarDetalle] = useState(false);
   const [rol, setRol] = useState("");
+  const [loadingRol, setLoadingRol] = useState(true);
   const isMobile = useMobile();
 
   useEffect(() => {
@@ -71,8 +93,16 @@ export const Settings = () => {
 
   useEffect(() => {
     const obtenerRol = async () => {
-      const rolObtenido = await getRol();
-      setRol(rolObtenido);
+      try {
+        setLoadingRol(true);
+        const rolObtenido = await getRol();
+        setRol(rolObtenido);
+      } catch (error) {
+        console.error("Error al obtener el rol:", error);
+        setRol("");
+      } finally {
+        setLoadingRol(false);
+      }
     };
     obtenerRol();
   }, []);
@@ -88,20 +118,20 @@ export const Settings = () => {
     }
   };
 
-  const menuOptions: { id: string; label: string; icon: React.ReactNode }[] = [
+  const baseMenuOptions = [
     { id: "Perfil", label: "Perfil", icon: <Person /> },
     { id: "Maniquie", label: "Maniquie", icon: <Accessibility /> },
     { id: "Seguridad", label: "Seguridad", icon: <Security /> },
-    ...(rol === "ADMINISTRADOR"
-      ? [
-        { id: "Usuarios", label: "Usuarios", icon: <GroupAdd /> },
-        { id: "Tiendas", label: "Tiendas", icon: <AddBusiness /> },
-        { id: "Prendas", label: "Prendas", icon: <LocalOffer /> },
-      ]
-      : []),
-    { id: "Soporte", label: "Soporte", icon: <Help /> },
-
   ];
+
+  const adminMenuOptions = [
+    { id: "Usuarios", label: "Usuarios", icon: <GroupAdd /> },
+    { id: "Tiendas", label: "Tiendas", icon: <AddBusiness /> },
+    { id: "Prendas", label: "Prendas", icon: <LocalOffer /> },
+    { id: "Pedidos", label: "Pedidos", icon: <PostAdd /> },
+  ];
+
+  const supportOption = { id: "Soporte", label: "Soporte", icon: <Help /> };
 
   const backToList = () => {
     setMostrarDetalle(false);
@@ -450,7 +480,61 @@ export const Settings = () => {
                 borderRadius: 1,
               }}
             />
-            {/* <ClotheSettings /> */}
+            <ClotheSettings />
+          </Box>
+        );
+
+      case "Pedidos":
+        return (
+          <Box
+            sx={{
+              background: (theme) => `linear-gradient(135deg, ${alpha(theme.palette.info.light, 0.05)} 0%, ${alpha(theme.palette.primary.light, 0.05)} 100%)`,
+              borderRadius: 3,
+              p: 3,
+              border: (theme) => `1px solid ${alpha(theme.palette.info.main, 0.1)}`,
+            }}
+          >
+            {isMobile ? (
+              <Box display="flex" alignItems="center" mb={3}>
+                <IconButton
+                  edge="start"
+                  onClick={backToList}
+                  sx={{
+                    mr: 2,
+                    bgcolor: (theme) => alpha(theme.palette.info.main, 0.1),
+                    color: (theme) => theme.palette.info.main,
+                    '&:hover': {
+                      bgcolor: (theme) => alpha(theme.palette.info.main, 0.2),
+                    }
+                  }}
+                >
+                  <ArrowBackIosIcon sx={{ fontSize: 20 }} />
+                </IconButton>
+                <Typography sx={{
+                  ...titleProps,
+                  color: (theme) => theme.palette.info.main,
+                }}>
+                  GESTIÓN DE PEDIDOS
+                </Typography>
+              </Box>
+            ) : (
+              <Typography sx={{
+                ...titleProps,
+                color: (theme) => theme.palette.info.main,
+              }} >
+                GESTIÓN DE PEDIDOS
+              </Typography>
+            )}
+
+            <Divider
+              sx={{
+                mb: 3,
+                bgcolor: (theme) => alpha(theme.palette.info.main, 0.3),
+                height: 2,
+                borderRadius: 1,
+              }}
+            />
+            <OrdersSettings />
           </Box>
         );
 
@@ -552,7 +636,8 @@ export const Settings = () => {
             <Box
               sx={{
                 p: 3,
-                background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                background: (theme) =>
+                  `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
                 color: (theme) => theme.palette.primary.contrastText,
               }}
             >
@@ -562,29 +647,33 @@ export const Settings = () => {
                 sx={{
                   fontFamily: "'Poppins', sans-serif",
                   fontSize: { xs: "1.1rem", md: "1.3rem" },
-                  letterSpacing: '0.5px',
+                  letterSpacing: "0.5px",
                 }}
               >
                 Menú de Ajustes
               </Typography>
             </Box>
-            <List sx={{
-              bgcolor: (theme) => theme.palette.background.paper,
-              pt: 0,
-              '& .MuiListItemButton-root': {
-                transition: 'all 0.3s ease',
-              }
-            }}>
-              {menuOptions.map((option) => (
+
+            <List
+              sx={{
+                bgcolor: (theme) => theme.palette.background.paper,
+                pt: 0,
+                "& .MuiListItemButton-root": {
+                  transition: "all 0.3s ease",
+                },
+              }}
+            >
+              {/* Opciones base */}
+              {baseMenuOptions.map((option) => (
                 <ListItemButton
                   key={option.id}
                   onClick={() => handleSeleccionarOpcion(option.id)}
                   sx={(theme) => ({
                     py: 2.5,
                     px: 3,
-                    '&:hover': {
+                    "&:hover": {
                       bgcolor: alpha(theme.palette.primary.main, 0.08),
-                      transform: 'translateX(8px)',
+                      transform: "translateX(8px)",
                     },
                   })}
                 >
@@ -592,9 +681,9 @@ export const Settings = () => {
                     sx={{
                       color: (theme) => theme.palette.primary.main,
                       minWidth: 50,
-                      '& svg': {
-                        fontSize: '1.4rem',
-                      }
+                      "& svg": {
+                        fontSize: "1.4rem",
+                      },
                     }}
                   >
                     {option.icon}
@@ -611,11 +700,104 @@ export const Settings = () => {
                   <ChevronRight
                     sx={{
                       color: (theme) => alpha(theme.palette.text.secondary, 0.6),
-                      transition: 'transform 0.2s ease',
+                      transition: "transform 0.2s ease",
                     }}
                   />
                 </ListItemButton>
               ))}
+
+              {/* Skeletons mientras se carga el rol */}
+              {loadingRol ? (
+                <>
+                  <MenuItemSkeleton isMobile />
+                  <MenuItemSkeleton isMobile />
+                  <MenuItemSkeleton isMobile />
+                  <MenuItemSkeleton isMobile />
+                </>
+              ) : (
+                rol === "ADMINISTRADOR" &&
+                adminMenuOptions.map((option) => (
+                  <ListItemButton
+                    key={option.id}
+                    onClick={() => handleSeleccionarOpcion(option.id)}
+                    sx={(theme) => ({
+                      py: 2.5,
+                      px: 3,
+                      "&:hover": {
+                        bgcolor: alpha(theme.palette.primary.main, 0.08),
+                        transform: "translateX(8px)",
+                      },
+                    })}
+                  >
+                    <ListItemIcon
+                      sx={{
+                        color: (theme) => theme.palette.primary.main,
+                        minWidth: 50,
+                        "& svg": {
+                          fontSize: "1.4rem",
+                        },
+                      }}
+                    >
+                      {option.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={option.label}
+                      primaryTypographyProps={{
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: { xs: "1rem", md: "1.1rem" },
+                        fontWeight: 500,
+                        color: "text.primary",
+                      }}
+                    />
+                    <ChevronRight
+                      sx={{
+                        color: (theme) => alpha(theme.palette.text.secondary, 0.6),
+                        transition: "transform 0.2s ease",
+                      }}
+                    />
+                  </ListItemButton>
+                ))
+              )}
+
+              {/* Opción de soporte */}
+              <ListItemButton
+                onClick={() => handleSeleccionarOpcion(supportOption.id)}
+                sx={(theme) => ({
+                  py: 2.5,
+                  px: 3,
+                  "&:hover": {
+                    bgcolor: alpha(theme.palette.primary.main, 0.08),
+                    transform: "translateX(8px)",
+                  },
+                })}
+              >
+                <ListItemIcon
+                  sx={{
+                    color: (theme) => theme.palette.primary.main,
+                    minWidth: 50,
+                    "& svg": {
+                      fontSize: "1.4rem",
+                    },
+                  }}
+                >
+                  {supportOption.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={supportOption.label}
+                  primaryTypographyProps={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: { xs: "1rem", md: "1.1rem" },
+                    fontWeight: 500,
+                    color: "text.primary",
+                  }}
+                />
+                <ChevronRight
+                  sx={{
+                    color: (theme) => alpha(theme.palette.text.secondary, 0.6),
+                    transition: "transform 0.2s ease",
+                  }}
+                />
+              </ListItemButton>
             </List>
           </Box>
         </Slide>
@@ -636,11 +818,13 @@ export const Settings = () => {
               right: 0,
             }}
           >
-            <Box sx={{
-              p: 2,
-              bgcolor: (theme) => theme.palette.background.paper,
-              minHeight: '100vh',
-            }}>
+            <Box
+              sx={{
+                p: 2,
+                bgcolor: (theme) => theme.palette.background.paper,
+                minHeight: "100vh",
+              }}
+            >
               {renderContenido()}
             </Box>
           </Box>
@@ -650,6 +834,35 @@ export const Settings = () => {
   };
 
   const renderDesktop = () => {
+    if (loadingRol) {
+      return (
+        <Stack
+          direction="row"
+          spacing={4}
+          sx={{
+            width: "100%",
+            mt: 5,
+            px: 3,
+            pb: 4,
+          }}
+        >
+          {/* Skeleton del menú lateral */}
+          <Skeleton
+            variant="rectangular"
+            width={280}
+            height={650}
+            sx={{ borderRadius: 3 }}
+          />
+
+          {/* Skeleton del contenido principal */}
+          <Skeleton
+            variant="rectangular"
+            sx={{ borderRadius: 3, flexGrow: 1, height: 650 }}
+          />
+        </Stack>
+      );
+    }
+
     return (
       <Stack
         direction="row"
@@ -667,25 +880,32 @@ export const Settings = () => {
             width: "280px",
             borderRadius: 3,
             overflow: "hidden",
-            background: (theme) => `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.primary.light, 0.02)} 100%)`,
-            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+            background: (theme) =>
+              `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(
+                theme.palette.primary.light,
+                0.02
+              )} 100%)`,
+            border: (theme) =>
+              `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
           }}
         >
           <Box
             sx={{
               p: 3,
-              background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+              background: (theme) =>
+                `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
               color: (theme) => theme.palette.primary.contrastText,
-              position: 'relative',
-              '&::after': {
+              position: "relative",
+              "&::after": {
                 content: '""',
-                position: 'absolute',
+                position: "absolute",
                 bottom: 0,
                 left: 0,
                 right: 0,
-                height: '4px',
-                background: (theme) => `linear-gradient(90deg, ${theme.palette.secondary.main} 0%, ${theme.palette.primary.light} 100%)`,
-              }
+                height: "4px",
+                background: (theme) =>
+                  `linear-gradient(90deg, ${theme.palette.secondary.main} 0%, ${theme.palette.primary.light} 100%)`,
+              },
             }}
           >
             <Typography
@@ -694,7 +914,7 @@ export const Settings = () => {
               sx={{
                 fontFamily: "'Poppins', sans-serif",
                 fontSize: { xs: "1.1rem", md: "1.3rem" },
-                letterSpacing: '0.5px',
+                letterSpacing: "0.5px",
               }}
             >
               Menú de Ajustes
@@ -702,7 +922,8 @@ export const Settings = () => {
           </Box>
 
           <List component="nav" sx={{ p: 2 }}>
-            {menuOptions.map((option) => (
+            {/* Opciones base */}
+            {baseMenuOptions.map((option) => (
               <ListItemButton
                 key={option.id}
                 selected={opcionSeleccionada === option.id}
@@ -712,33 +933,35 @@ export const Settings = () => {
                   mb: 1,
                   py: 1.5,
                   px: 2,
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                   "&.Mui-selected": {
                     bgcolor: alpha(theme.palette.primary.main, 0.12),
                     color: theme.palette.primary.main,
-                    transform: 'translateX(8px)',
+                    transform: "translateX(8px)",
                     border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
                     "&:hover": {
                       bgcolor: alpha(theme.palette.primary.main, 0.18),
                     },
                     "& .MuiListItemIcon-root": {
                       color: theme.palette.primary.main,
-                      transform: 'scale(1.1)',
+                      transform: "scale(1.1)",
                     },
                   },
                   "&:hover": {
                     bgcolor: alpha(theme.palette.primary.main, 0.06),
-                    transform: 'translateX(4px)',
+                    transform: "translateX(4px)",
                   },
                 })}
               >
-                <ListItemIcon sx={{
-                  minWidth: 45,
-                  transition: 'transform 0.2s ease',
-                  '& svg': {
-                    fontSize: '1.3rem',
-                  }
-                }}>
+                <ListItemIcon
+                  sx={{
+                    minWidth: 45,
+                    transition: "transform 0.2s ease",
+                    "& svg": {
+                      fontSize: "1.3rem",
+                    },
+                  }}
+                >
                   {option.icon}
                 </ListItemIcon>
                 <ListItemText
@@ -748,12 +971,124 @@ export const Settings = () => {
                       fontFamily: "'Poppins', sans-serif",
                       fontSize: "1.05rem",
                       fontWeight: 500,
-                      transition: 'font-weight 0.2s ease',
+                      transition: "font-weight 0.2s ease",
                     },
                   }}
                 />
               </ListItemButton>
             ))}
+
+            {rol === "ADMINISTRADOR" &&
+              adminMenuOptions.map((option) => (
+                <ListItemButton
+                  key={option.id}
+                  selected={opcionSeleccionada === option.id}
+                  onClick={() => setOpcionSeleccionada(option.id)}
+                  sx={(theme) => ({
+                    borderRadius: 2,
+                    mb: 1,
+                    py: 1.5,
+                    px: 2,
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    "&.Mui-selected": {
+                      bgcolor: alpha(theme.palette.primary.main, 0.12),
+                      color: theme.palette.primary.main,
+                      transform: "translateX(8px)",
+                      border: `1px solid ${alpha(
+                        theme.palette.primary.main,
+                        0.3
+                      )}`,
+                      "&:hover": {
+                        bgcolor: alpha(theme.palette.primary.main, 0.18),
+                      },
+                      "& .MuiListItemIcon-root": {
+                        color: theme.palette.primary.main,
+                        transform: "scale(1.1)",
+                      },
+                    },
+                    "&:hover": {
+                      bgcolor: alpha(theme.palette.primary.main, 0.06),
+                      transform: "translateX(4px)",
+                    },
+                  })}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 45,
+                      transition: "transform 0.2s ease",
+                      "& svg": {
+                        fontSize: "1.3rem",
+                      },
+                    }}
+                  >
+                    {option.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={option.label}
+                    primaryTypographyProps={{
+                      sx: {
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "1.05rem",
+                        fontWeight: 500,
+                        transition: "font-weight 0.2s ease",
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              ))}
+
+            {/* Opción de soporte */}
+            <ListItemButton
+              selected={opcionSeleccionada === supportOption.id}
+              onClick={() => setOpcionSeleccionada(supportOption.id)}
+              sx={(theme) => ({
+                borderRadius: 2,
+                mb: 1,
+                py: 1.5,
+                px: 2,
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                "&.Mui-selected": {
+                  bgcolor: alpha(theme.palette.primary.main, 0.12),
+                  color: theme.palette.primary.main,
+                  transform: "translateX(8px)",
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+                  "&:hover": {
+                    bgcolor: alpha(theme.palette.primary.main, 0.18),
+                  },
+                  "& .MuiListItemIcon-root": {
+                    color: theme.palette.primary.main,
+                    transform: "scale(1.1)",
+                  },
+                },
+                "&:hover": {
+                  bgcolor: alpha(theme.palette.primary.main, 0.06),
+                  transform: "translateX(4px)",
+                },
+              })}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 45,
+                  transition: "transform 0.2s ease",
+                  "& svg": {
+                    fontSize: "1.3rem",
+                  },
+                }}
+              >
+                {supportOption.icon}
+              </ListItemIcon>
+              <ListItemText
+                primary={supportOption.label}
+                primaryTypographyProps={{
+                  sx: {
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: "1.05rem",
+                    fontWeight: 500,
+                    transition: "font-weight 0.2s ease",
+                  },
+                }}
+              />
+            </ListItemButton>
           </List>
         </Paper>
 
@@ -766,8 +1101,13 @@ export const Settings = () => {
             minHeight: 650,
             width: "100%",
             overflow: "auto",
-            background: (theme) => `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.primary.light, 0.01)} 100%)`,
-            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.08)}`,
+            background: (theme) =>
+              `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(
+                theme.palette.primary.light,
+                0.01
+              )} 100%)`,
+            border: (theme) =>
+              `1px solid ${alpha(theme.palette.primary.main, 0.08)}`,
           }}
         >
           <Box>{renderContenido()}</Box>
@@ -775,6 +1115,7 @@ export const Settings = () => {
       </Stack>
     );
   };
+
 
   return (
     <>

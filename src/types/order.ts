@@ -9,7 +9,7 @@ export interface Order {
     fecha: string;
     estado: string;
     total: number;
-    prendas: OrderClothe[];
+    prendas?: OrderClothe[];
 }
 
 export interface PostOrder {

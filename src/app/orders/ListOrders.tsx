@@ -39,7 +39,7 @@ const getStatusColor = (status?: string) => {
     case "enviado":
       return "warning";
     default:
-      return "default";
+      return "secondary";
   }
 };
 

@@ -28,6 +28,18 @@ export const postClothe = async (clothe: Clothe): Promise<Clothe> => {
   return response.data;
 };
 
+export const updateClothe = async (
+  id: number,
+  data: Partial<Clothe>
+): Promise<Partial<Clothe> | null> => {
+  try {
+    const response = await API.put<Clothe>(`/clothes/${id}`, data);
+    return response.data;
+  } catch {
+    return null;
+  }
+};
+
 export const subirImagenClothe = async (
   id: number,
   imagen: File

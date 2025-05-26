@@ -41,21 +41,8 @@ import {
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { Usuario } from "../../types/user";
-import { createUsuario, deleteUser, getUsuarioById, getUsuarios, updateUsuario } from "../../api/userApi";
-
-interface UserFormData {
-    id?: number;
-    nombre: string;
-    email: string;
-    password?: string;
-    rol?: string;
-    altura: number;
-    cuelloManga: number;
-    pecho: number;
-    cintura: number;
-    cadera: number;
-    entrepierna: number;
-}
+import { createUsuario, deleteUser, getUsuarioById, getUsuarios, updateUsuarioById } from "../../api/userApi";
+import { ModalConfirmation } from "../../components/ModalConfirmation";
 
 export const UsersSettings = () => {
     const [userList, setUserList] = useState<Usuario[]>([]);
@@ -63,9 +50,12 @@ export const UsersSettings = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
+    const [openModal, setOpenModal] = useState(false);
+    const [mensaje, setMensaje] = useState("");
+    const [userToDelete, setUserToDelete] = useState<number | null>(null);
     const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
-    const [selectedUser, setSelectedUser] = useState<UserFormData | null>(null);
-    const [formData, setFormData] = useState<UserFormData>({
+    const [selectedUser, setSelectedUser] = useState<Usuario | null>(null);
+    const [formData, setFormData] = useState<Usuario>({
         nombre: '',
         email: '',
         rol: '',
@@ -94,7 +84,6 @@ export const UsersSettings = () => {
             setUserList(usuarios);
             setFilteredUsers(usuarios);
         } catch (error) {
-            console.error('Error al cargar usuarios:', error);
             showSnackbar('Error al cargar los usuarios', 'error');
         } finally {
             setLoading(false);
@@ -135,7 +124,6 @@ export const UsersSettings = () => {
                         entrepierna: fullUser.entrepierna
                     });
                 } catch (error) {
-                    console.error('Error al cargar detalles del usuario:', error);
                     setFormData({
                         id: user.id,
                         nombre: user.nombre,
@@ -184,28 +172,18 @@ export const UsersSettings = () => {
         });
     };
 
-    const handleInputChange = (field: keyof UserFormData, value: any) => {
+    const handleInputChange = (field: keyof Usuario, value: any) => {
         setFormData(prev => ({
             ...prev,
             [field]: value
         }));
     };
 
-    const handleCreate = async (usuario: Usuario) => {
-        const response = await createUsuario(usuario);
-        return response;
-    };
-
-    const handleUpdate = async (data: Partial<Usuario>) => {
-        const response = await updateUsuario(data);
-        return response;
-    };
-
     const handleSubmit = async () => {
         setLoading(true);
         try {
             if (dialogMode === "create") {
-                const response = await handleCreate(formData);
+                const response = await createUsuario(formData);
                 if (typeof response === "string") {
                     showSnackbar(response, "error");
                     return;
@@ -222,39 +200,22 @@ export const UsersSettings = () => {
                     return;
                 }
 
-                const dataToUpdate: Partial<Usuario> = {};
+                const data: Partial<Usuario> = { id: selectedUser.id };
 
-                if (formData.nombre && formData.nombre !== selectedUser.nombre)
-                    dataToUpdate.nombre = formData.nombre;
-                if (formData.email && formData.email !== selectedUser.email)
-                    dataToUpdate.email = formData.email;
-                if (formData.rol && formData.rol !== selectedUser.rol)
-                    dataToUpdate.rol = formData.rol;
-                if (formData.altura !== selectedUser.altura)
-                    dataToUpdate.altura = formData.altura;
-                if (formData.cuelloManga !== selectedUser.cuelloManga)
-                    dataToUpdate.cuelloManga = formData.cuelloManga;
-                if (formData.pecho !== selectedUser.pecho)
-                    dataToUpdate.pecho = formData.pecho;
-                if (formData.cintura !== selectedUser.cintura)
-                    dataToUpdate.cintura = formData.cintura;
-                if (formData.cadera !== selectedUser.cadera)
-                    dataToUpdate.cadera = formData.cadera;
-                if (formData.entrepierna !== selectedUser.entrepierna)
-                    dataToUpdate.entrepierna = formData.entrepierna;
+                if (formData.nombre !== "") data.nombre = formData.nombre;
+                if (formData.email !== "") data.email = formData.email;
+                if (formData.rol !== "") data.rol = formData.rol;
+                if (formData.altura && !isNaN(Number(formData.altura))) data.altura = Number(formData.altura);
+                if (formData.cuelloManga && !isNaN(Number(formData.cuelloManga))) data.cuelloManga = Number(formData.cuelloManga);
+                if (formData.pecho && !isNaN(Number(formData.pecho))) data.pecho = Number(formData.pecho);
+                if (formData.cintura && !isNaN(Number(formData.cintura))) data.cintura = Number(formData.cintura);
+                if (formData.cadera && !isNaN(Number(formData.cadera))) data.cadera = Number(formData.cadera);
+                if (formData.entrepierna && !isNaN(Number(formData.entrepierna))) data.entrepierna = Number(formData.entrepierna);
 
-                if (Object.keys(dataToUpdate).length === 0) {
-                    showSnackbar("No has introducido ningún dato para actualizar.", "error");
-                    setLoading(false);
-                    return;
-                }
-
-                await handleUpdate(dataToUpdate);
+                await updateUsuarioById(selectedUser.id!, data);
                 await loadUsuarios();
-
                 showSnackbar("Usuario actualizado exitosamente", "success");
             }
-
             handleCloseDialog();
         } catch (error) {
             showSnackbar("Error al procesar la solicitud", "error");
@@ -263,13 +224,20 @@ export const UsersSettings = () => {
         }
     };
 
+    const handleDeleteClick = (userId: number, userName: string) => {
+        setUserToDelete(userId);
+        setMensaje(`¿Estás seguro de que deseas eliminar al usuario "${userName}"? Esta acción no se puede deshacer.`);
+        setOpenModal(true);
+    };
 
-    const handleDelete = async (userId: number) => {
+    const handleConfirmDelete = async () => {
+        if (userToDelete === null) return;
+
         setLoading(true);
         try {
-            await deleteUser(userId);
+            await deleteUser(userToDelete);
 
-            const updatedList = userList.filter(user => user.id !== userId);
+            const updatedList = userList.filter(user => user.id !== userToDelete);
             setUserList(updatedList);
             setFilteredUsers(updatedList);
 
@@ -278,9 +246,11 @@ export const UsersSettings = () => {
             showSnackbar('Error al eliminar al usuario', 'error');
         } finally {
             setLoading(false);
+            setOpenModal(false);
+            setUserToDelete(null);
+            setMensaje("");
         }
     };
-
 
     const showSnackbar = (message: string, severity: 'success' | 'error' | 'warning' | 'info') => {
         setSnackbar({
@@ -480,7 +450,7 @@ export const UsersSettings = () => {
                                                     <IconButton
                                                         size="small"
                                                         color="error"
-                                                        onClick={() => handleDelete(user.id!)}
+                                                        onClick={() => handleDeleteClick(user.id!, user.nombre)}
                                                     >
                                                         <Delete />
                                                     </IconButton>
@@ -751,6 +721,13 @@ export const UsersSettings = () => {
                     </DialogActions>
                 )}
             </Dialog>
+
+            <ModalConfirmation
+                open={openModal}
+                onClose={() => setOpenModal(false)}
+                onConfirm={handleConfirmDelete}
+                mensaje={mensaje}
+            />
 
             <Snackbar
                 open={snackbar.open}

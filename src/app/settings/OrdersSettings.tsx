@@ -24,63 +24,71 @@ import {
     Stack,
     InputAdornment,
     Chip,
+    InputLabel,
+    Select,
+    MenuItem,
 } from "@mui/material";
 import {
-    Add,
     Edit,
     Delete,
     Visibility,
     Close,
     Search,
     Clear,
-    Cases,
     CheckCircle,
-    Cancel,
+    Receipt,
+    LocalShipping,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
-import { Clothe } from "../../types/clothe";
-import { deleteClothe, getClotheById, getClothes, postClothe, updateClothe } from "../../api/clotheApi";
 import { ModalConfirmation } from "../../components/ModalConfirmation";
+import { Order } from "../../types/order";
+import { deleteOrder, getOrderById, getOrders, updateStatusOrder } from "../../api/orderApi";
 
-export const ClotheSettings = () => {
-    const [clotheList, setClotheList] = useState<Clothe[]>([]);
-    const [filteredClothe, setFilteredClothe] = useState<Clothe[]>([]);
+export const OrdersSettings = () => {
+    const [orderList, setOrderList] = useState<Order[]>([]);
+    const [filteredOrder, setFilteredOrder] = useState<Order[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
     const [openModal, setOpenModal] = useState(false);
     const [mensaje, setMensaje] = useState("");
-    const [clotheToDelete, setClotheToDelete] = useState<number | null>(null);
-    const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
-    const [selectedClothe, setSelectedClothe] = useState<Clothe | null>(null);
-    const [formData, setFormData] = useState<Clothe>({
-        nombre: '',
-        precio: 0,
-        descripcion: '',
-        stock: 0,
-        tiendaId: 0,
-        tallaNombre: '',
-        tiendaNombre: '',
+    const [orderToDelete, setOrderToDelete] = useState<number | null>(null);
+    const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [formData, setFormData] = useState<Order>({
+        id: 0,
+        usuario: {
+            id: 0,
+            nombre: ''
+        },
+        fecha: '',
+        estado: '',
+        total: 0,
+        prendas: []
     });
+
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
         severity: 'success' as 'success' | 'error' | 'warning' | 'info'
     });
 
+    const validStatus = ["CONFIRMADO", "ENVIADO", "ENTREGADO"];
+
     useEffect(() => {
-        loadClothe();
+        loadOrders();
     }, []);
 
-    const loadClothe = async () => {
+    const loadOrders = async () => {
         try {
             setLoading(true);
-            const clothes = await getClothes();
-            clothes.sort((a, b) => a.tiendaNombre!.localeCompare(b.tiendaNombre!));
-            setClotheList(clothes);
-            setFilteredClothe(clothes);
+            const orders = await getOrders();
+            console.log("Orders loaded:", orders);
+            orders.sort((a, b) => a.estado!.localeCompare(b.estado!));
+            setOrderList(orders);
+            setFilteredOrder(orders);
         } catch (error) {
-            showSnackbar('Error al cargar las prendas', 'error');
+            showSnackbar('Error al cargar los pedidos', 'error');
         } finally {
             setLoading(false);
         }
@@ -88,68 +96,65 @@ export const ClotheSettings = () => {
 
     useEffect(() => {
         if (!searchTerm.trim()) {
-            setFilteredClothe(clotheList);
+            setFilteredOrder(orderList);
         } else {
             const term = searchTerm.toLowerCase();
 
-            const filtered = clotheList.filter(clothe =>
-                (clothe.nombre || '').toLowerCase().includes(term) ||
-                (clothe.descripcion || '').toLowerCase().includes(term) ||
-                (clothe.precio?.toString() || '').toLowerCase().includes(term) ||
-                (clothe.tiendaNombre || '').toLowerCase().includes(term)
+            const filtered = orderList.filter(order =>
+                (order.usuario.nombre || '').toLowerCase().includes(term) ||
+                (order.estado || '').toLowerCase().includes(term) ||
+                (order.total?.toString() || '').includes(term) ||
+                (order.fecha || '').toLowerCase().includes(term)
             );
 
-            setFilteredClothe(filtered);
+            setFilteredOrder(filtered);
         }
-    }, [searchTerm, clotheList, selectedClothe]);
+    }, [searchTerm, orderList, selectedOrder]);
 
-    const handleOpenDialog = async (mode: 'create' | 'edit' | 'view', clothe?: Clothe) => {
+    const handleOpenDialog = async (mode: 'view' | 'edit', order?: Order) => {
         setDialogMode(mode);
-        if (clothe) {
-            setSelectedClothe(clothe);
+        if (order) {
+            setSelectedOrder(order);
 
             if (mode === 'view' || mode === 'edit') {
                 try {
-                    const fullClothe = await getClotheById(clothe.id!);
+                    const fullOrder = await getOrderById(order.id!);
                     setFormData({
-                        id: fullClothe!.id,
-                        nombre: fullClothe!.nombre,
-                        descripcion: fullClothe!.descripcion,
-                        precio: fullClothe!.precio,
-                        stock: fullClothe!.stock,
-                        tallaNombre: fullClothe!.tallaNombre,
-                        tallaId: fullClothe!.tallaId,
-                        tiendaNombre: fullClothe!.tiendaNombre,
-                        tiendaId: fullClothe!.tiendaId,
-                        imagen: fullClothe!.imagen
-
+                        id: fullOrder!.id,
+                        usuario: {
+                            id: fullOrder!.usuario.id,
+                            nombre: fullOrder!.usuario.nombre
+                        },
+                        fecha: fullOrder!.fecha,
+                        estado: fullOrder!.estado,
+                        total: fullOrder!.total
                     });
                 } catch (error) {
                     setFormData({
-                        id: clothe!.id,
-                        nombre: clothe!.nombre,
-                        descripcion: clothe!.descripcion,
-                        precio: clothe!.precio,
-                        stock: clothe!.stock,
-                        tallaNombre: clothe!.tallaNombre,
-                        tallaId: clothe!.tallaId,
-                        tiendaNombre: clothe!.tiendaNombre,
-                        tiendaId: clothe!.tiendaId,
-                        imagen: clothe!.imagen
+                        id: order!.id,
+                        usuario: {
+                            id: order!.usuario.id,
+                            nombre: order!.usuario.nombre
+                        },
+                        fecha: order!.fecha,
+                        estado: order!.estado,
+                        total: order!.total
                     });
-                    showSnackbar('Error al cargar detalles completos de la prenda', 'warning');
+                    showSnackbar('Error al cargar detalles completos del pedido', 'warning');
                 }
             }
         } else {
-            setSelectedClothe(null);
+            setSelectedOrder(null);
             setFormData({
-                nombre: '',
-                precio: 0,
-                descripcion: '',
-                stock: 0,
-                tiendaId: 0,
-                tallaNombre: '',
-                tiendaNombre: '',
+                id: 0,
+                usuario: {
+                    id: 0,
+                    nombre: ''
+                },
+                fecha: '',
+                estado: '',
+                total: 0,
+                prendas: []
             });
         }
         setOpenDialog(true);
@@ -157,19 +162,21 @@ export const ClotheSettings = () => {
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
-        setSelectedClothe(null);
+        setSelectedOrder(null);
         setFormData({
-            nombre: '',
-            precio: 0,
-            descripcion: '',
-            stock: 0,
-            tiendaId: 0,
-            tallaNombre: '',
-            tiendaNombre: '',
+            id: 0,
+            usuario: {
+                id: 0,
+                nombre: ''
+            },
+            fecha: '',
+            estado: '',
+            total: 0,
+            prendas: []
         });
     };
 
-    const handleInputChange = (field: keyof Clothe, value: any) => {
+    const handleInputChange = (field: keyof Order, value: any) => {
         setFormData(prev => ({
             ...prev,
             [field]: value
@@ -179,38 +186,24 @@ export const ClotheSettings = () => {
     const handleSubmit = async () => {
         setLoading(true);
         try {
-            if (dialogMode === "create") {
-                const response = await postClothe(formData);
-                if (typeof response === "string") {
-                    showSnackbar(response, "error");
-                    return;
-                }
-                const newClothe = response as Clothe;
-                const updatedList = [...clotheList, newClothe];
-                setClotheList(updatedList);
-                setFilteredClothe(updatedList);
-                showSnackbar("Teinda creada exitosamente", "success");
-            } else if (dialogMode === "edit") {
-                if (!selectedClothe) {
-                    showSnackbar("No se ha seleccionado ningúna prenda para editar.", "error");
+            if (dialogMode === "edit") {
+                if (!selectedOrder) {
+                    showSnackbar("No se ha seleccionado ningún pedido para editar.", "error");
                     setLoading(false);
                     return;
                 }
 
-                const data: Partial<Clothe> = { id: selectedClothe.id };
+                const estadoVal = formData.estado.toUpperCase();
 
-                if (formData.nombre !== "") data.nombre = formData.nombre;
-                if (formData.precio && !isNaN(Number(formData.precio))) data.precio = Number(formData.precio);
-                if (formData.stock && !isNaN(Number(formData.stock))) data.stock = Number(formData.stock);
-                if (formData.tallaNombre !== "") data.tallaNombre = formData.tallaNombre;
-                if (formData.tiendaId && !isNaN(Number(formData.tiendaId))) data.tiendaId = Number(formData.tiendaId);
-                if (formData.tiendaNombre !== "") data.tiendaNombre = formData.tiendaNombre;
-                if (formData.tallaId && !isNaN(Number(formData.tallaId))) data.tallaId = Number(formData.tallaId);
-                if (formData.descripcion !== "") data.descripcion = formData.descripcion;
+                if (!validStatus.includes(estadoVal)) {
+                    showSnackbar("Estado inválido. Debe ser CONFIRMADO, ENVIADO o ENTREGADO.", "error");
+                    setLoading(false);
+                    return;
+                }
 
-                await updateClothe(selectedClothe.id!, data);
-                await loadClothe();
-                showSnackbar("Tienda actualizada exitosamente", "success");
+                await updateStatusOrder(selectedOrder.id!, estadoVal);
+                await loadOrders();
+                showSnackbar("Estado actualizado exitosamente", "success");
             }
 
             handleCloseDialog();
@@ -223,21 +216,21 @@ export const ClotheSettings = () => {
 
 
     const handleDeleteClick = (clotheId: number, clothe: string) => {
-        setClotheToDelete(clotheId);
+        setOrderToDelete(clotheId);
         setMensaje(`¿Estás seguro de que deseas eliminar al usuario "${clothe}"? Esta acción no se puede deshacer.`);
         setOpenModal(true);
     };
 
     const handleConfirmDelete = async () => {
-        if (clotheToDelete === null) return;
+        if (orderToDelete === null) return;
 
         setLoading(true);
         try {
-            await deleteClothe(clotheToDelete);
+            await deleteOrder(orderToDelete);
 
-            const updatedList = clotheList.filter(clothe => clothe.id !== clotheToDelete);
-            setClotheList(updatedList);
-            setFilteredClothe(updatedList);
+            const updatedList = orderList.filter(order => order.id !== orderToDelete);
+            setOrderList(updatedList);
+            setFilteredOrder(updatedList);
 
             showSnackbar('Usuario eliminado exitosamente', 'success');
         } catch (error: any) {
@@ -245,7 +238,7 @@ export const ClotheSettings = () => {
         } finally {
             setLoading(false);
             setOpenModal(false);
-            setClotheToDelete(null);
+            setOrderToDelete(null);
             setMensaje("");
         }
     };
@@ -268,10 +261,23 @@ export const ClotheSettings = () => {
 
     const getDialogTitle = () => {
         switch (dialogMode) {
-            case 'create': return 'AÑADIR PRENDA';
-            case 'edit': return 'EDITAR PRENDA';
-            case 'view': return 'PRENDA';
-            default: return 'PRENDA';
+            case 'edit': return 'CAMBIAR ESTADO DE PEDIDO';
+            case 'view': return 'PEDIDO' + (selectedOrder ? ` ${selectedOrder.id}` : '');
+            default: return 'PEDIDO';
+        }
+    };
+
+    const formatDate = (dateString: string) => {
+        try {
+            return new Date(dateString).toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+            });
+        } catch {
+            return dateString;
         }
     };
 
@@ -289,7 +295,7 @@ export const ClotheSettings = () => {
             >
                 <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
                     <Box display="flex" alignItems="center">
-                        <Cases
+                        <Receipt
                             sx={{
                                 mr: 2,
                                 color: (theme) => theme.palette.info.main,
@@ -305,22 +311,9 @@ export const ClotheSettings = () => {
                                 color: (theme) => theme.palette.info.main,
                             }}
                         >
-                            LISTA DE PRENDAS
+                            LISTA DE PEDIDOS
                         </Typography>
                     </Box>
-
-                    <Button
-                        variant="contained"
-                        startIcon={<Add />}
-                        onClick={() => handleOpenDialog('create')}
-                        sx={{
-                            borderRadius: 2,
-                            textTransform: 'none',
-                            fontWeight: 600,
-                        }}
-                    >
-                        Nueva Prenda
-                    </Button>
                 </Box>
 
                 <Divider
@@ -335,7 +328,7 @@ export const ClotheSettings = () => {
                 <Box sx={{ mb: 3 }}>
                     <TextField
                         fullWidth
-                        placeholder="Buscar prenda por nombre, descripción..."
+                        placeholder="Buscar pedido por nombre, estado..."
                         value={searchTerm}
                         onChange={(e) => handleSearchChange(e.target.value)}
                         variant="outlined"
@@ -375,7 +368,7 @@ export const ClotheSettings = () => {
                                 fontSize: { xs: "0.9rem", md: "1rem" },
                             }}
                         >
-                            {filteredClothe.length} prenda {filteredClothe.length !== 1 ? 's' : ''} encontrado{filteredClothe.length !== 1 ? 's' : ''}
+                            {filteredOrder.length} pedido {filteredOrder.length !== 1 ? 's' : ''} encontrado{filteredOrder.length !== 1 ? 's' : ''}
                         </Typography>
                     )}
                 </Box>
@@ -387,7 +380,7 @@ export const ClotheSettings = () => {
                             ml: 2, fontFamily: "'Poppins', sans-serif",
                             fontSize: { xs: "0.9rem", md: "1rem" },
                         }}>
-                            Cargando prendas...
+                            Cargando pedidos...
                         </Typography>
                     </Box>
                 ) : (
@@ -395,51 +388,59 @@ export const ClotheSettings = () => {
                         <Table>
                             <TableHead>
                                 <TableRow sx={{ bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1) }}>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Nombre</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Precio</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Descripción</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Stock</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Tienda</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' }}>ID</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' }}>Comprador</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' }}>Fecha</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' }}>Estado</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' }}>Total</TableCell>
                                     <TableCell sx={{ fontWeight: 'bold' }} align="center">Acciones</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {filteredClothe.map((clothe) => (
-                                    <TableRow key={clothe.id} hover>
-                                        <TableCell>{clothe.nombre}</TableCell>
-                                        <TableCell>{clothe.precio}</TableCell>
-                                        <TableCell>{clothe.descripcion}</TableCell>
+                                {filteredOrder.map((order) => (
+                                    <TableRow key={order.id} hover>
+                                        <TableCell>{order.id}</TableCell>
+                                        <TableCell>{order.usuario.nombre}</TableCell>
+                                        <TableCell>{formatDate(order.fecha)}</TableCell>
                                         <TableCell>
-                                            {clothe.stock > 0 ? (
+                                            {order.estado === "CONFIRMADO" ? (
                                                 <Chip
-                                                    label="STOCK"
-                                                    color="success"
-                                                    icon={<CheckCircle />}
+                                                    label="CONFIRMADO"
+                                                    color="secondary"
+                                                    icon={<Receipt />}
+                                                    variant="outlined"
+                                                    size="small"
+                                                    sx={{ fontFamily: "'Poppins', sans-serif", fontSize: { xs: "0.7rem", md: "0.9rem" }, p: 1 }}
+                                                />
+                                            ) : order.estado === "ENVIADO" ? (
+                                                <Chip
+                                                    label="ENVIADO"
+                                                    color="warning"
+                                                    icon={<LocalShipping />}
                                                     variant="outlined"
                                                     size="small"
                                                     sx={{ fontFamily: "'Poppins', sans-serif", fontSize: { xs: "0.7rem", md: "0.9rem" }, p: 1 }}
                                                 />
                                             ) : (
                                                 <Chip
-                                                    label="SIN STOCK"
-                                                    color="error"
-                                                    icon={<Cancel />}
+                                                    label="ENTREGADO"
+                                                    color="success"
+                                                    icon={<CheckCircle />}
                                                     variant="outlined"
                                                     size="small"
                                                     sx={{ fontFamily: "'Poppins', sans-serif", fontSize: { xs: "0.7rem", md: "0.9rem" }, p: 1 }}
-
                                                 />
                                             )}
                                         </TableCell>
 
-                                        <TableCell>{clothe.tiendaNombre}</TableCell>
+                                        <TableCell>{order.total}</TableCell>
                                         <TableCell align="center">
                                             <Stack direction="row" spacing={1} justifyContent="center">
                                                 <Tooltip title="Ver detalles">
                                                     <IconButton
                                                         size="small"
                                                         color="info"
-                                                        onClick={() => handleOpenDialog('view', clothe)}
+                                                        onClick={() => handleOpenDialog('view', order)}
                                                     >
                                                         <Visibility />
                                                     </IconButton>
@@ -448,7 +449,7 @@ export const ClotheSettings = () => {
                                                     <IconButton
                                                         size="small"
                                                         color="primary"
-                                                        onClick={() => handleOpenDialog('edit', clothe)}
+                                                        onClick={() => handleOpenDialog('edit', order)}
                                                     >
                                                         <Edit />
                                                     </IconButton>
@@ -457,7 +458,7 @@ export const ClotheSettings = () => {
                                                     <IconButton
                                                         size="small"
                                                         color="error"
-                                                        onClick={() => handleDeleteClick(clothe.id!, clothe.nombre)}
+                                                        onClick={() => handleDeleteClick(order.id!, `Pedido # ${order.id}`)}
                                                     >
                                                         <Delete />
                                                     </IconButton>
@@ -466,7 +467,7 @@ export const ClotheSettings = () => {
                                         </TableCell>
                                     </TableRow>
                                 ))}
-                                {filteredClothe.length === 0 && searchTerm && (
+                                {filteredOrder.length === 0 && searchTerm && (
                                     <TableRow>
                                         <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
                                             <Stack alignItems="center" spacing={1}>
@@ -475,7 +476,7 @@ export const ClotheSettings = () => {
                                                     fontFamily: "'Poppins', sans-serif",
                                                     fontSize: { xs: "0.9rem", md: "1rem" },
                                                 }}>
-                                                    No se encontraron prendas
+                                                    No se encontraron pedidos
                                                 </Typography>
                                                 <Typography variant="body2" color="text.disabled" sx={{
                                                     fontFamily: "'Poppins', sans-serif",
@@ -494,14 +495,14 @@ export const ClotheSettings = () => {
                                         </TableCell>
                                     </TableRow>
                                 )}
-                                {clotheList.length === 0 && (
+                                {orderList.length === 0 && (
                                     <TableRow>
                                         <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
                                             <Typography variant="body2" color="text.secondary" sx={{
                                                 fontFamily: "'Poppins', sans-serif",
                                                 fontSize: { xs: "0.9rem", md: "1rem" },
                                             }}>
-                                                No hay prendas creadas
+                                                No hay pedidos creados
                                             </Typography>
                                         </TableCell>
                                     </TableRow>
@@ -550,78 +551,98 @@ export const ClotheSettings = () => {
 
                 <DialogContent sx={{ pt: 2 }}>
                     <Stack spacing={3} sx={{ mt: 2 }}>
-                        <TextField
-                            label="Nombre de la prenda"
-                            value={formData.nombre}
-                            onChange={(e) => handleInputChange('nombre', e.target.value)}
-                            fullWidth
-                            disabled={dialogMode === 'view'}
-                            required
-                            sx={{
-                                background: (theme) => theme.palette.background.paper,
-                                fontFamily: "'Poppins', sans-serif",
-                                fontSize: { xs: "0.9rem", md: "1rem" },
-                            }}
-                        />
 
-                        <TextField
-                            label="Descripción"
-                            value={formData.descripcion}
-                            onChange={(e) => handleInputChange('descripcion', e.target.value)}
-                            fullWidth
-                            disabled={dialogMode === 'view'}
-                            required
-                            multiline
-                            rows={3}
-                            sx={{
-                                background: (theme) => theme.palette.background.paper,
-                                fontFamily: "'Poppins', sans-serif",
-                                fontSize: { xs: "0.9rem", md: "1rem" },
-                            }}
-                        />
+                        {dialogMode === 'view' && (<>
+                            <TextField
+                                label="ID"
+                                value={formData.id}
+                                onChange={(e) => handleInputChange('id', parseInt(e.target.value) || 0)}
+                                fullWidth
+                                disabled
+                                required
+                                sx={{
+                                    background: (theme) => theme.palette.background.paper,
+                                    fontFamily: "'Poppins', sans-serif",
+                                    fontSize: { xs: "0.9rem", md: "1rem" },
+                                }}
+                            />
 
-                        <TextField
-                            label="Precio"
-                            type="number"
-                            value={formData.precio}
-                            onChange={(e) => handleInputChange('precio', parseFloat(e.target.value) || 0)}
-                            fullWidth
-                            disabled={dialogMode === 'view'}
-                            required
-                            InputProps={{
-                                startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                            }}
-                            sx={{
-                                background: (theme) => theme.palette.background.paper,
-                                fontFamily: "'Poppins', sans-serif",
-                                fontSize: { xs: "0.9rem", md: "1rem" },
-                            }}
-                        />
+                            <TextField
+                                label="Comprador"
+                                value={formData.usuario.nombre}
+                                onChange={(e) => handleInputChange('usuario', { ...formData.usuario, nombre: e.target.value })}
+                                fullWidth
+                                disabled
+                                required
+                                rows={3}
+                                sx={{
+                                    background: (theme) => theme.palette.background.paper,
+                                    fontFamily: "'Poppins', sans-serif",
+                                    fontSize: { xs: "0.9rem", md: "1rem" },
+                                }}
+                            />
 
-                        <TextField
-                            label="ID de la tienda"
-                            type="number"
-                            value={formData.tiendaId}
-                            onChange={(e) => handleInputChange('tiendaId', parseInt(e.target.value) || 0)}
-                            fullWidth
-                            disabled={dialogMode === 'view'}
-                            required
-                            inputProps={{ min: 1 }}
-                            sx={{
-                                background: (theme) => theme.palette.background.paper,
-                                fontFamily: "'Poppins', sans-serif",
-                                fontSize: { xs: "0.9rem", md: "1rem" },
-                            }}
-                        />
+                            <TextField
+                                label="Fecha"
+                                type="text"
+                                value={formatDate(formData.fecha)}
+                                onChange={(e) => handleInputChange('fecha', e.target.value)}
+                                fullWidth
+                                disabled
+                                required
+                                sx={{
+                                    background: (theme) => theme.palette.background.paper,
+                                    fontFamily: "'Poppins', sans-serif",
+                                    fontSize: { xs: "0.9rem", md: "1rem" },
+                                }}
+                            />
+                        </>)}
+
+                        {dialogMode === 'edit' ? (
+                            <>
+                                <InputLabel id="estado-label" sx={{ mb: 1, fontWeight: 'bold' }}>ESTADO</InputLabel>
+                                <Select
+                                    labelId="estado-label"
+                                    id="estado-select"
+                                    value={formData.estado}
+                                    label="Estado"
+                                    onChange={(e) => handleInputChange('estado', e.target.value)}
+                                    sx={{
+                                        background: (theme) => theme.palette.background.paper,
+                                        fontFamily: "'Poppins', sans-serif",
+                                        fontSize: { xs: "0.9rem", md: "1rem" },
+                                    }}
+                                    fullWidth
+                                    required
+                                >
+                                    <MenuItem value="CONFIRMADO">CONFIRMADO</MenuItem>
+                                    <MenuItem value="ENVIADO">ENVIADO</MenuItem>
+                                    <MenuItem value="ENTREGADO">ENTREGADO</MenuItem>
+                                </Select>
+                            </>
+                        ) : (
+                            <TextField
+                                label="Estado"
+                                value={formData.estado}
+                                fullWidth
+                                disabled
+                                sx={{
+                                    background: (theme) => theme.palette.background.paper,
+                                    fontFamily: "'Poppins', sans-serif",
+                                    fontSize: { xs: "0.9rem", md: "1rem" },
+                                }}
+                            />
+                        )}
 
                         {dialogMode === 'view' && (
                             <>
                                 <TextField
-                                    label="Nombre de la tienda"
-                                    value={formData.tiendaNombre}
-                                    onChange={(e) => handleInputChange('tiendaNombre', e.target.value)}
+                                    label="Total"
+                                    type="number"
+                                    value={formData.total}
+                                    onChange={(e) => handleInputChange('total', parseFloat(e.target.value) || 0)}
                                     fullWidth
-                                    disabled={dialogMode === 'view'}
+                                    disabled
                                     required
                                     sx={{
                                         background: (theme) => theme.palette.background.paper,
@@ -644,14 +665,14 @@ export const ClotheSettings = () => {
                         <Button
                             onClick={handleSubmit}
                             variant="contained"
-                            disabled={loading || !formData.nombre || !formData.descripcion}
+                            disabled={loading || !formData.id || !formData.usuario.nombre || !formData.fecha || !formData.estado}
                             startIcon={loading && <CircularProgress size={16} />}
                             sx={{
                                 fontFamily: "'Poppins', sans-serif",
                                 fontSize: { xs: "0.9rem", md: "1rem" },
                             }}
                         >
-                            {dialogMode === 'create' ? 'Crear' : 'Guardar'}
+                            Guardar
                         </Button>
                     </DialogActions>
                 )}
