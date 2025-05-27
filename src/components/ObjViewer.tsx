@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 interface ObjViewerProps {
-  size: number;
+  size: number | string;
   filename: string;
   className?: string;
   minDistance?: number;

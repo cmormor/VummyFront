@@ -48,6 +48,8 @@ import {
 } from "../../api/clotheApi";
 import { ModalConfirmation } from "../../components/ModalConfirmation";
 
+// TODO: NOT SEND IMAGE = NULL 
+
 export const ClotheSettings = () => {
   const [clotheList, setClotheList] = useState<Clothe[]>([]);
   const [filteredClothe, setFilteredClothe] = useState<Clothe[]>([]);
@@ -235,7 +237,7 @@ export const ClotheSettings = () => {
 
         await updateClothe(selectedClothe.id!, data);
         await loadClothe();
-        showSnackbar("Tienda actualizada exitosamente", "success");
+        showSnackbar("Prendas actualizada exitosamente", "success");
       }
 
       handleCloseDialog();

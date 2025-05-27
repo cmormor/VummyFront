@@ -1,4 +1,4 @@
-import { alpha, Box, Divider, Paper, Typography, useTheme, useMediaQuery } from "@mui/material";
+import { alpha, Box, Divider, Paper, Typography, useTheme, useMediaQuery, Chip } from "@mui/material";
 import ObjViewer from "../../components/ObjViewer";
 
 export const ManiquieViewSettings = () => {
@@ -33,10 +33,17 @@ export const ManiquieViewSettings = () => {
           border: (theme) => `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
         }}
       >
-        <Box display="flex" alignItems="center" mb={2}>
+        <Box
+          display="flex"
+          alignItems="center"
+          mb={2}
+        >
           <Typography
             variant="h6"
             sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
               fontFamily: "'Poppins', sans-serif",
               fontSize: { xs: "1.1rem", md: "1.3rem" },
               fontWeight: 600,
@@ -44,6 +51,17 @@ export const ManiquieViewSettings = () => {
             }}
           >
             MANIQUÍ
+            <Chip
+              label="EN DESARROLLO"
+              size="medium"
+              variant="outlined"
+              sx={{
+                fontSize: { xs: "0.7rem", sm: "0.75rem" },
+                color: "black",
+                backgroundColor: "warning.light",
+                height: "28px",
+              }}
+            />
           </Typography>
         </Box>
 

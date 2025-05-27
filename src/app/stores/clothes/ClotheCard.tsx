@@ -181,6 +181,8 @@ export const ClotheCard = ({
           onChange={handleFileChange}
         />
 
+        {/* ...otras partes del componente */}
+
         {loading ? (
           <Box
             sx={{
@@ -207,7 +209,7 @@ export const ClotheCard = ({
               alt={nombre}
               sx={{
                 width: "100%",
-                height: "auto",
+                height: "50vh",
                 objectFit: "contain",
                 borderTopLeftRadius: "8px",
                 borderTopRightRadius: "8px",
@@ -218,7 +220,10 @@ export const ClotheCard = ({
           )
         )}
 
-        <Box onClick={handleClick} sx={{ cursor: "pointer" }}>
+        <Box
+          onClick={handleClick}
+          sx={{ cursor: "pointer", mt: imagen ? -8 : 0 }}
+        >
           <CardContent sx={{ padding: 2 }}>
             <Details detail={nombre} fontSize={15} />
             <Details detail={precio} fontSize={15} />
