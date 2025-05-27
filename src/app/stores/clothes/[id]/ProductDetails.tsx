@@ -19,8 +19,6 @@ import {
   Box,
   Skeleton,
   alpha,
-  Alert,
-  AlertTitle,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -135,7 +133,6 @@ export default function ProductDetails() {
 
         setDataRecommended(mejorTalla);
         console.log("Mejor talla recomendada:", mejorTalla);
-
       } catch (error) {
         console.error("Error al obtener tallas recomendadas:", error);
         setDataRecommended(null);
@@ -144,7 +141,6 @@ export default function ProductDetails() {
 
     fetchData();
   }, [storeSizes]);
-
 
   const handleRecommendSize = () => {
     setShowRecommendation(true);
@@ -291,8 +287,9 @@ export default function ProductDetails() {
                 textTransform: "none",
                 color: (theme) => theme.palette.primary.main,
                 borderColor: (theme) => theme.palette.primary.main,
-                '&:hover': {
-                  backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.1),
+                "&:hover": {
+                  backgroundColor: (theme) =>
+                    alpha(theme.palette.primary.main, 0.1),
                 },
               }}
             >
@@ -318,35 +315,60 @@ export default function ProductDetails() {
         </Box>
 
         {showRecommendation && (
-          <Box mb={2}>
-            {dataRecommended ? (
-              <Alert
-                severity="success"
+          <Dialog
+            open={showRecommendation}
+            onClose={() => setShowRecommendation(false)}
+            fullWidth
+            maxWidth="sm"
+            PaperProps={{
+              sx: {
+                background: (theme) => theme.palette.background.paper,
+                border: (theme) => `5px solid ${theme.palette.success.light}`,
+                fontFamily: "'Poppins', sans-serif",
+                textAlign: "center",
+              },
+            }}
+          >
+            <DialogTitle
+              sx={{
+                fontWeight: "bold",
+                color: (theme) => theme.palette.text.primary,
+                fontSize: { xs: "1rem", md: "1.1rem" },
+                textDecorationLine: "underline",
+                textUnderlineOffset: "4px",
+              }}
+            >
+              {dataRecommended
+                ? `TALLA RECOMENDADA`
+                : "No se pudo determinar una talla"}
+            </DialogTitle>
+
+            <DialogContent
+              sx={{
+                fontSize: { xs: "0.9rem", md: "1rem" },
+                color: (theme) => theme.palette.text.primary,
+              }}
+            >
+              {dataRecommended
+                ? "Basado en tus medidas corporales, te recomendamos esta talla para un mejor ajuste."
+                : "Completa tu perfil con tus medidas corporales para obtener recomendaciones personalizadas."}
+              <br />
+              <Typography
                 sx={{
+                  color: (theme) => theme.palette.success.main,
+                  fontWeight: "bold",
                   fontFamily: "'Poppins', sans-serif",
-                  fontSize: { xs: "0.9rem", md: "1rem" },
+                  fontSize: 30,
+                  display: "inline-block",
+                  mt: 2,
+                  pl: 1.5,
+                  pr: 1.5,
                 }}
               >
-                <AlertTitle sx={{ fontWeight: "bold" }}>
-                  Talla recomendada: {dataRecommended.nombre}
-                </AlertTitle>
-                Basado en tus medidas corporales, te recomendamos esta talla para un mejor ajuste.
-              </Alert>
-            ) : (
-              <Alert
-                severity="info"
-                sx={{
-                  fontFamily: "'Poppins', sans-serif",
-                  fontSize: { xs: "0.9rem", md: "1rem" },
-                }}
-              >
-                <AlertTitle sx={{ fontWeight: "bold" }}>
-                  No se pudo determinar una talla.
-                </AlertTitle>
-                Completa tu perfil con tus medidas corporales para obtener recomendaciones personalizadas.
-              </Alert>
-            )}
-          </Box>
+                {dataRecommended?.nombre}
+              </Typography>
+            </DialogContent>
+          </Dialog>
         )}
 
         <FormControl>
@@ -382,7 +404,7 @@ export default function ProductDetails() {
                         <RecommendIcon
                           sx={{
                             fontSize: 16,
-                            color: (theme) => theme.palette.success.main
+                            color: (theme) => theme.palette.success.main,
                           }}
                         />
                       )}
@@ -493,18 +515,24 @@ export default function ProductDetails() {
           GUÍA DE TALLAS
         </DialogTitle>
         <DialogContent>
-          <Box sx={{
-            overflowX: "auto",
-          }}>
-            <Table sx={{
-              minWidth: 650, background: (theme) =>
-                `linear-gradient(135deg, ${alpha(theme.palette.info.light, 0.08)} 0%, ${alpha(
-                  theme.palette.primary.light,
-                  0.05
-                )} 100%)`,
-              border: (theme) => `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
-              color: (theme) => theme.palette.text.primary,
-            }}>
+          <Box
+            sx={{
+              overflowX: "auto",
+            }}
+          >
+            <Table
+              sx={{
+                minWidth: 650,
+                background: (theme) =>
+                  `linear-gradient(135deg, ${alpha(
+                    theme.palette.info.light,
+                    0.08
+                  )} 0%, ${alpha(theme.palette.primary.light, 0.05)} 100%)`,
+                border: (theme) =>
+                  `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
+                color: (theme) => theme.palette.text.primary,
+              }}
+            >
               <TableHead>
                 <TableRow>
                   {[
@@ -538,23 +566,31 @@ export default function ProductDetails() {
                       (a, b) =>
                         ["S", "M", "L", "XL"].indexOf(a.nombre) -
                         ["S", "M", "L", "XL"].indexOf(b.nombre)
-                    ).map((row) => (
+                    )
+                    .map((row) => (
                       <TableRow
                         key={row.id}
                         sx={{
-                          backgroundColor: dataRecommended?.id === row.id
-                            ? (theme) => alpha(theme.palette.success.main, 0.1)
-                            : 'transparent'
+                          backgroundColor:
+                            dataRecommended?.id === row.id
+                              ? (theme) =>
+                                  alpha(theme.palette.success.main, 0.1)
+                              : "transparent",
                         }}
                       >
                         <TableCell align="center">
-                          <Box display="flex" alignItems="center" justifyContent="center" gap={0.5}>
+                          <Box
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            gap={0.5}
+                          >
                             {row.nombre}
                             {dataRecommended?.id === row.id && (
                               <RecommendIcon
                                 sx={{
                                   fontSize: 16,
-                                  color: (theme) => theme.palette.success.main
+                                  color: (theme) => theme.palette.success.main,
                                 }}
                               />
                             )}

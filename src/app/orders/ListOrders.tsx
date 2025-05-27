@@ -25,7 +25,7 @@ import {
   CheckCircle,
   Visibility,
   Store,
-  Close
+  Close,
 } from "@mui/icons-material";
 import { getOrdersByUser } from "../../api/orderApi";
 import { Order } from "../../types/order";
@@ -56,7 +56,8 @@ const getStatusIcon = (status?: string) => {
 
 const formatDate = (dateString: string) => {
   try {
-    return new Date(dateString).toLocaleDateString("es-ES", {
+    return new Date(dateString).toLocaleString("es-ES", {
+      timeZone: "Europe/Madrid",
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -86,7 +87,9 @@ export const ListOrders = () => {
 
         setOrders(fetchedOrders);
       } catch (error) {
-        setError("No se pudieron cargar los pedidos. Inténtalo de nuevo más tarde.");
+        setError(
+          `No se pudieron cargar los pedidos. Inténtalo de nuevo más tarde. ${error}`
+        );
       } finally {
         setLoading(false);
       }
@@ -96,7 +99,7 @@ export const ListOrders = () => {
   }, []);
 
   const openModal = (orderId: number) => {
-    const order = orders.find(o => o.id === orderId);
+    const order = orders.find((o) => o.id === orderId);
     if (order) {
       setSelectedOrder(order);
       setModalOpen(true);
@@ -112,21 +115,29 @@ export const ListOrders = () => {
     return (
       <Container maxWidth="md" sx={{ mt: 3, px: { xs: 1, sm: 3 } }}>
         <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 } }}>
-          <Typography variant="h5" component="h2"
+          <Typography
+            variant="h5"
+            component="h2"
             sx={{
-              display: "flex", alignItems: "center",
+              display: "flex",
+              alignItems: "center",
               gap: 1,
               color: "text.primary",
               fontFamily: "'Poppins', sans-serif",
               fontSize: { xs: "1.1rem", md: "1.25rem" },
-            }}>
+            }}
+          >
             <ShoppingBag color="primary" />
             Mis Pedidos
           </Typography>
           <Divider sx={{ mb: 3 }} />
           {[...Array(5)].map((_, index) => (
             <Box key={index} sx={{ mb: 2 }}>
-              <Skeleton variant="rectangular" height={80} sx={{ borderRadius: 1 }} />
+              <Skeleton
+                variant="rectangular"
+                height={80}
+                sx={{ borderRadius: 1 }}
+              />
             </Box>
           ))}
         </Paper>
@@ -135,29 +146,35 @@ export const ListOrders = () => {
   }
 
   if (error) {
-    return (
-      <ErrorModal error={error} />
-    );
+    return <ErrorModal error={error} />;
   }
 
   if (orders.length === 0) {
     return (
       <Container maxWidth="md" sx={{ mt: 3, px: { xs: 1, sm: 3 } }}>
         <Paper elevation={2} sx={{ p: { xs: 3, sm: 4 }, textAlign: "center" }}>
-          <ShoppingBag sx={{ fontSize: { xs: 48, sm: 64 }, color: "text.disabled", mb: 2 }} />
-          <Typography variant="h6" sx={{
-            color: "text.primary",
-            fontFamily: "'Poppins', sans-serif",
-            fontSize: { xs: "1rem", md: "1.25rem" },
-            mb: 1,
-          }}>
+          <ShoppingBag
+            sx={{ fontSize: { xs: 48, sm: 64 }, color: "text.disabled", mb: 2 }}
+          />
+          <Typography
+            variant="h6"
+            sx={{
+              color: "text.primary",
+              fontFamily: "'Poppins', sans-serif",
+              fontSize: { xs: "1rem", md: "1.25rem" },
+              mb: 1,
+            }}
+          >
             No tienes pedidos aún.
           </Typography>
-          <Typography variant="body2" color="textSecondary"
+          <Typography
+            variant="body2"
+            color="textSecondary"
             sx={{
               fontFamily: "'Poppins', sans-serif",
               fontSize: { xs: "0.85rem", md: "1rem" },
-            }}>
+            }}
+          >
             Cuando realices tu primer pedido, aparecerá aquí.
           </Typography>
         </Paper>
@@ -167,18 +184,25 @@ export const ListOrders = () => {
 
   return (
     <>
-      <Container maxWidth="md" sx={{ mt: { xs: 2, sm: 5 }, px: { xs: 1, sm: 3 } }}>
+      <Container
+        maxWidth="md"
+        sx={{ mt: { xs: 2, sm: 5 }, px: { xs: 1, sm: 3 } }}
+      >
         <Paper elevation={2} sx={{ overflow: "hidden" }}>
-          <Box sx={{
-            p: { xs: 2, sm: 2.5 },
-            bgcolor: "primary.main",
-            color: "primary.contrastText",
-          }}>
-            <Box sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}>
+          <Box
+            sx={{
+              p: { xs: 2, sm: 2.5 },
+              bgcolor: "primary.main",
+              color: "primary.contrastText",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <ShoppingBag sx={{ fontSize: { xs: 32, sm: 50 } }} />
               <Box
                 component="img"
@@ -193,14 +217,20 @@ export const ListOrders = () => {
                 }}
               />
             </Box>
-            <Typography variant="body2" sx={{
-              opacity: 0.9,
-              mt: 1,
-              color: "white",
-              fontFamily: "'Poppins', sans-serif",
-              fontSize: { xs: "0.85rem", md: "1rem" },
-            }}>
-              {orders.length} {orders.length === 1 ? "PEDIDO ENCONTRADO" : "PEDIDOS ENCONTRADOS"}
+            <Typography
+              variant="body2"
+              sx={{
+                opacity: 0.9,
+                mt: 1,
+                color: "white",
+                fontFamily: "'Poppins', sans-serif",
+                fontSize: { xs: "0.85rem", md: "1rem" },
+              }}
+            >
+              {orders.length}{" "}
+              {orders.length === 1
+                ? "PEDIDO ENCONTRADO"
+                : "PEDIDOS ENCONTRADOS"}
             </Typography>
           </Box>
 
@@ -220,24 +250,38 @@ export const ListOrders = () => {
                   }}
                 >
                   <ListItemIcon sx={{ minWidth: { xs: 60, sm: 80 } }}>
-                    <Avatar sx={{
-                      bgcolor: "primary.light",
-                      width: { xs: 40, sm: 50 },
-                      height: { xs: 40, sm: 50 }
-                    }}>
+                    <Avatar
+                      sx={{
+                        bgcolor: "primary.light",
+                        width: { xs: 40, sm: 50 },
+                        height: { xs: 40, sm: 50 },
+                      }}
+                    >
                       {getStatusIcon(order.estado)}
                     </Avatar>
                   </ListItemIcon>
 
                   <ListItemText
                     primary={
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1, flexWrap: "wrap" }}>
-                        <Typography variant="h6" component="span" sx={{
-                          color: "text.primary",
-                          fontFamily: "'Poppins', sans-serif",
-                          fontSize: { xs: "0.95rem", md: "1.1rem" },
-                          fontWeight: 600,
-                        }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          mb: 1,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <Typography
+                          variant="h6"
+                          component="span"
+                          sx={{
+                            color: "text.primary",
+                            fontFamily: "'Poppins', sans-serif",
+                            fontSize: { xs: "0.95rem", md: "1.1rem" },
+                            fontWeight: 600,
+                          }}
+                        >
                           Pedido #{order.id}
                         </Typography>
                         {order.estado && (
@@ -252,25 +296,52 @@ export const ListOrders = () => {
                       </Box>
                     }
                     secondary={
-                      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-                          <CalendarToday sx={{ fontSize: { xs: 14, sm: 16 }, color: "text.disabled" }} />
-                          <Typography variant="body2" color="textSecondary" sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            fontSize: { xs: "0.75rem", md: "0.85rem" },
-                          }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 0.5,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            mb: 1,
+                          }}
+                        >
+                          <CalendarToday
+                            sx={{
+                              fontSize: { xs: 14, sm: 16 },
+                              color: "text.disabled",
+                            }}
+                          />
+                          <Typography
+                            variant="body2"
+                            color="textSecondary"
+                            sx={{
+                              fontFamily: "'Poppins', sans-serif",
+                              fontSize: { xs: "0.75rem", md: "0.85rem" },
+                            }}
+                          >
                             {formatDate(order.fecha)}
                           </Typography>
                         </Box>
                         {order.total && (
-                          <Typography variant="body2" color="primary" sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            fontSize: { xs: "0.85rem", md: "0.95rem" },
-                            fontWeight: 600,
-                          }}>
-                            TOTAL: {order.total.toLocaleString("es-ES", {
+                          <Typography
+                            variant="body2"
+                            color="primary"
+                            sx={{
+                              fontFamily: "'Poppins', sans-serif",
+                              fontSize: { xs: "0.85rem", md: "0.95rem" },
+                              fontWeight: 600,
+                            }}
+                          >
+                            TOTAL:{" "}
+                            {order.total.toLocaleString("es-ES", {
                               style: "currency",
-                              currency: "EUR"
+                              currency: "EUR",
                             })}
                           </Typography>
                         )}
@@ -285,13 +356,17 @@ export const ListOrders = () => {
                     }}
                     sx={{ ml: "auto" }}
                   >
-                    <Visibility sx={{
-                      color: "text.primary",
-                      fontSize: { xs: 24, sm: 30 }
-                    }} />
+                    <Visibility
+                      sx={{
+                        color: "text.primary",
+                        fontSize: { xs: 24, sm: 30 },
+                      }}
+                    />
                   </IconButton>
                 </ListItem>
-                {index < orders.length - 1 && <Divider variant="inset" component="li" />}
+                {index < orders.length - 1 && (
+                  <Divider variant="inset" component="li" />
+                )}
               </Box>
             ))}
           </List>
@@ -306,58 +381,63 @@ export const ListOrders = () => {
         slotProps={{
           backdrop: {
             timeout: 500,
-            sx: { backdropFilter: 'blur(4px)' }
+            sx: { backdropFilter: "blur(4px)" },
           },
         }}
       >
         <Fade in={modalOpen}>
           <Box
             sx={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: { xs: '95%', sm: '90%', md: 650 },
-              maxHeight: '90vh',
-              overflowY: 'auto',
-              bgcolor: 'background.paper',
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: { xs: "95%", sm: "90%", md: 650 },
+              maxHeight: "90vh",
+              overflowY: "auto",
+              bgcolor: "background.paper",
               borderRadius: 4,
-              boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+              boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
             }}
           >
             <Box
               sx={{
-                bgcolor: 'background.default',
+                bgcolor: "background.default",
                 p: { xs: 2, sm: 3 },
-                borderRadius: '16px 16px 0 0',
-                position: 'relative',
-                overflow: 'hidden',
+                borderRadius: "16px 16px 0 0",
+                position: "relative",
+                overflow: "hidden",
               }}
             >
-              <Box sx={{ position: 'relative', zIndex: 1 }}>
-                <Box sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  mb: { xs: 1.5, sm: 2 },
-                  flexWrap: { xs: 'wrap', sm: 'nowrap' },
-                  gap: 1
-                }}>
-                  <Typography variant="h5" sx={{
-                    fontWeight: 600,
-                    fontFamily: "'Poppins', sans-serif",
-                    fontSize: { xs: "1.2rem", md: "1.5rem" },
-                    color: "text.primary",
-                  }}>
+              <Box sx={{ position: "relative", zIndex: 1 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mb: { xs: 1.5, sm: 2 },
+                    flexWrap: { xs: "wrap", sm: "nowrap" },
+                    gap: 1,
+                  }}
+                >
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: 600,
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: { xs: "1.2rem", md: "1.5rem" },
+                      color: "text.primary",
+                    }}
+                  >
                     PEDIDO #{selectedOrder?.id}
                   </Typography>
                   <IconButton
                     onClick={closeModal}
                     sx={{
-                      color: 'text.primary',
-                      bgcolor: 'background.paper',
-                      '&:hover': {
-                        bgcolor: 'action.hover',
+                      color: "text.primary",
+                      bgcolor: "background.paper",
+                      "&:hover": {
+                        bgcolor: "action.hover",
                       },
                     }}
                   >
@@ -365,35 +445,41 @@ export const ListOrders = () => {
                   </IconButton>
                 </Box>
 
-                <Box sx={{
-                  display: 'flex',
-                  gap: { xs: 1, sm: 2 },
-                  flexWrap: 'wrap'
-                }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: { xs: 1, sm: 2 },
+                    flexWrap: "wrap",
+                  }}
+                >
                   <Chip
-                    icon={<CalendarToday sx={{ fontSize: { xs: 16, sm: 18 } }} />}
-                    label={selectedOrder?.fecha && formatDate(selectedOrder.fecha)}
+                    icon={
+                      <CalendarToday sx={{ fontSize: { xs: 16, sm: 18 } }} />
+                    }
+                    label={
+                      selectedOrder?.fecha && formatDate(selectedOrder.fecha)
+                    }
                     sx={{
-                      backgroundColor: 'background.paper',
-                      color: 'text.primary',
+                      backgroundColor: "background.paper",
+                      color: "text.primary",
                       fontFamily: "'Poppins', sans-serif",
                       fontSize: { xs: "0.7rem", md: "0.8rem" },
-                      '& .MuiChip-label': {
-                        px: { xs: 1, sm: 1.5 }
-                      }
+                      "& .MuiChip-label": {
+                        px: { xs: 1, sm: 1.5 },
+                      },
                     }}
                   />
                   <Chip
                     icon={getStatusIcon(selectedOrder?.estado)}
                     label={selectedOrder?.estado}
                     sx={{
-                      backgroundColor: 'background.paper',
-                      color: 'text.primary',
+                      backgroundColor: "background.paper",
+                      color: "text.primary",
                       fontFamily: "'Poppins', sans-serif",
                       fontSize: { xs: "0.7rem", md: "0.8rem" },
-                      '& .MuiChip-label': {
-                        px: { xs: 1, sm: 1.5 }
-                      }
+                      "& .MuiChip-label": {
+                        px: { xs: 1, sm: 1.5 },
+                      },
                     }}
                   />
                 </Box>
@@ -403,27 +489,36 @@ export const ListOrders = () => {
             <Box sx={{ p: { xs: 2, sm: 3 } }}>
               <Box
                 sx={{
-                  color: 'text.primary',
+                  color: "text.primary",
                   p: { xs: 2, sm: 2.5 },
                   borderRadius: 3,
                   mb: 3,
-                  textAlign: 'center',
-                  background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                  textAlign: "center",
+                  background: (theme) =>
+                    `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
                 }}
               >
-                <Typography variant="body2" color="white" sx={{
-                  opacity: 0.9,
-                  mb: 0.5,
-                  fontFamily: "'Poppins', sans-serif",
-                  fontSize: { xs: "0.8rem", md: "0.9rem" },
-                }}>
+                <Typography
+                  variant="body2"
+                  color="white"
+                  sx={{
+                    opacity: 0.9,
+                    mb: 0.5,
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: { xs: "0.8rem", md: "0.9rem" },
+                  }}
+                >
                   TOTAL DEL PEDIDO
                 </Typography>
-                <Typography variant="h4" color="white" sx={{
-                  fontWeight: 700,
-                  fontFamily: "'Poppins', sans-serif",
-                  fontSize: { xs: "1.8rem", md: "2.125rem" },
-                }}>
+                <Typography
+                  variant="h4"
+                  color="white"
+                  sx={{
+                    fontWeight: 700,
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: { xs: "1.8rem", md: "2.125rem" },
+                  }}
+                >
                   {selectedOrder?.total?.toLocaleString("es-ES", {
                     style: "currency",
                     currency: "EUR",
@@ -432,38 +527,43 @@ export const ListOrders = () => {
               </Box>
 
               <Box sx={{ mb: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <ShoppingBag sx={{ color: 'primary.main' }} />
-                  <Typography variant="h6" sx={{
-                    fontWeight: 600,
-                    fontFamily: "'Poppins', sans-serif",
-                    fontSize: { xs: "1rem", md: "1.2rem" },
-                  }}>
+                <Box
+                  sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
+                >
+                  <ShoppingBag sx={{ color: "primary.main" }} />
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 600,
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: { xs: "1rem", md: "1.2rem" },
+                    }}
+                  >
                     Productos ({selectedOrder?.prendas?.length || 0})
                   </Typography>
                 </Box>
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   {selectedOrder?.prendas?.map((prenda) => (
                     <Box
                       key={prenda.id}
                       sx={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
+                        display: "flex",
+                        alignItems: "flex-start",
                         gap: { xs: 1.5, sm: 2 },
                         p: { xs: 2, sm: 2.5 },
-                        border: '1px solid',
-                        borderColor: 'divider',
+                        border: "1px solid",
+                        borderColor: "divider",
                         borderRadius: 3,
-                        bgcolor: 'background.default',
-                        transition: 'all 0.3s ease',
-                        '&:hover': {
-                          transform: { xs: 'none', sm: 'translateY(-2px)' },
-                          boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
-                          borderColor: 'primary.main',
+                        bgcolor: "background.default",
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          transform: { xs: "none", sm: "translateY(-2px)" },
+                          boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
+                          borderColor: "primary.main",
                         },
-                        position: 'relative',
-                        overflow: 'hidden',
+                        position: "relative",
+                        overflow: "hidden",
                       }}
                     >
                       <Box>
@@ -475,7 +575,7 @@ export const ListOrders = () => {
                             width: { xs: 75, sm: 90 },
                             height: { xs: 75, sm: 90 },
                             ml: -1.5,
-                            mt: 1.5
+                            mt: 1.5,
                           }}
                         />
                       </Box>
@@ -486,7 +586,7 @@ export const ListOrders = () => {
                           sx={{
                             fontWeight: 600,
                             mb: 0.5,
-                            color: 'text.primary',
+                            color: "text.primary",
                             fontFamily: "'Poppins', sans-serif",
                             fontSize: { xs: "0.9rem", md: "1rem" },
                           }}
@@ -507,12 +607,14 @@ export const ListOrders = () => {
                           {prenda.prenda.descripcion}
                         </Typography>
 
-                        <Box sx={{
-                          display: 'flex',
-                          flexWrap: 'wrap',
-                          gap: 1,
-                          mb: 1.5
-                        }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: 1,
+                            mb: 1.5,
+                          }}
+                        >
                           <Chip
                             size="small"
                             label={`${prenda.prenda.precio}€`}
@@ -536,12 +638,27 @@ export const ListOrders = () => {
                           />
                         </Box>
 
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <Store sx={{ fontSize: { xs: 16, sm: 18 }, color: 'text.secondary' }} />
-                          <Typography variant="body2" color="text.secondary" sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            fontSize: { xs: "0.75rem", md: "0.85rem" },
-                          }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.5,
+                          }}
+                        >
+                          <Store
+                            sx={{
+                              fontSize: { xs: 16, sm: 18 },
+                              color: "text.secondary",
+                            }}
+                          />
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              fontFamily: "'Poppins', sans-serif",
+                              fontSize: { xs: "0.75rem", md: "0.85rem" },
+                            }}
+                          >
                             {prenda.prenda.tiendaNombre}
                           </Typography>
                         </Box>
