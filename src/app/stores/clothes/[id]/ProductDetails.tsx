@@ -132,7 +132,6 @@ export default function ProductDetails() {
         }
 
         setDataRecommended(mejorTalla);
-        console.log("Mejor talla recomendada:", mejorTalla);
       } catch (error) {
         console.error("Error al obtener tallas recomendadas:", error);
         setDataRecommended(null);
@@ -574,7 +573,7 @@ export default function ProductDetails() {
                           backgroundColor:
                             dataRecommended?.id === row.id
                               ? (theme) =>
-                                  alpha(theme.palette.success.main, 0.1)
+                                alpha(theme.palette.success.main, 0.1)
                               : "transparent",
                         }}
                       >

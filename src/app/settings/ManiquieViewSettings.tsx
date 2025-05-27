@@ -1,13 +1,28 @@
-import { alpha, Box, Divider, Paper, Typography } from "@mui/material";
+import { alpha, Box, Divider, Paper, Typography, useTheme, useMediaQuery } from "@mui/material";
 import ObjViewer from "../../components/ObjViewer";
 
 export const ManiquieViewSettings = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const getViewerSize = () => {
+    if (isSmallMobile) return 280;
+    if (isMobile) return 400;
+    return 700;
+  };
+
   return (
-    <Box sx={{ mt: 2, maxWidth: 800 }}>
+    <Box sx={{
+      mt: 2,
+      maxWidth: 800,
+      px: { xs: 1, sm: 2 },
+      width: '100%'
+    }}>
       <Paper
         elevation={4}
         sx={{
-          p: 3,
+          p: { xs: 2, sm: 3 },
           mb: 3,
           borderRadius: 3,
           background: (theme) =>
@@ -40,7 +55,21 @@ export const ManiquieViewSettings = () => {
             borderRadius: 1,
           }}
         />
-        <ObjViewer size={700} filename="/vummy.obj" />
+
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            overflow: 'hidden',
+          }}
+        >
+          <ObjViewer
+            size={getViewerSize()}
+            filename="/maniquieV2.obj"
+          />
+        </Box>
       </Paper>
     </Box>
   );

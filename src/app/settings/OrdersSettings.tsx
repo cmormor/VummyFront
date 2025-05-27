@@ -89,7 +89,6 @@ export const OrdersSettings = () => {
     try {
       setLoading(true);
       const orders = await getOrders();
-      console.log("Orders loaded:", orders);
       orders.sort((a, b) => a.estado!.localeCompare(b.estado!));
       setOrderList(orders);
       setFilteredOrder(orders);

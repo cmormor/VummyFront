@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
@@ -369,13 +367,23 @@ export default function ObjViewer(props: ObjViewerProps) {
 
     const scene = new THREE.Scene();
 
-    // Iluminación simple sin sombras
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+    const ambientLight = new THREE.AmbientLight(0x404040, 1.2);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(5, 5, 5);
-    scene.add(directionalLight);
+    const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight1.position.set(5, 5, 5);
+    scene.add(directionalLight1);
+
+    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.6);
+    directionalLight2.position.set(-5, 5, -5);
+    scene.add(directionalLight2);
+
+    const directionalLight3 = new THREE.DirectionalLight(0xffffff, 0.4);
+    directionalLight3.position.set(0, -5, 0);
+    scene.add(directionalLight3);
+
+    const hemisphereLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 0.5);
+    scene.add(hemisphereLight);
 
     try {
       const loader = new OBJLoader();
@@ -393,21 +401,29 @@ export default function ObjViewer(props: ObjViewerProps) {
 
       const bounding = new THREE.Box3().setFromObject(obj);
       const center = bounding.getCenter(new THREE.Vector3());
+      const size = bounding.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
 
       obj.position.sub(center);
 
-      camera.position.set(0, 0, 5);
+      const distance = maxDim * 0.8;
+
+      camera.position.set(0, 0, distance);
+      camera.up.set(0, 1, 0);
       camera.lookAt(0, 0, 0);
 
       const controls = new OrbitControls(camera, renderer.domElement);
-      controls.enableZoom = false;
-      controls.minDistance = 150;
-      controls.maxDistance = 150;
-      controls.enableRotate = true;
-      controls.autoRotate = true;
-      controls.autoRotateSpeed = 1.0;
+      controls.enableZoom = props.enableZoom ?? true;
+      controls.minDistance = props.minDistance ?? maxDim * 0.5;
+      controls.maxDistance = props.maxDistance ?? maxDim * 5;
+      controls.enableRotate = props.enableRotate ?? true;
+      controls.enablePan = props.enablePan ?? true;
+      controls.autoRotate = props.autoRotate ?? true;
+      controls.autoRotateSpeed = props.autoRotateSpeed ?? 1.0;
 
       controls.target.set(0, 0, 0);
+
+      controls.update();
 
       const handleResize = () => {
         const newWidth = div.clientWidth;
@@ -499,7 +515,7 @@ export default function ObjViewer(props: ObjViewerProps) {
       style={{
         width: props.size,
         height: props.size,
-        border: "1px solid #ddd",
+        border: "1px solid #1976d2",
         borderRadius: "8px",
         overflow: "hidden",
       }}
