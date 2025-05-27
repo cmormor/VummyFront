@@ -498,7 +498,7 @@ export const OrdersSettings = () => {
                       )}
                     </TableCell>
 
-                    <TableCell>{order.total}</TableCell>
+                    <TableCell>{order.total.toFixed(2)}</TableCell>
                     <TableCell align="center">
                       <Stack
                         direction="row"
@@ -746,7 +746,7 @@ export const OrdersSettings = () => {
                 <TextField
                   label="Total"
                   type="number"
-                  value={formData.total}
+                  value={formData.total.toFixed(2)}
                   onChange={(e) =>
                     handleInputChange("total", parseFloat(e.target.value) || 0)
                   }
