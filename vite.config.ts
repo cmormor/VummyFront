@@ -10,6 +10,7 @@ export default defineConfig({
           react: ["react", "react-dom"],
           mui: ["@mui/material", "@mui/icons-material"],
           router: ["react-router-dom"],
+          three: ["three"],
         },
       },
     },
