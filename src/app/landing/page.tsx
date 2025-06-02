@@ -68,20 +68,7 @@ export const Landing = () => {
 
             Para mantener la precisión del sistema, tus medidas se actualizarán cada tres meses, adaptándose a los cambios naturales de tu cuerpo.
 
-
-
           </Typography>
-
-          <Typography
-            variant="body1"
-            sx={{
-              textAlign: "center",
-              color: (theme) => theme.palette.text.primary,
-              lineHeight: "1.5",
-              fontFamily: "'Poppins', sans-serif",
-              fontSize: { xs: "0.9rem", md: "1rem" },
-            }}
-          >Como mejora futura, se prevé incorporar un maniquí virtual 3D personalizado que permita visualizar cómo te quedarían las prendas, ofreciendo una experiencia aún más inmersiva y personalizada.</Typography>
 
           <Typography
             variant="body1"

@@ -116,8 +116,15 @@ export const ResetPassword = () => {
                             gap={2}
                             justifyContent="center"
                             alignItems="center"
-                            sx={{ width: { xs: "90vw", sm: "400px", md: "450px" }, margin: "0 auto" }}
+                            sx={{
+                                width: "100%",
+                                maxWidth: 450,
+                                margin: "0 auto",
+                                boxSizing: "border-box",
+                                px: 2,
+                            }}
                         >
+
                             <TextField
                                 fullWidth
                                 label="Email"
