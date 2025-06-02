@@ -31,17 +31,24 @@ export const createUsuario = async (
 
     return response.data;
   } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
+    const err = error as AxiosError<{ errores?: Record<string, string> }>;
 
     if (err.response?.status === 409) {
       return "El nombre o el correo electrónico ya están en uso.";
     }
 
-    return (
-      err.response?.data?.message || "Hubo un error al registrar el usuario."
-    );
+    const errores = err.response?.data?.errores;
+
+    if (errores) {
+      const mensajes = Object.values(errores).join(" | ");
+      return mensajes;
+    }
+
+    return "Hubo un error al registrar el usuario.";
   }
 };
+
+
 
 export const loginUsuario = async (
   email: string,

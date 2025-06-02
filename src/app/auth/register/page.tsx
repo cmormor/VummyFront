@@ -1,19 +1,54 @@
 import { useState } from "react";
+import * as yup from "yup";
 import { createUsuario } from "../../../api/userApi";
-import { Usuario } from "../../../types/user";
 import {
   Box,
   TextField,
   Button,
   Typography,
   Stack,
-  Alert,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Title } from "../../../components/Title";
 import { FormCard } from "../../../components/FormCard";
 import { Layout } from "../../../components/Layout";
 import { Loading } from "../../../components/Loading";
+
+const schema = yup.object().shape({
+  nombre: yup.string().min(3, "Mínimo 3 caracteres").required("El nombre es obligatorio"),
+  email: yup.string().email("Email inválido").required("El email es obligatorio"),
+  password: yup.string().min(8, "Mínimo 8 caracteres").required("La contraseña es obligatoria"),
+  altura: yup
+    .number()
+    .typeError("La altura debe ser un número")
+    .min(100, "La altura debe ser al menos 100 cm")
+    .required("La altura es obligatoria"),
+  cuelloManga: yup
+    .number()
+    .typeError("El cuello/manga debe ser un número")
+    .min(25, "El cuello/manga debe ser al menos 25 cm")
+    .required("El cuello/manga es obligatorio"),
+  pecho: yup
+    .number()
+    .typeError("El pecho debe ser un número")
+    .min(60, "El pecho debe ser al menos 60 cm")
+    .required("El pecho es obligatorio"),
+  cintura: yup
+    .number()
+    .typeError("La cintura debe ser un número")
+    .min(50, "La cintura debe ser al menos 50 cm")
+    .required("La cintura es obligatoria"),
+  cadera: yup
+    .number()
+    .typeError("La cadera debe ser un número")
+    .min(50, "La cadera debe ser al menos 50 cm")
+    .required("La cadera es obligatoria"),
+  entrepierna: yup
+    .number()
+    .typeError("La entrepierna debe ser un número")
+    .min(50, "La entrepierna debe ser al menos 50 cm")
+    .required("La entrepierna es obligatoria"),
+});
 
 export const Register = () => {
   const [nombre, setNombre] = useState("");
@@ -26,77 +61,64 @@ export const Register = () => {
   const [cadera, setCadera] = useState<number | string>("");
   const [entrepierna, setEntrepierna] = useState<number | string>("");
   const [error, setError] = useState<string | null>(null);
+  const [errorsForm, setErrorsForm] = useState<{ [key: string]: string }>({});
   const [isLoading, isSetLoading] = useState(false);
 
   const navigate = useNavigate();
 
-  const validarMedidas = () => {
-    if (+altura < 100 || +altura <= 0) {
-      alert("La altura debe ser al menos 100 cm y no puede ser negativa.");
-      return false;
-    }
-    if (+cuelloManga < 25 || +cuelloManga <= 0) {
-      alert("El cuello/manga debe ser al menos 25 cm y no puede ser negativa.");
-      return false;
-    }
-    if (+pecho < 60 || +pecho <= 0) {
-      alert("El pecho debe ser al menos 60 cm y no puede ser negativo.");
-      return false;
-    }
-    if (+cintura < 50 || +cintura <= 0) {
-      alert("La cintura debe ser al menos 50 cm y no puede ser negativa.");
-      return false;
-    }
-    if (+cadera < 50 || +cadera <= 0) {
-      alert("La cadera debe ser al menos 50 cm y no puede ser negativa.");
-      return false;
-    }
-    if (+entrepierna < 50 || +entrepierna <= 0) {
-      alert("La entrepierna debe ser al menos 50 cm y no puede ser negativa.");
-      return false;
-    }
-    return true;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validarMedidas()) {
-      return;
-    }
-
-    const newUser: Omit<Usuario, "id"> = {
+    const data = {
       nombre,
       email,
       password,
-      altura: +altura,
-      cuelloManga: +cuelloManga,
-      pecho: +pecho,
-      cintura: +cintura,
-      cadera: +cadera,
-      entrepierna: +entrepierna,
+      altura: Number(altura),
+      cuelloManga: Number(cuelloManga),
+      pecho: Number(pecho),
+      cintura: Number(cintura),
+      cadera: Number(cadera),
+      entrepierna: Number(entrepierna),
     };
 
-    isSetLoading(true);
-
-    const result = await createUsuario(newUser);
-
-    isSetLoading(false);
-
-    if (typeof result === "string") {
-      setError(result);
-    } else {
-      setNombre("");
-      setEmail("");
-      setPassword("");
-      setAltura("");
-      setCuelloManga("");
-      setPecho("");
-      setCintura("");
-      setCadera("");
-      setEntrepierna("");
+    try {
+      setErrorsForm({});
       setError(null);
-      navigate("/home", { replace: true });
+
+      await schema.validate(data, { abortEarly: false });
+
+      isSetLoading(true);
+
+      const result = await createUsuario(data);
+
+      isSetLoading(false);
+
+      if (typeof result === "string") {
+        setError(result);
+      } else {
+        setNombre("");
+        setEmail("");
+        setPassword("");
+        setAltura("");
+        setCuelloManga("");
+        setPecho("");
+        setCintura("");
+        setCadera("");
+        setEntrepierna("");
+        setError(null);
+        navigate("/home", { replace: true });
+      }
+    } catch (validationError: any) {
+      isSetLoading(false);
+      if (validationError.inner) {
+        const formErrors: { [key: string]: string } = {};
+        validationError.inner.forEach((err: any) => {
+          if (err.path) formErrors[err.path] = err.message;
+        });
+        setErrorsForm(formErrors);
+      } else {
+        setError("Error inesperado en la validación");
+      }
     }
   };
 
@@ -140,13 +162,12 @@ export const Register = () => {
               </Typography>
             </Box>
 
-            {error && <Alert severity="error">{error}</Alert>}
             <form onSubmit={handleSubmit}>
               <Box
                 display="flex"
                 flexDirection="column"
                 alignItems="center"
-                gap={3}
+                gap={4.5}
               >
                 <Box
                   display="flex"
@@ -161,22 +182,45 @@ export const Register = () => {
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
                     required
+                    error={!!errorsForm.nombre}
+                    helperText={errorsForm.nombre}
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
+                      '& .MuiFormHelperText-root.Mui-error': {
+                        color: 'error.main',
+                        fontWeight: 'bold',
+                      },
+                      '& .MuiFilledInput-root.Mui-error': {
+                        borderBottom: '2px solid #ff4444',
+                      },
+                      '& .MuiInputLabel-root.Mui-error': {
+                        color: '#ff4444',
+                      },
                     }}
                   />
                   <TextField
                     fullWidth
                     label="Email"
                     variant="filled"
-                    type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    error={!!errorsForm.email}
+                    helperText={errorsForm.email}
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
+                      '& .MuiFormHelperText-root.Mui-error': {
+                        color: 'error.main',
+                        fontWeight: 'bold',
+                      },
+                      '& .MuiFilledInput-root.Mui-error': {
+                        borderBottom: '2px solid #ff4444',
+                      },
+                      '& .MuiInputLabel-root.Mui-error': {
+                        color: '#ff4444',
+                      },
                     }}
                   />
                   <TextField
@@ -187,9 +231,21 @@ export const Register = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    error={!!errorsForm.password}
+                    helperText={errorsForm.password}
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
+                      '& .MuiFormHelperText-root.Mui-error': {
+                        color: 'error.main',
+                        fontWeight: 'bold',
+                      },
+                      '& .MuiFilledInput-root.Mui-error': {
+                        borderBottom: '2px solid #ff4444',
+                      },
+                      '& .MuiInputLabel-root.Mui-error': {
+                        color: '#ff4444',
+                      },
                     }}
                   />
                 </Box>
@@ -208,9 +264,21 @@ export const Register = () => {
                     value={altura}
                     onChange={(e) => setAltura(e.target.value)}
                     required
+                    error={!!errorsForm.altura}
+                    helperText={errorsForm.altura}
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
+                      '& .MuiFormHelperText-root.Mui-error': {
+                        color: 'error.main',
+                        fontWeight: 'bold',
+                      },
+                      '& .MuiFilledInput-root.Mui-error': {
+                        borderBottom: '2px solid #ff4444',
+                      },
+                      '& .MuiInputLabel-root.Mui-error': {
+                        color: '#ff4444',
+                      },
                     }}
                   />
                   <TextField
@@ -221,9 +289,21 @@ export const Register = () => {
                     value={cuelloManga}
                     onChange={(e) => setCuelloManga(e.target.value)}
                     required
+                    error={!!errorsForm.cuelloManga}
+                    helperText={errorsForm.cuelloManga}
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
+                      '& .MuiFormHelperText-root.Mui-error': {
+                        color: 'error.main',
+                        fontWeight: 'bold',
+                      },
+                      '& .MuiFilledInput-root.Mui-error': {
+                        borderBottom: '2px solid #ff4444',
+                      },
+                      '& .MuiInputLabel-root.Mui-error': {
+                        color: '#ff4444',
+                      },
                     }}
                   />
                   <TextField
@@ -234,9 +314,21 @@ export const Register = () => {
                     value={pecho}
                     onChange={(e) => setPecho(e.target.value)}
                     required
+                    error={!!errorsForm.pecho}
+                    helperText={errorsForm.pecho}
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
+                      '& .MuiFormHelperText-root.Mui-error': {
+                        color: 'error.main',
+                        fontWeight: 'bold',
+                      },
+                      '& .MuiFilledInput-root.Mui-error': {
+                        borderBottom: '2px solid #ff4444',
+                      },
+                      '& .MuiInputLabel-root.Mui-error': {
+                        color: '#ff4444',
+                      },
                     }}
                   />
                 </Box>
@@ -255,9 +347,21 @@ export const Register = () => {
                     value={cintura}
                     onChange={(e) => setCintura(e.target.value)}
                     required
+                    error={!!errorsForm.cintura}
+                    helperText={errorsForm.cintura}
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
+                      '& .MuiFormHelperText-root.Mui-error': {
+                        color: 'error.main',
+                        fontWeight: 'bold',
+                      },
+                      '& .MuiFilledInput-root.Mui-error': {
+                        borderBottom: '2px solid #ff4444',
+                      },
+                      '& .MuiInputLabel-root.Mui-error': {
+                        color: '#ff4444',
+                      },
                     }}
                   />
                   <TextField
@@ -268,9 +372,21 @@ export const Register = () => {
                     value={cadera}
                     onChange={(e) => setCadera(e.target.value)}
                     required
+                    error={!!errorsForm.cadera}
+                    helperText={errorsForm.cadera}
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
+                      '& .MuiFormHelperText-root.Mui-error': {
+                        color: 'error.main',
+                        fontWeight: 'bold',
+                      },
+                      '& .MuiFilledInput-root.Mui-error': {
+                        borderBottom: '2px solid #ff4444',
+                      },
+                      '& .MuiInputLabel-root.Mui-error': {
+                        color: '#ff4444',
+                      },
                     }}
                   />
                   <TextField
@@ -281,12 +397,38 @@ export const Register = () => {
                     value={entrepierna}
                     onChange={(e) => setEntrepierna(e.target.value)}
                     required
+                    error={!!errorsForm.entrepierna}
+                    helperText={errorsForm.entrepierna}
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
+                      '& .MuiFormHelperText-root.Mui-error': {
+                        color: 'error.main',
+                        fontWeight: 'bold',
+                      },
+                      '& .MuiFilledInput-root.Mui-error': {
+                        borderBottom: '2px solid #ff4444',
+                      },
+                      '& .MuiInputLabel-root.Mui-error': {
+                        color: '#ff4444',
+                      },
                     }}
                   />
                 </Box>
+
+                {error && (
+                  <Typography
+                    sx={{
+                      color: "red",
+                      textAlign: "center",
+                      margin: 2,
+                      fontWeight: "bold",
+                      fontFamily: "'Poppins', sans-serif",
+                    }}
+                  >
+                    {error}
+                  </Typography>
+                )}
 
                 {isLoading ? (
                   <Loading />
@@ -311,7 +453,6 @@ export const Register = () => {
               <Button
                 onClick={() => navigate("/login")}
                 fullWidth
-                type="submit"
                 variant="outlined"
                 color="primary"
                 sx={{
