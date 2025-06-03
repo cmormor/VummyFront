@@ -19,6 +19,7 @@ import {
   Box,
   Skeleton,
   alpha,
+  IconButton,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -325,9 +326,21 @@ export default function ProductDetails() {
                 border: (theme) => `5px solid ${theme.palette.success.light}`,
                 fontFamily: "'Poppins', sans-serif",
                 textAlign: "center",
+                position: "relative",
               },
             }}
           >
+            <IconButton
+              onClick={() => setShowRecommendation(false)}
+              sx={{
+                position: "absolute",
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
             <DialogTitle
               sx={{
                 fontWeight: "bold",
@@ -335,6 +348,7 @@ export default function ProductDetails() {
                 fontSize: { xs: "1rem", md: "1.1rem" },
                 textDecorationLine: "underline",
                 textUnderlineOffset: "4px",
+                pr: 6, // Add padding to prevent overlap with close button
               }}
             >
               {dataRecommended
@@ -499,7 +513,24 @@ export default function ProductDetails() {
         onClose={() => setOpenDialog(false)}
         fullWidth
         maxWidth="md"
+        PaperProps={{
+          sx: {
+            position: "relative",
+          },
+        }}
       >
+        <IconButton
+          onClick={() => setOpenDialog(false)}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+            zIndex: 1,
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
         <DialogTitle
           sx={{
             textAlign: "center",
@@ -509,6 +540,7 @@ export default function ProductDetails() {
             color: (theme) => theme.palette.primary.main,
             textDecorationLine: "underline",
             textUnderlineOffset: "10px",
+            pr: 6,
           }}
         >
           GUÍA DE TALLAS

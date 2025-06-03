@@ -97,6 +97,7 @@ export const OrdersSettings = () => {
     } finally {
       setLoading(false);
     }
+    console.log(orderList.map((o) => o.prendas?.map((p) => p.prenda.nombre)))
   };
 
   useEffect(() => {
@@ -305,7 +306,6 @@ export const OrdersSettings = () => {
       return dateString;
     }
   };
-
   return (
     <Box sx={{ mt: 2, maxWidth: 1200 }}>
       <Paper
@@ -697,6 +697,120 @@ export const OrdersSettings = () => {
                     fontSize: { xs: "0.9rem", md: "1rem" },
                   }}
                 />
+
+                <TextField
+                  label="Total"
+                  type="number"
+                  value={formData.total.toFixed(2)}
+                  onChange={(e) =>
+                    handleInputChange("total", parseFloat(e.target.value) || 0)
+                  }
+                  fullWidth
+                  disabled
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">€</InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    background: (theme) => theme.palette.background.paper,
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: { xs: "0.9rem", md: "1rem" },
+                  }}
+                />
+
+                {(() => {
+                  const pedidoSeleccionado = orderList.find((order) => order.id === formData.id);
+
+                  if (!pedidoSeleccionado || !Array.isArray(pedidoSeleccionado.prendas)) {
+                    return (
+                      <Box
+                        sx={{
+                          p: 3,
+                          textAlign: 'center',
+                          border: (theme) => `1px dashed ${theme.palette.divider}`,
+                          borderRadius: 1,
+                          backgroundColor: (theme) => alpha(theme.palette.grey[500], 0.05),
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{
+                            fontFamily: "'Poppins', sans-serif",
+                            fontSize: { xs: "0.85rem", md: "0.9rem" },
+                          }}
+                        >
+                          No hay prendas para este pedido
+                        </Typography>
+                      </Box>
+                    );
+                  }
+
+                  return (
+                    <Box
+                      sx={{
+                        maxHeight: 200,
+                        overflowY: 'auto',
+                        border: (theme) => `1px solid ${theme.palette.divider}`,
+                        borderRadius: 1,
+                        p: 1,
+                        backgroundColor: (theme) => theme.palette.background.paper,
+                      }}
+                    >
+                      {pedidoSeleccionado.prendas.map((item, index) => (
+                        <Box
+                          key={item.id || index}
+                          sx={{
+                            py: 0.5,
+                            px: 1,
+                            mb: 1,
+                          }}
+                        >
+                          <Box sx={{ flex: 1 }}>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontWeight: 500,
+                                fontFamily: "'Poppins', sans-serif",
+                                fontSize: { xs: "0.85rem", md: "0.9rem" },
+                              }}
+                            >
+                              {item?.prenda?.nombre || 'Nombre no disponible'}
+                            </Typography>
+                            {item?.prenda?.descripcion && (
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{
+                                  fontFamily: "'Poppins', sans-serif",
+                                  fontSize: { xs: "0.75rem", md: "0.8rem" },
+                                }}
+                              >
+                                {item.prenda.descripcion}
+                              </Typography>
+                            )}
+                            {item?.talla?.nombre && (
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{
+                                  fontFamily: "'Poppins', sans-serif",
+                                  fontSize: { xs: "0.75rem", md: "0.8rem" },
+                                  display: 'block',
+                                }}
+                              >
+                                Talla: {item.talla.nombre}
+                              </Typography>
+                            )}
+                          </Box>
+                          <Divider sx={{ mt: 1 }} />
+                        </Box>
+                      ))}
+                    </Box>
+                  );
+                })()}
               </>
             )}
 
@@ -739,27 +853,6 @@ export const OrdersSettings = () => {
                   fontSize: { xs: "0.9rem", md: "1rem" },
                 }}
               />
-            )}
-
-            {dialogMode === "view" && (
-              <>
-                <TextField
-                  label="Total"
-                  type="number"
-                  value={formData.total.toFixed(2)}
-                  onChange={(e) =>
-                    handleInputChange("total", parseFloat(e.target.value) || 0)
-                  }
-                  fullWidth
-                  disabled
-                  required
-                  sx={{
-                    background: (theme) => theme.palette.background.paper,
-                    fontFamily: "'Poppins', sans-serif",
-                    fontSize: { xs: "0.9rem", md: "1rem" },
-                  }}
-                />
-              </>
             )}
           </Stack>
         </DialogContent>

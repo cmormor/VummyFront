@@ -3,6 +3,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import IconButton from "@mui/material/IconButton";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import ImageNotSupportedIcon from "@mui/icons-material/ImageNotSupported";
 import { useNavigate } from "react-router-dom";
 import { Details } from "../../../components/Details";
 import { useRef, useState } from "react";
@@ -181,8 +182,6 @@ export const ClotheCard = ({
           onChange={handleFileChange}
         />
 
-        {/* ...otras partes del componente */}
-
         {loading ? (
           <Box
             sx={{
@@ -201,23 +200,56 @@ export const ClotheCard = ({
           >
             <Loading />
           </Box>
+        ) : imagen ? (
+          <Box
+            component="img"
+            src={`data:image/jpeg;base64,${imagen}`}
+            alt={nombre}
+            sx={{
+              width: "100%",
+              height: "50vh",
+              objectFit: "contain",
+              borderTopLeftRadius: "8px",
+              borderTopRightRadius: "8px",
+              cursor: "pointer",
+            }}
+            onClick={handleClick}
+          />
         ) : (
-          imagen && (
-            <Box
-              component="img"
-              src={`data:image/jpeg;base64,${imagen}`}
-              alt={nombre}
+          <Box
+            sx={{
+              width: "100%",
+              height: 200,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              borderTopLeftRadius: "8px",
+              borderTopRightRadius: "8px",
+              bgcolor: "background.default",
+              color: "text.secondary",
+              cursor: "pointer",
+            }}
+            onClick={handleClick}
+          >
+            <ImageNotSupportedIcon
               sx={{
-                width: "100%",
-                height: "50vh",
-                objectFit: "contain",
-                borderTopLeftRadius: "8px",
-                borderTopRightRadius: "8px",
-                cursor: "pointer",
+                fontSize: 80,
+                mb: 1,
+                opacity: 0.5,
               }}
-              onClick={handleClick}
             />
-          )
+            <Box
+              sx={{
+                fontSize: 14,
+                fontWeight: "medium",
+                textAlign: "center",
+                opacity: 0.7,
+              }}
+            >
+              Sin Imagen
+            </Box>
+          </Box>
         )}
 
         <Box
@@ -226,7 +258,7 @@ export const ClotheCard = ({
         >
           <CardContent sx={{ padding: 2 }}>
             <Details detail={nombre} fontSize={15} />
-            <Details detail={precio} fontSize={15} />
+            <Details detail={precio + " €"} fontSize={15} />
           </CardContent>
         </Box>
       </Card>
