@@ -3,6 +3,7 @@ import { Box, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { NavBar } from "./NavBar";
+import { Footer } from "./Footer";
 
 interface LayoutProps {
   children: ReactNode;
@@ -44,6 +45,7 @@ export const Layout = ({ children, color, arrow, path }: LayoutProps) => {
             flex: 5,
             padding: 2,
             marginTop: 10,
+            paddingBottom: "80px",
             backgroundColor: (theme) => theme.palette.background.default,
             zIndex: 1,
             "@media (max-width: 768px)": {
@@ -87,6 +89,7 @@ export const Layout = ({ children, color, arrow, path }: LayoutProps) => {
           }}
         />
       </Box>
+      <Footer />
     </>
   );
 };

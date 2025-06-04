@@ -26,7 +26,10 @@ import {
   Visibility,
   Store,
   Close,
+  Download,
 } from "@mui/icons-material";
+import jsPDF from "jspdf";
+
 import { getOrdersByUser } from "../../api/orderApi";
 import { Order } from "../../types/order";
 import logoDiamante from "/VummyLogo_Azul_Diamante.png";
@@ -69,6 +72,187 @@ const formatDate = (dateString: string) => {
   }
 };
 
+const generateOrderPDF = (order: Order) => {
+  const img = new Image();
+  img.src = logoDiamante;
+  img.onload = () => {
+    const doc = new jsPDF({
+      unit: "mm",
+      format: "a4",
+    });
+
+    const primaryBlue = [25, 118, 210];
+    const darkGray = [33, 33, 33];
+    const lightGray = [245, 245, 245];
+    const priceGreen = [76, 175, 80];
+
+    doc.setFillColor(primaryBlue[0], primaryBlue[1], primaryBlue[2]);
+    doc.rect(0, 0, 210, 45, "F");
+
+    doc.setFillColor(255, 255, 255);
+    doc.circle(30, 22.5, 18, "F");
+    doc.addImage(img, "PNG", 15, 7.5, 30, 30);
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(26);
+    const titleText = "VUMMY APP";
+    const titleWidth = doc.getTextWidth(titleText);
+    const titleX = (210 - titleWidth) / 2;
+    doc.text(titleText, titleX, 28);
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    const subtitleText = "Resumen de Pedido";
+    const subtitleWidth = doc.getTextWidth(subtitleText);
+    const subtitleX = (210 - subtitleWidth) / 2;
+    doc.text(subtitleText, subtitleX, 36);
+
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(150, 8, 50, 12, 3, 3, "F");
+    doc.setTextColor(primaryBlue[0], primaryBlue[1], primaryBlue[2]);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    const orderLabel = `PEDIDO #${order.id}`;
+    const orderWidth = doc.getTextWidth(orderLabel);
+    doc.text(orderLabel, 150 + (50 - orderWidth) / 2, 16);
+
+    let yPosition = 52;
+    doc.setFillColor(lightGray[0], lightGray[1], lightGray[2]);
+    doc.roundedRect(15, yPosition, 180, 28, 3, 3, "F");
+
+    doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text("Comprador:", 20, yPosition + 7);
+    doc.setFont("helvetica", "normal");
+    doc.text(order.usuario.nombre || "Desconocido", 65, yPosition + 7);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Fecha del Pedido:", 20, yPosition + 14);
+    doc.setFont("helvetica", "normal");
+    doc.text(formatDate(order.fecha), 65, yPosition + 14);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Estado:", 20, yPosition + 21);
+    doc.setFont("helvetica", "normal");
+    const estado = order.estado || "Sin estado";
+    if (estado.toLowerCase().includes("completado")) {
+      doc.setTextColor(76, 175, 80);
+    } else if (estado.toLowerCase().includes("pendiente")) {
+      doc.setTextColor(255, 152, 0);
+    } else {
+      doc.setTextColor(primaryBlue[0], primaryBlue[1], primaryBlue[2]);
+    }
+    doc.text(estado, 65, yPosition + 21);
+
+    yPosition += 40;
+    doc.setFillColor(primaryBlue[0], primaryBlue[1], primaryBlue[2]);
+    doc.roundedRect(15, yPosition - 5, 180, 12, 3, 3, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("PRODUCTOS PEDIDOS", 20, yPosition + 3);
+
+    yPosition += 15;
+    doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+
+    if (order.prendas && order.prendas.length > 0) {
+      order.prendas.forEach((prenda) => {
+        if (yPosition > 245) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        doc.setFillColor(lightGray[0], lightGray[1], lightGray[2]);
+        doc.roundedRect(15, yPosition - 2, 180, 25, 3, 3, "F");
+
+        doc.setFillColor(primaryBlue[0], primaryBlue[1], primaryBlue[2]);
+        doc.rect(15, yPosition - 2, 3, 25, "F");
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(primaryBlue[0], primaryBlue[1], primaryBlue[2]);
+        doc.text(prenda.prenda.nombre, 20, yPosition + 5);
+
+        yPosition += 6;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        let descripcion = prenda.prenda.descripcion;
+        if (descripcion.length > 65) {
+          descripcion = descripcion.substring(0, 65) + "...";
+        }
+        doc.text(descripcion, 20, yPosition + 4);
+
+        yPosition += 8;
+        doc.setFontSize(9);
+        doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+        doc.text(prenda.prenda.tiendaNombre, 20, yPosition + 2);
+
+        doc.setFillColor(priceGreen[0], priceGreen[1], priceGreen[2]);
+        doc.roundedRect(85, yPosition - 1.5, 20, 7, 2, 2, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        const priceText = `${prenda.prenda.precio} €`;
+        const priceWidth = doc.getTextWidth(priceText);
+        doc.text(priceText, 85 + (20 - priceWidth) / 2, yPosition + 3);
+
+        const qtyLabel = `CANTIDAD: ${prenda.cantidad}`;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        const qtyWidth = doc.getTextWidth(qtyLabel);
+        const padding = 2;
+        const rectWidth = qtyWidth + padding * 2;
+        doc.setFillColor(priceGreen[0], priceGreen[1], priceGreen[2]);
+        doc.roundedRect(110, yPosition - 1.5, rectWidth, 7, 2, 2, "F");
+        doc.setTextColor(255, 255, 255);
+        const textX = 110 + padding;
+        doc.text(qtyLabel, textX, yPosition + 3);
+
+        yPosition += 17;
+      });
+    }
+
+    yPosition += 5;
+    doc.setFillColor(primaryBlue[0], primaryBlue[1], primaryBlue[2]);
+    doc.roundedRect(120, yPosition - 6, 65, 20, 4, 4, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("TOTAL:", 125, yPosition);
+
+    doc.setFontSize(16);
+    const totalText = order.total?.toLocaleString("es-ES", {
+      style: "currency",
+      currency: "EUR",
+    });
+    doc.text(totalText, 125, yPosition + 8);
+
+    const footerY = 270;
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, footerY, 210, 27, "F");
+
+    doc.setTextColor(primaryBlue[0], primaryBlue[1], primaryBlue[2]);
+    doc.setLineWidth(1);
+    doc.line(20, footerY + 4, 190, footerY + 4);
+
+    doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text(
+      `Documento generado el ${new Date().toLocaleString("es-ES")}`,
+      20,
+      footerY + 12
+    );
+    doc.text("VUMMY APP - Tu tienda de confianza", 20, footerY + 18);
+
+    doc.save(`Pedido${order.id}_Vummy_${order.usuario.nombre}.pdf`);
+  };
+};
+
 export const ListOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,9 +266,7 @@ export const ListOrders = () => {
         setLoading(true);
         setError(null);
         const fetchedOrders: Order[] = await getOrdersByUser();
-
         fetchedOrders.sort((a, b) => b.id - a.id);
-
         setOrders(fetchedOrders);
       } catch (error) {
         setError(
@@ -109,6 +291,10 @@ export const ListOrders = () => {
   const closeModal = () => {
     setModalOpen(false);
     setSelectedOrder(null);
+  };
+
+  const handleDownloadPDF = (order: Order) => {
+    generateOrderPDF(order);
   };
 
   if (loading) {
@@ -349,20 +535,33 @@ export const ListOrders = () => {
                     }
                   />
 
-                  <IconButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openModal(order.id);
-                    }}
-                    sx={{ ml: "auto" }}
-                  >
-                    <Visibility
-                      sx={{
-                        color: "text.primary",
-                        fontSize: { xs: 24, sm: 30 },
+                  <Box sx={{ display: "flex", gap: 1, ml: "auto" }}>
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDownloadPDF(order);
                       }}
-                    />
-                  </IconButton>
+                      sx={{
+                        color: "success.main",
+                      }}
+                      title="Descargar PDF"
+                    >
+                      <Download sx={{ fontSize: { xs: 20, sm: 24 } }} />
+                    </IconButton>
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openModal(order.id);
+                      }}
+                    >
+                      <Visibility
+                        sx={{
+                          color: "text.primary",
+                          fontSize: { xs: 24, sm: 30 },
+                        }}
+                      />
+                    </IconButton>
+                  </Box>
                 </ListItem>
                 {index < orders.length - 1 && (
                   <Divider variant="inset" component="li" />
@@ -431,18 +630,31 @@ export const ListOrders = () => {
                   >
                     PEDIDO #{selectedOrder?.id}
                   </Typography>
-                  <IconButton
-                    onClick={closeModal}
-                    sx={{
-                      color: "text.primary",
-                      bgcolor: "background.paper",
-                      "&:hover": {
-                        bgcolor: "action.hover",
-                      },
-                    }}
-                  >
-                    <Close />
-                  </IconButton>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <IconButton
+                      onClick={() =>
+                        selectedOrder && generateOrderPDF(selectedOrder)
+                      }
+                      sx={{
+                        color: "success.main",
+                      }}
+                      title="Descargar PDF"
+                    >
+                      <Download />
+                    </IconButton>
+                    <IconButton
+                      onClick={closeModal}
+                      sx={{
+                        color: "text.primary",
+                        bgcolor: "background.paper",
+                        "&:hover": {
+                          bgcolor: "action.hover",
+                        },
+                      }}
+                    >
+                      <Close />
+                    </IconButton>
+                  </Box>
                 </Box>
 
                 <Box

@@ -64,10 +64,12 @@ export const Landing = () => {
             sean siempre las correctas. Para mayor precisión, tus medidas se
             actualizarán cada tres meses, adaptándose a los cambios naturales en
             tu cuerpo. */}
-            En Vummy App transformamos tu experiencia de compra online. Al registrarte, podrás ingresar tus medidas corporales y acceder a un sistema inteligente de recomendación de tallas, que compara tus medidas con las tallas disponibles en cada tienda. Así, podrás elegir la talla que mejor se adapta a ti, evitando dudas y reduciendo devoluciones.
-
-            Para mantener la precisión del sistema, tus medidas se actualizarán cada tres meses, adaptándose a los cambios naturales de tu cuerpo.
-
+            En Vummy App transformamos tu experiencia de compra online. Al
+            registrarte, podrás ingresar tus medidas corporales y acceder a un
+            sistema inteligente de recomendación de tallas, que compara tus
+            medidas con las tallas disponibles en cada tienda. Así, podrás
+            elegir la talla que mejor se adapta a ti, evitando dudas y
+            reduciendo devoluciones.
           </Typography>
 
           <Typography
@@ -86,28 +88,53 @@ export const Landing = () => {
 
           <Box
             sx={{
+              textAlign: "center",
+              mt: "auto",
+              py: 2,
+            }}
+          >
+            <Typography
+              variant="body1"
+              sx={{
+                color: (theme) => theme.palette.text.disabled,
+                fontFamily: "'Poppins', sans-serif",
+                fontSize: { xs: "0.5rem", md: "0.9rem" },
+                fontWeight: "bold",
+              }}
+            >
+              Implementación de maniquí 3D en desarrollo
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
               display: "flex",
               gap: 2,
               flexDirection: { xs: "column", md: "row" },
               justifyContent: "center",
-              mt: 3,
+              mt: 1,
             }}
           >
             <Button
-              variant="contained"
+              variant="outlined"
               color="primary"
               onClick={() => navigate("/register")}
               sx={{
                 width: { xs: "100%", md: "auto" },
                 boxShadow: "none",
+                fontFamily: "'Poppins', sans-serif",
+                fontWeight: "bold",
               }}
             >
               REGÍSTRATE
             </Button>
             <Button
-              variant="outlined"
+              variant="contained"
               onClick={() => navigate("/login")}
-              sx={{ width: { xs: "100%", md: "auto" } }}
+              sx={{
+                width: { xs: "100%", md: "auto" },
+                fontFamily: "'Poppins', sans-serif",
+              }}
             >
               INICIA SESIÓN
             </Button>
