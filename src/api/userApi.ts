@@ -44,7 +44,7 @@ export const createUsuario = async (
       return mensajes;
     }
 
-    return "Hubo un error al registrar el usuario.";
+    return err.response?.data as string;
   }
 };
 

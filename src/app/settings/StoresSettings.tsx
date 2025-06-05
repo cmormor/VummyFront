@@ -611,8 +611,8 @@ export const StoresSettings = () => {
             />
 
             <TextField
-              label="Email"
-              type="email"
+              label="Descripción"
+              type="text"
               value={formData.descripcion}
               onChange={(e) => handleInputChange("descripcion", e.target.value)}
               fullWidth
@@ -651,6 +651,25 @@ export const StoresSettings = () => {
             >
               {dialogMode === "create" ? "Crear" : "Guardar"}
             </Button>
+            <Snackbar
+              open={snackbar.open}
+              autoHideDuration={6000}
+              onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            >
+              <Alert
+                onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+                severity={snackbar.severity}
+                variant="filled"
+                sx={{
+                  width: "100%",
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: { xs: "0.9rem", md: "1rem" },
+                }}
+              >
+                {snackbar.message}
+              </Alert>
+            </Snackbar>
           </DialogActions>
         )}
       </Dialog>
@@ -661,26 +680,6 @@ export const StoresSettings = () => {
         onConfirm={handleConfirmDelete}
         mensaje={mensaje}
       />
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
-          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{
-            width: "100%",
-            fontFamily: "'Poppins', sans-serif",
-            fontSize: { xs: "0.9rem", md: "1rem" },
-          }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 };

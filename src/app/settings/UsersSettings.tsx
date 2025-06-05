@@ -49,6 +49,55 @@ import {
   updateUsuarioById,
 } from "../../api/userApi";
 import { ModalConfirmation } from "../../components/ModalConfirmation";
+import * as yup from "yup";
+
+const schema = yup.object().shape({
+  nombre: yup
+    .string()
+    .min(3, "Mínimo 3 caracteres")
+    .required("El nombre es obligatorio"),
+  email: yup
+    .string()
+    .email("Email inválido")
+    .required("El email es obligatorio"),
+  password: yup.string()
+    .required("La contraseña es obligatoria")
+    .min(6, "La contraseña debe tener al menos 6 caracteres")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+      "La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial"
+    ),
+  altura: yup
+    .number()
+    .typeError("La altura debe ser un número")
+    .min(100, "La altura debe ser al menos 100 cm")
+    .required("La altura es obligatoria"),
+  cuelloManga: yup
+    .number()
+    .typeError("El cuello/manga debe ser un número")
+    .min(25, "El cuello/manga debe ser al menos 25 cm")
+    .required("El cuello/manga es obligatorio"),
+  pecho: yup
+    .number()
+    .typeError("El pecho debe ser un número")
+    .min(60, "El pecho debe ser al menos 60 cm")
+    .required("El pecho es obligatorio"),
+  cintura: yup
+    .number()
+    .typeError("La cintura debe ser un número")
+    .min(50, "La cintura debe ser al menos 50 cm")
+    .required("La cintura es obligatoria"),
+  cadera: yup
+    .number()
+    .typeError("La cadera debe ser un número")
+    .min(50, "La cadera debe ser al menos 50 cm")
+    .required("La cadera es obligatoria"),
+  entrepierna: yup
+    .number()
+    .typeError("La entrepierna debe ser un número")
+    .min(50, "La entrepierna debe ser al menos 50 cm")
+    .required("La entrepierna es obligatoria"),
+});
 
 export const UsersSettings = () => {
   const [userList, setUserList] = useState<Usuario[]>([]);
@@ -197,6 +246,25 @@ export const UsersSettings = () => {
   };
 
   const handleSubmit = async () => {
+    try {
+      if (dialogMode === "create") {
+        await schema.validate(formData, { abortEarly: false });
+      } else {
+        const toValidate = { ...formData };
+        delete (toValidate as any).password;
+        const partialSchema = schema.omit(["password"]);
+        await partialSchema.validate(toValidate, { abortEarly: false });
+      }
+    } catch (validationError) {
+      if (validationError instanceof yup.ValidationError) {
+        const mensajes = validationError.inner.map((err) => err.message).join(" | ");
+        showSnackbar(mensajes, "error");
+        return;
+      }
+    }
+
+
+
     setLoading(true);
     try {
       if (dialogMode === "create") {
@@ -319,8 +387,6 @@ export const UsersSettings = () => {
         return "error";
       case "REGISTRADO":
         return "warning";
-      case "TIENDA_USER":
-        return "info";
       default:
         return "default";
     }
@@ -701,15 +767,6 @@ export const UsersSettings = () => {
                 >
                   REGISTRADO
                 </MenuItem>
-                <MenuItem
-                  value="TIENDA_USER"
-                  sx={{
-                    fontFamily: "'Poppins', sans-serif",
-                    fontSize: { xs: "0.9rem", md: "1rem" },
-                  }}
-                >
-                  VISITANTE
-                </MenuItem>
               </Select>
             </FormControl>
 
@@ -861,9 +918,58 @@ export const UsersSettings = () => {
             >
               {dialogMode === "create" ? "Crear" : "Guardar"}
             </Button>
+            {snackbar.severity !== "success" && (
+              <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                sx={{
+                  zIndex: 1100,
+                }}
+              >
+                <Alert
+                  onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+                  severity={snackbar.severity}
+                  variant="filled"
+                  sx={{
+                    width: "100%",
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: { xs: "0.9rem", md: "1rem" },
+                  }}
+                >
+                  {snackbar.message}
+                </Alert>
+              </Snackbar>
+            )}
           </DialogActions>
         )}
       </Dialog>
+
+      {snackbar.severity === "success" && (
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          sx={{
+            zIndex: 1100,
+          }}
+        >
+          <Alert
+            onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+            severity={snackbar.severity}
+            variant="filled"
+            sx={{
+              width: "100%",
+              fontFamily: "'Poppins', sans-serif",
+              fontSize: { xs: "0.9rem", md: "1rem" },
+            }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      )}
 
       <ModalConfirmation
         open={openModal}
@@ -871,26 +977,6 @@ export const UsersSettings = () => {
         onConfirm={handleConfirmDelete}
         mensaje={mensaje}
       />
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
-          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{
-            width: "100%",
-            fontFamily: "'Poppins', sans-serif",
-            fontSize: { xs: "0.9rem", md: "1rem" },
-          }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 };

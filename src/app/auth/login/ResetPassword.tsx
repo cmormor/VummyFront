@@ -14,10 +14,13 @@ const schema = yup.object().shape({
     .string()
     .email("Email inválido")
     .required("El email es obligatorio"),
-  password: yup
-    .string()
-    .min(8, "Mínimo 8 caracteres")
-    .required("La contraseña es obligatoria"),
+  password: yup.string()
+    .required("La contraseña es obligatoria")
+    .min(6, "La contraseña debe tener al menos 6 caracteres")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+      "La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial"
+    ),
 });
 
 export const ResetPassword = () => {
