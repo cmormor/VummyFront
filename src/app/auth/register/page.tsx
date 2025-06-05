@@ -1,12 +1,13 @@
 import { useState } from "react";
 import * as yup from "yup";
 import { createUsuario } from "../../../api/userApi";
-import { Box, TextField, Button, Typography, Stack } from "@mui/material";
+import { Box, TextField, Button, Typography, Stack, InputAdornment, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Title } from "../../../components/Title";
 import { FormCard } from "../../../components/FormCard";
 import { Layout } from "../../../components/Layout";
 import { Loading } from "../../../components/Loading";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const schema = yup.object().shape({
   nombre: yup
@@ -66,8 +67,13 @@ export const Register = () => {
   const [error, setError] = useState<string | null>(null);
   const [errorsForm, setErrorsForm] = useState<{ [key: string]: string }>({});
   const [isLoading, isSetLoading] = useState(false);
+  const [mostrarPassword, setMostrarPassword] = useState(false);
 
   const navigate = useNavigate();
+
+  const handleTogglePassword = () => {
+    setMostrarPassword(!mostrarPassword);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -231,7 +237,7 @@ export const Register = () => {
                     fullWidth
                     label="Contraseña"
                     variant="filled"
-                    type="password"
+                    type={mostrarPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -250,6 +256,15 @@ export const Register = () => {
                       "& .MuiInputLabel-root.Mui-error": {
                         color: "#ff4444",
                       },
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={handleTogglePassword} edge="end" sx={{ color: "black" }}>
+                            {mostrarPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
                     }}
                   />
                 </Box>

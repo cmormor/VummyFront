@@ -10,8 +10,10 @@ import {
   alpha,
   Fade,
   CircularProgress,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
-import { Save, CheckCircle, Key, Lock } from "@mui/icons-material";
+import { Save, CheckCircle, Key, Lock, VisibilityOff, Visibility } from "@mui/icons-material";
 import { perfilUsuario, updateUsuario } from "../../api/userApi";
 import { Usuario } from "../../types/user";
 import ErrorModal from "../../components/ErrorModal";
@@ -22,6 +24,11 @@ export const SecuritySettings = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [mostrarPassword, setMostrarPassword] = useState(false);
+
+  const handleTogglePassword = () => {
+    setMostrarPassword(!mostrarPassword);
+  };
 
   const handleSave = async () => {
     setLoading(true);
@@ -163,7 +170,7 @@ export const SecuritySettings = () => {
             <Box sx={{ flex: 1 }}>
               <TextField
                 label="Password"
-                type="password"
+                type={mostrarPassword ? "text" : "password"}
                 fullWidth
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -178,6 +185,13 @@ export const SecuritySettings = () => {
                         fontSize: "1.2rem",
                       }}
                     />
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleTogglePassword} edge="end" sx={{ color: (theme) => theme.palette.text.primary }}>
+                        {mostrarPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
                   ),
                 }}
               />
@@ -204,6 +218,13 @@ export const SecuritySettings = () => {
                         fontSize: "1.2rem",
                       }}
                     />
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleTogglePassword} edge="end" sx={{ color: (theme) => theme.palette.text.primary }}>
+                        {mostrarPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
                   ),
                 }}
               />
@@ -238,9 +259,9 @@ export const SecuritySettings = () => {
             letterSpacing: "0.5px",
             background: success
               ? (theme) =>
-                  `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`
+                `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`
               : (theme) =>
-                  `linear-gradient(135deg, ${theme.palette.error.main} 0%, ${theme.palette.error.dark} 100%)`,
+                `linear-gradient(135deg, ${theme.palette.error.main} 0%, ${theme.palette.error.dark} 100%)`,
             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             "&:hover": {
               transform: "translateY(-2px)",
@@ -257,8 +278,8 @@ export const SecuritySettings = () => {
           {loading
             ? "Restableciendo..."
             : success
-            ? "Contraseña Restablecida!"
-            : "Restablecer Contraseña"}
+              ? "Contraseña Restablecida!"
+              : "Restablecer Contraseña"}
         </Button>
       </Box>
 

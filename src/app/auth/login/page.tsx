@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { loginUsuario } from "../../../api/userApi";
-import { Box, TextField, Button, Typography, Stack } from "@mui/material";
+import { Box, TextField, Button, Typography, Stack, InputAdornment, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Title } from "../../../components/Title";
 import { FormCard } from "../../../components/FormCard";
 import { Layout } from "../../../components/Layout";
 import { Loading } from "../../../components/Loading";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,6 +14,11 @@ export const Login = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [mostrarPassword, setMostrarPassword] = useState(false);
+
+  const handleTogglePassword = () => {
+    setMostrarPassword(!mostrarPassword);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,10 +74,19 @@ export const Login = () => {
                 fullWidth
                 label="Contraseña"
                 variant="filled"
-                type="password"
+                type={mostrarPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleTogglePassword} edge="end" sx={{ color: "black" }}>
+                        {mostrarPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Box>
 
