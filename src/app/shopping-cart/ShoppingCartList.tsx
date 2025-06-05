@@ -17,7 +17,12 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { ApiCartItem, CartItem } from "../../types/cart-item";
-import { deleteCart, deleteCartPorId, getCartItems, putQuantity } from "../../api/cart-items";
+import {
+  deleteCart,
+  deleteCartPorId,
+  getCartItems,
+  putQuantity,
+} from "../../api/cart-items";
 import logoDiamante from "/VummyLogo_Azul_Diamante.png";
 import { postOrder } from "../../api/orderApi";
 import { PostOrder } from "../../types/order";
@@ -81,7 +86,10 @@ export const ShoppingCartList = () => {
       handleGetCartItems();
       setError(null);
     } catch (error) {
-      setError("Error al cargar el carrito. Por favor, inténtalo de nuevo más tarde.");
+      setError(
+        "Error al cargar el carrito. Por favor, inténtalo de nuevo más tarde: " +
+          error
+      );
     }
   }, []);
 
@@ -119,8 +127,10 @@ export const ShoppingCartList = () => {
 
     const postCartItems: PostOrder = {
       prendas: cartItems
-        .filter(item => item.prenda.id !== undefined && item.talla?.id !== undefined)
-        .map(item => ({
+        .filter(
+          (item) => item.prenda.id !== undefined && item.talla?.id !== undefined
+        )
+        .map((item) => ({
           prenda: { id: item.prenda.id! },
           talla: { id: item.talla!.id! },
           cantidad: item.cantidad,
@@ -206,9 +216,7 @@ export const ShoppingCartList = () => {
   }
 
   if (error) {
-    return (
-      <ErrorModal error={error} />
-    );
+    return <ErrorModal error={error} />;
   }
 
   return (
@@ -314,7 +322,9 @@ export const ShoppingCartList = () => {
                     <Box display="flex" alignItems="center" gap={1}>
                       <IconButton
                         size="small"
-                        onClick={() => handleUpdateQuantity(item.id!, cantidad - 1)}
+                        onClick={() =>
+                          handleUpdateQuantity(item.id!, cantidad - 1)
+                        }
                         disabled={updatingItemId === item.id || isPostingOrder}
                       >
                         <RemoveIcon fontSize="small" />
@@ -333,7 +343,9 @@ export const ShoppingCartList = () => {
                       </Typography>
                       <IconButton
                         size="small"
-                        onClick={() => handleUpdateQuantity(item.id!, cantidad + 1)}
+                        onClick={() =>
+                          handleUpdateQuantity(item.id!, cantidad + 1)
+                        }
                         disabled={updatingItemId === item.id || isPostingOrder}
                       >
                         <AddIcon fontSize="small" />
@@ -379,7 +391,7 @@ export const ShoppingCartList = () => {
 
       {cartItems.length > 0 && (
         <>
-          {(updatingItemId != null) && <LinearProgress sx={{ mt: 1 }} />}
+          {updatingItemId != null && <LinearProgress sx={{ mt: 1 }} />}
           <Divider sx={{ my: 2 }} />
           <Stack spacing={2} mb={2}>
             <Box display="flex" justifyContent="space-between">
@@ -441,7 +453,13 @@ export const ShoppingCartList = () => {
             }}
           >
             {isPostingOrder ? (
-              <Box display="flex" alignItems="center" gap={1} justifyContent="center" width="100%">
+              <Box
+                display="flex"
+                alignItems="center"
+                gap={1}
+                justifyContent="center"
+                width="100%"
+              >
                 <CircularProgress size={20} color="inherit" />
                 Realizando compra...
               </Box>

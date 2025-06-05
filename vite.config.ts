@@ -11,6 +11,7 @@ export default defineConfig({
           mui: ["@mui/material", "@mui/icons-material"],
           router: ["react-router-dom"],
           three: ["three"],
+          jspdf: ["jspdf"],
         },
       },
     },

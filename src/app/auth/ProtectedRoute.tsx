@@ -37,6 +37,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     } catch (error) {
       localStorage.removeItem("authToken");
       setIsAuthenticated(false);
+      console.error(error);
     }
 
     setIsLoading(false);

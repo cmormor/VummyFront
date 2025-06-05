@@ -35,7 +35,10 @@ export const Clothes = () => {
         setRol(rolUsuario);
         setError(null);
       } catch (error) {
-        setError("Error al cargar las prendas. Por favor, inténtalo de nuevo más tarde.");
+        setError(
+          "Error al cargar las prendas. Por favor, inténtalo de nuevo más tarde: " +
+            error
+        );
       } finally {
         setLoading(false);
       }
@@ -85,7 +88,8 @@ export const Clothes = () => {
             height={24}
             width="80%"
             sx={{
-              mb: 1, backgroundColor: (theme) =>
+              mb: 1,
+              backgroundColor: (theme) =>
                 theme.palette.mode === "dark"
                   ? "rgba(255, 255, 255, 0.1)"
                   : "rgba(0, 0, 0, 0.05)",
@@ -108,9 +112,7 @@ export const Clothes = () => {
   );
 
   if (error) {
-    return (
-      <ErrorModal error={error} />
-    );
+    return <ErrorModal error={error} />;
   }
 
   return (
@@ -155,7 +157,12 @@ export const Clothes = () => {
           Array.from({ length: 6 }).map((_, i) => <ClotheSkeleton key={i} />)
         ) : clothes.length === 0 ? (
           <Box
-            sx={{ display: "flex", justifyContent: "center", width: "100%", mt: 4 }}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              width: "100%",
+              mt: 4,
+            }}
           >
             <Typography variant="h6" color="text.secondary">
               No hay prendas disponibles.

@@ -21,7 +21,10 @@ export const Stores = () => {
         setLoading(false);
         setError(null);
       } catch (error) {
-        setError("Error al cargar las tiendas. Por favor, inténtalo de nuevo más tarde.");
+        setError(
+          "Error al cargar las tiendas. Por favor, inténtalo de nuevo más tarde: " +
+            error
+        );
       } finally {
         setLoading(false);
       }
@@ -30,15 +33,13 @@ export const Stores = () => {
   }, []);
 
   if (error) {
-    return (
-      <ErrorModal error={error} />
-    );
+    return <ErrorModal error={error} />;
   }
 
   const StoreSkeleton = () => (
     <StoreCard path="#">
       <Box>
-        <Box sx={{ marginTop: 2, paddingTop: '20px' }}>
+        <Box sx={{ marginTop: 2, paddingTop: "20px" }}>
           <Skeleton
             variant="text"
             height={40}
@@ -48,7 +49,7 @@ export const Stores = () => {
                 theme.palette.mode === "dark"
                   ? "rgba(255, 255, 255, 0.1)"
                   : "rgba(0, 0, 0, 0.05)",
-              fontSize: '1.8rem'
+              fontSize: "1.8rem",
             }}
           />
         </Box>
@@ -62,7 +63,7 @@ export const Stores = () => {
                 theme.palette.mode === "dark"
                   ? "rgba(255, 255, 255, 0.1)"
                   : "rgba(0, 0, 0, 0.05)",
-              marginBottom: 1
+              marginBottom: 1,
             }}
           />
           <Skeleton

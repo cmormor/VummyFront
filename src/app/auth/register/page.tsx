@@ -1,13 +1,7 @@
 import { useState } from "react";
 import * as yup from "yup";
 import { createUsuario } from "../../../api/userApi";
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Stack,
-} from "@mui/material";
+import { Box, TextField, Button, Typography, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Title } from "../../../components/Title";
 import { FormCard } from "../../../components/FormCard";
@@ -15,9 +9,18 @@ import { Layout } from "../../../components/Layout";
 import { Loading } from "../../../components/Loading";
 
 const schema = yup.object().shape({
-  nombre: yup.string().min(3, "Mínimo 3 caracteres").required("El nombre es obligatorio"),
-  email: yup.string().email("Email inválido").required("El email es obligatorio"),
-  password: yup.string().min(8, "Mínimo 8 caracteres").required("La contraseña es obligatoria"),
+  nombre: yup
+    .string()
+    .min(3, "Mínimo 3 caracteres")
+    .required("El nombre es obligatorio"),
+  email: yup
+    .string()
+    .email("Email inválido")
+    .required("El email es obligatorio"),
+  password: yup
+    .string()
+    .min(8, "Mínimo 8 caracteres")
+    .required("La contraseña es obligatoria"),
   altura: yup
     .number()
     .typeError("La altura debe ser un número")
@@ -108,12 +111,13 @@ export const Register = () => {
         setError(null);
         navigate("/home", { replace: true });
       }
-    } catch (validationError: any) {
+    } catch (err) {
       isSetLoading(false);
-      if (validationError.inner) {
+
+      if (err instanceof yup.ValidationError) {
         const formErrors: { [key: string]: string } = {};
-        validationError.inner.forEach((err: any) => {
-          if (err.path) formErrors[err.path] = err.message;
+        err.inner.forEach((error) => {
+          if (error.path) formErrors[error.path] = error.message;
         });
         setErrorsForm(formErrors);
       } else {
@@ -187,15 +191,15 @@ export const Register = () => {
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
-                      '& .MuiFormHelperText-root.Mui-error': {
-                        color: 'error.main',
-                        fontWeight: 'bold',
+                      "& .MuiFormHelperText-root.Mui-error": {
+                        color: "error.main",
+                        fontWeight: "bold",
                       },
-                      '& .MuiFilledInput-root.Mui-error': {
-                        borderBottom: '2px solid #ff4444',
+                      "& .MuiFilledInput-root.Mui-error": {
+                        borderBottom: "2px solid #ff4444",
                       },
-                      '& .MuiInputLabel-root.Mui-error': {
-                        color: '#ff4444',
+                      "& .MuiInputLabel-root.Mui-error": {
+                        color: "#ff4444",
                       },
                     }}
                   />
@@ -211,15 +215,15 @@ export const Register = () => {
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
-                      '& .MuiFormHelperText-root.Mui-error': {
-                        color: 'error.main',
-                        fontWeight: 'bold',
+                      "& .MuiFormHelperText-root.Mui-error": {
+                        color: "error.main",
+                        fontWeight: "bold",
                       },
-                      '& .MuiFilledInput-root.Mui-error': {
-                        borderBottom: '2px solid #ff4444',
+                      "& .MuiFilledInput-root.Mui-error": {
+                        borderBottom: "2px solid #ff4444",
                       },
-                      '& .MuiInputLabel-root.Mui-error': {
-                        color: '#ff4444',
+                      "& .MuiInputLabel-root.Mui-error": {
+                        color: "#ff4444",
                       },
                     }}
                   />
@@ -236,15 +240,15 @@ export const Register = () => {
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
-                      '& .MuiFormHelperText-root.Mui-error': {
-                        color: 'error.main',
-                        fontWeight: 'bold',
+                      "& .MuiFormHelperText-root.Mui-error": {
+                        color: "error.main",
+                        fontWeight: "bold",
                       },
-                      '& .MuiFilledInput-root.Mui-error': {
-                        borderBottom: '2px solid #ff4444',
+                      "& .MuiFilledInput-root.Mui-error": {
+                        borderBottom: "2px solid #ff4444",
                       },
-                      '& .MuiInputLabel-root.Mui-error': {
-                        color: '#ff4444',
+                      "& .MuiInputLabel-root.Mui-error": {
+                        color: "#ff4444",
                       },
                     }}
                   />
@@ -269,15 +273,15 @@ export const Register = () => {
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
-                      '& .MuiFormHelperText-root.Mui-error': {
-                        color: 'error.main',
-                        fontWeight: 'bold',
+                      "& .MuiFormHelperText-root.Mui-error": {
+                        color: "error.main",
+                        fontWeight: "bold",
                       },
-                      '& .MuiFilledInput-root.Mui-error': {
-                        borderBottom: '2px solid #ff4444',
+                      "& .MuiFilledInput-root.Mui-error": {
+                        borderBottom: "2px solid #ff4444",
                       },
-                      '& .MuiInputLabel-root.Mui-error': {
-                        color: '#ff4444',
+                      "& .MuiInputLabel-root.Mui-error": {
+                        color: "#ff4444",
                       },
                     }}
                   />
@@ -294,15 +298,15 @@ export const Register = () => {
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
-                      '& .MuiFormHelperText-root.Mui-error': {
-                        color: 'error.main',
-                        fontWeight: 'bold',
+                      "& .MuiFormHelperText-root.Mui-error": {
+                        color: "error.main",
+                        fontWeight: "bold",
                       },
-                      '& .MuiFilledInput-root.Mui-error': {
-                        borderBottom: '2px solid #ff4444',
+                      "& .MuiFilledInput-root.Mui-error": {
+                        borderBottom: "2px solid #ff4444",
                       },
-                      '& .MuiInputLabel-root.Mui-error': {
-                        color: '#ff4444',
+                      "& .MuiInputLabel-root.Mui-error": {
+                        color: "#ff4444",
                       },
                     }}
                   />
@@ -319,15 +323,15 @@ export const Register = () => {
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
-                      '& .MuiFormHelperText-root.Mui-error': {
-                        color: 'error.main',
-                        fontWeight: 'bold',
+                      "& .MuiFormHelperText-root.Mui-error": {
+                        color: "error.main",
+                        fontWeight: "bold",
                       },
-                      '& .MuiFilledInput-root.Mui-error': {
-                        borderBottom: '2px solid #ff4444',
+                      "& .MuiFilledInput-root.Mui-error": {
+                        borderBottom: "2px solid #ff4444",
                       },
-                      '& .MuiInputLabel-root.Mui-error': {
-                        color: '#ff4444',
+                      "& .MuiInputLabel-root.Mui-error": {
+                        color: "#ff4444",
                       },
                     }}
                   />
@@ -352,15 +356,15 @@ export const Register = () => {
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
-                      '& .MuiFormHelperText-root.Mui-error': {
-                        color: 'error.main',
-                        fontWeight: 'bold',
+                      "& .MuiFormHelperText-root.Mui-error": {
+                        color: "error.main",
+                        fontWeight: "bold",
                       },
-                      '& .MuiFilledInput-root.Mui-error': {
-                        borderBottom: '2px solid #ff4444',
+                      "& .MuiFilledInput-root.Mui-error": {
+                        borderBottom: "2px solid #ff4444",
                       },
-                      '& .MuiInputLabel-root.Mui-error': {
-                        color: '#ff4444',
+                      "& .MuiInputLabel-root.Mui-error": {
+                        color: "#ff4444",
                       },
                     }}
                   />
@@ -377,15 +381,15 @@ export const Register = () => {
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
-                      '& .MuiFormHelperText-root.Mui-error': {
-                        color: 'error.main',
-                        fontWeight: 'bold',
+                      "& .MuiFormHelperText-root.Mui-error": {
+                        color: "error.main",
+                        fontWeight: "bold",
                       },
-                      '& .MuiFilledInput-root.Mui-error': {
-                        borderBottom: '2px solid #ff4444',
+                      "& .MuiFilledInput-root.Mui-error": {
+                        borderBottom: "2px solid #ff4444",
                       },
-                      '& .MuiInputLabel-root.Mui-error': {
-                        color: '#ff4444',
+                      "& .MuiInputLabel-root.Mui-error": {
+                        color: "#ff4444",
                       },
                     }}
                   />
@@ -402,15 +406,15 @@ export const Register = () => {
                     sx={{
                       width: { xs: "100%", sm: "250px" },
                       height: "50px",
-                      '& .MuiFormHelperText-root.Mui-error': {
-                        color: 'error.main',
-                        fontWeight: 'bold',
+                      "& .MuiFormHelperText-root.Mui-error": {
+                        color: "error.main",
+                        fontWeight: "bold",
                       },
-                      '& .MuiFilledInput-root.Mui-error': {
-                        borderBottom: '2px solid #ff4444',
+                      "& .MuiFilledInput-root.Mui-error": {
+                        borderBottom: "2px solid #ff4444",
                       },
-                      '& .MuiInputLabel-root.Mui-error': {
-                        color: '#ff4444',
+                      "& .MuiInputLabel-root.Mui-error": {
+                        color: "#ff4444",
                       },
                     }}
                   />
