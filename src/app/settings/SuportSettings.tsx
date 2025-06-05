@@ -64,7 +64,6 @@ export const SuportSettings = () => {
           border: (theme) => `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
         }}
       >
-        {/* Título */}
         <Box display="flex" alignItems="center" mb={2}>
           <Avatar
             sx={{
@@ -111,14 +110,12 @@ export const SuportSettings = () => {
           mediante teléfono móvil.
         </Typography>
 
-        {/* Contacto */}
         <Stack
           direction={{ xs: "column", sm: "row" }}
           spacing={2}
           flexWrap="wrap"
           sx={{ mb: 3 }}
         >
-          {/* Email */}
           <List sx={{ width: { xs: "100%", sm: "auto" } }}>
             <ListItem sx={{ mb: 1, width: "100%" }}>
               <ListItemIcon sx={{ minWidth: 40 }}>
@@ -153,7 +150,6 @@ export const SuportSettings = () => {
             </ListItem>
           </List>
 
-          {/* Teléfono */}
           <List sx={{ width: { xs: "100%", sm: "auto" } }}>
             <ListItem sx={{ mb: 1, width: "100%" }}>
               <ListItemIcon sx={{ minWidth: 40 }}>
@@ -177,7 +173,6 @@ export const SuportSettings = () => {
           </List>
         </Stack>
 
-        {/* Chips visibles */}
         <Stack
           direction={{ xs: "column", sm: "row" }}
           spacing={2}
@@ -209,7 +204,6 @@ export const SuportSettings = () => {
         </Stack>
       </Paper>
 
-      {/* Sección de FAQ */}
       <Box sx={{ flex: 1, minWidth: { xs: "100%", md: "300px" } }}>
         <Stack spacing={3}>
           <Paper

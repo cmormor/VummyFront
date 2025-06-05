@@ -28,7 +28,7 @@ export const ThemeContextProvider = ({
           },
           background: {
             default: mode === "dark" ? "#1a1a1a" : "#fefefe",
-            paper: mode === "dark" ? "#2a2a2a" : "#fafafa",
+            paper: mode === "dark" ? "#2a2a2a" : "#f5f5f5",
           },
           text: {
             primary: mode === "dark" ? "#e0e0e0" : "#212121",

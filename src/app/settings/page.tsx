@@ -742,7 +742,6 @@ export const Settings = () => {
                 },
               }}
             >
-              {/* Opciones base */}
               {baseMenuOptions.map((option) => (
                 <ListItemButton
                   key={option.id}
@@ -786,7 +785,6 @@ export const Settings = () => {
                 </ListItemButton>
               ))}
 
-              {/* Skeletons mientras se carga el rol */}
               {loadingRol ? (
                 <>
                   <MenuItemSkeleton isMobile />
@@ -926,7 +924,6 @@ export const Settings = () => {
             pb: 4,
           }}
         >
-          {/* Skeleton del menú lateral */}
           <Skeleton
             variant="rectangular"
             width={280}
@@ -934,7 +931,6 @@ export const Settings = () => {
             sx={{ borderRadius: 3 }}
           />
 
-          {/* Skeleton del contenido principal */}
           <Skeleton
             variant="rectangular"
             sx={{ borderRadius: 3, flexGrow: 1, height: 650 }}
@@ -961,8 +957,7 @@ export const Settings = () => {
             borderRadius: 3,
             overflow: "hidden",
             background: (theme) =>
-              `linear-gradient(145deg, ${
-                theme.palette.background.paper
+              `linear-gradient(145deg, ${theme.palette.background.paper
               } 0%, ${alpha(theme.palette.primary.light, 0.02)} 100%)`,
             border: (theme) =>
               `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
@@ -1001,7 +996,6 @@ export const Settings = () => {
           </Box>
 
           <List component="nav" sx={{ p: 2 }}>
-            {/* Opciones base */}
             {baseMenuOptions.map((option) => (
               <ListItemButton
                 key={option.id}
@@ -1183,8 +1177,7 @@ export const Settings = () => {
             width: "100%",
             overflow: "auto",
             background: (theme) =>
-              `linear-gradient(145deg, ${
-                theme.palette.background.paper
+              `linear-gradient(145deg, ${theme.palette.background.paper
               } 0%, ${alpha(theme.palette.primary.light, 0.01)} 100%)`,
             border: (theme) =>
               `1px solid ${alpha(theme.palette.primary.main, 0.08)}`,
@@ -1211,8 +1204,7 @@ export const Settings = () => {
                 position: "relative",
                 minHeight: 500,
                 background: (theme) =>
-                  `linear-gradient(145deg, ${
-                    theme.palette.background.paper
+                  `linear-gradient(145deg, ${theme.palette.background.paper
                   } 0%, ${alpha(theme.palette.primary.light, 0.02)} 100%)`,
                 border: (theme) =>
                   `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,

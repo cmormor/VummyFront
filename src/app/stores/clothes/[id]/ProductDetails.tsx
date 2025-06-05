@@ -6,7 +6,6 @@ import {
   DialogTitle,
   DialogContent,
   FormControl,
-  FormLabel,
   RadioGroup,
   FormControlLabel,
   Radio,
@@ -20,11 +19,14 @@ import {
   Skeleton,
   alpha,
   IconButton,
+  Paper,
+  useTheme,
+  Chip,
+  Fade,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import StraightenIcon from "@mui/icons-material/Straighten";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import RecommendIcon from "@mui/icons-material/Recommend";
@@ -38,6 +40,7 @@ import ErrorModal from "../../../../components/ErrorModal";
 import { sizesStore } from "../../../../api/storeApi";
 import { perfilUsuario } from "../../../../api/userApi";
 import { Usuario } from "../../../../types/user";
+import { HelpingHandIcon, InfoIcon, RulerIcon, ShirtIcon } from "lucide-react";
 
 export default function ProductDetails() {
   const { clotheId } = useParams();
@@ -54,6 +57,7 @@ export default function ProductDetails() {
   const [loadingSizes, setLoadingSizes] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showRecommendation, setShowRecommendation] = useState(false);
+  const theme = useTheme();
 
   useEffect(() => {
     if (clotheId) {
@@ -142,13 +146,6 @@ export default function ProductDetails() {
     fetchData();
   }, [storeSizes]);
 
-  const handleRecommendSize = () => {
-    setShowRecommendation(true);
-    if (dataRecommended) {
-      setSize(dataRecommended.nombre);
-    }
-  };
-
   const handleAddToCart = async () => {
     if (!clothe) return;
 
@@ -169,7 +166,6 @@ export default function ProductDetails() {
       setIsAdding(true);
       await postItemToCart(itemToPost);
       setCantidad(1);
-      window.location.reload();
     } catch (error) {
       setError(`Error al añadir al carrito: ${error}`);
     } finally {
@@ -192,19 +188,9 @@ export default function ProductDetails() {
       <Box px={{ xs: 2, md: 4 }}>
         <Skeleton variant="text" width="40%" height={40} sx={{ mb: 2 }} />
         <Skeleton variant="text" width="80%" height={30} sx={{ mb: 5 }} />
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          height={200}
-          sx={{ mb: 3 }}
-        />
+        <Skeleton variant="rectangular" width="100%" height={200} sx={{ mb: 3 }} />
         <Skeleton variant="text" width="20%" height={30} sx={{ mb: 1 }} />
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          height={50}
-          sx={{ mb: 5 }}
-        />
+        <Skeleton variant="rectangular" width="100%" height={50} sx={{ mb: 5 }} />
         <Skeleton variant="rectangular" width="100%" height={50} />
       </Box>
     );
@@ -215,12 +201,7 @@ export default function ProductDetails() {
   }
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      height="100%"
-      px={{ xs: 2, md: 4 }}
-    >
+    <Box display="flex" flexDirection="column" height="100%" px={{ xs: 2, md: 4 }}>
       <Typography
         variant="h4"
         fontWeight="bold"
@@ -258,14 +239,7 @@ export default function ProductDetails() {
       </Typography>
 
       <Box mb={3}>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={1}
-          flexWrap="wrap"
-          gap={1}
-        >
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={4} flexWrap="wrap" gap={1}>
           <Typography
             variant="h6"
             sx={{
@@ -273,43 +247,35 @@ export default function ProductDetails() {
               fontSize: { xs: "1rem", md: "1.5rem" },
             }}
           >
-            Talla
+            TALLA
           </Typography>
+
           <Box display="flex" gap={1} flexWrap="wrap">
             <Button
-              size="small"
-              startIcon={<RecommendIcon sx={{ fontSize: 16 }} />}
-              onClick={handleRecommendSize}
               variant="outlined"
+              onClick={() => setShowRecommendation(true)}
+              startIcon={<ShirtIcon />}
               sx={{
-                fontFamily: "'Poppins', sans-serif",
-                fontSize: { xs: "0.85rem", md: "0.9rem" },
-                textTransform: "none",
-                color: (theme) => theme.palette.primary.main,
-                borderColor: (theme) => theme.palette.primary.main,
-                "&:hover": {
-                  backgroundColor: (theme) =>
-                    alpha(theme.palette.primary.main, 0.1),
-                },
+                color: theme.palette.success.main,
+                borderColor: theme.palette.success.main,
+                borderRadius: 3,
+                fontSize: "0.9rem",
               }}
             >
-              MI TALLA
+              Mi Talla
             </Button>
+
             <Button
+              variant="outlined"
               size="small"
-              startIcon={
-                <StraightenIcon
-                  sx={{ fontSize: 16, transform: "rotate(45deg)" }}
-                />
-              }
+              startIcon={<RulerIcon />}
               onClick={() => setOpenDialog(true)}
               sx={{
-                fontFamily: "'Poppins', sans-serif",
-                fontSize: { xs: "0.85rem", md: "0.9rem" },
-                textTransform: "none",
+                borderRadius: 3,
+                fontSize: "0.9rem",
               }}
             >
-              GUÍA DE TALLAS
+              Guía de Tallas
             </Button>
           </Box>
         </Box>
@@ -322,78 +288,158 @@ export default function ProductDetails() {
             maxWidth="sm"
             PaperProps={{
               sx: {
-                background: (theme) => theme.palette.background.paper,
-                border: (theme) => `5px solid ${theme.palette.success.light}`,
-                fontFamily: "'Poppins', sans-serif",
-                textAlign: "center",
+                background: theme.palette.background.paper,
+                borderRadius: 4,
+                overflow: "hidden",
+                boxShadow: `0 24px 80px ${alpha(theme.palette.common.black, 0.2)}`,
                 position: "relative",
               },
             }}
+            BackdropProps={{
+              sx: {
+                backgroundColor: alpha(theme.palette.common.black, 0.7),
+                backdropFilter: "blur(8px)",
+              },
+            }}
           >
+            <Box
+              sx={{
+                height: 8,
+                width: "100%",
+                background: dataRecommended
+                  ? `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.success.light})`
+                  : `linear-gradient(90deg, ${theme.palette.warning.main}, ${theme.palette.warning.light})`,
+              }}
+            />
+
             <IconButton
               onClick={() => setShowRecommendation(false)}
               sx={{
                 position: "absolute",
-                right: 8,
-                top: 8,
-                color: (theme) => theme.palette.grey[500],
+                right: 16,
+                top: 16,
+                backgroundColor: alpha(theme.palette.background.paper, 0.8),
+                backdropFilter: "blur(8px)",
               }}
             >
-              <CloseIcon />
+              <CloseIcon sx={{ color: theme.palette.text.secondary }} />
             </IconButton>
-            <DialogTitle
-              sx={{
-                fontWeight: "bold",
-                color: (theme) => theme.palette.text.primary,
-                fontSize: { xs: "1rem", md: "1.1rem" },
-                textDecorationLine: "underline",
-                textUnderlineOffset: "4px",
-                pr: 6, // Add padding to prevent overlap with close button
-              }}
-            >
-              {dataRecommended
-                ? `TALLA RECOMENDADA`
-                : "No se pudo determinar una talla"}
-            </DialogTitle>
 
-            <DialogContent
-              sx={{
-                fontSize: { xs: "0.9rem", md: "1rem" },
-                color: (theme) => theme.palette.text.primary,
-              }}
-            >
-              {dataRecommended
-                ? "Basado en tus medidas corporales, te recomendamos esta talla para un mejor ajuste."
-                : "Completa tu perfil con tus medidas corporales para obtener recomendaciones personalizadas."}
-              <br />
-              <Typography
+            <Box sx={{ px: 4, pt: 5, pb: 4, textAlign: "center" }}>
+              <Fade in={true}>
+                <Box
+                  sx={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: "50%",
+                    backgroundColor: alpha(
+                      dataRecommended ? theme.palette.success.main : theme.palette.warning.main,
+                      0.1
+                    ),
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    mx: "auto",
+                    mb: 3,
+                  }}
+                >
+                  {dataRecommended ? (
+                    <CheckIcon
+                      sx={{
+                        fontSize: 40,
+                        color: theme.palette.success.main,
+                      }}
+                    />
+                  ) : (
+                    <HelpingHandIcon />
+                  )}
+                </Box>
+              </Fade>
+
+              <DialogTitle
                 sx={{
-                  color: (theme) => theme.palette.success.main,
                   fontWeight: "bold",
+                  color: theme.palette.text.primary,
+                  fontSize: { xs: "1.2rem", md: "1.5rem" },
+                  p: 0,
+                  mb: 1,
                   fontFamily: "'Poppins', sans-serif",
-                  fontSize: 30,
+                  position: "relative",
                   display: "inline-block",
-                  mt: 2,
-                  pl: 1.5,
-                  pr: 1.5,
                 }}
               >
-                {dataRecommended?.nombre}
-              </Typography>
-            </DialogContent>
+                {dataRecommended ? "TALLA RECOMENDADA" : "No se pudo determinar una talla"}
+                <Box
+                  sx={{
+                    position: "absolute",
+                    bottom: -4,
+                    left: "10%",
+                    width: "80%",
+                    height: 3,
+                    background: dataRecommended
+                      ? `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.success.light})`
+                      : `linear-gradient(90deg, ${theme.palette.warning.main}, ${theme.palette.warning.light})`,
+                    borderRadius: 2,
+                  }}
+                />
+              </DialogTitle>
+
+              <DialogContent sx={{ p: 0, mt: 3 }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontSize: { xs: "0.95rem", md: "1.05rem" },
+                    color: theme.palette.text.secondary,
+                    fontFamily: "'Poppins', sans-serif",
+                    mb: 4,
+                    maxWidth: 400,
+                    mx: "auto",
+                  }}
+                >
+                  {dataRecommended
+                    ? "Basado en tus medidas corporales, te recomendamos esta talla para un mejor ajuste y comodidad."
+                    : "Completa tu perfil con tus medidas corporales para obtener recomendaciones personalizadas."}
+                </Typography>
+
+                {dataRecommended && (
+                  <Fade in={true}>
+                    <Paper
+                      elevation={0}
+                      sx={{
+                        display: "inline-block",
+                        borderRadius: 3,
+                        py: 1.5,
+                        px: 4,
+                        background: `linear-gradient(135deg, ${alpha(
+                          theme.palette.success.main,
+                          0.12
+                        )} 0%, ${alpha(theme.palette.success.light, 0.08)} 100%)`,
+                        border: `2px solid ${alpha(theme.palette.success.main, 0.3)}`,
+                        mb: 3,
+                      }}
+                    >
+                      <Typography
+                        variant="h2"
+                        sx={{
+                          color: theme.palette.success.main,
+                          fontWeight: "bold",
+                          fontFamily: "'Poppins', sans-serif",
+                          fontSize: { xs: "3rem", md: "4rem" },
+                          letterSpacing: "0.05em",
+                          textShadow: `0 2px 10px ${alpha(theme.palette.success.main, 0.3)}`,
+                        }}
+                      >
+                        {dataRecommended?.nombre}
+                      </Typography>
+                    </Paper>
+                  </Fade>
+                )}
+              </DialogContent>
+            </Box>
           </Dialog>
         )}
 
         <FormControl>
-          <FormLabel
-            sx={{
-              mb: 2,
-              fontFamily: "'Poppins', sans-serif",
-              fontSize: { xs: "0.95rem", md: "1rem" },
-            }}
-          >
-            Selecciona tu talla
-          </FormLabel>
           <RadioGroup
             row
             value={size}
@@ -401,9 +447,7 @@ export default function ProductDetails() {
             sx={{ flexWrap: "wrap", gap: 2 }}
           >
             {["S", "M", "L", "XL"].map((option) => {
-              const tallaDisponible = sizeAvailable.find(
-                (s) => s.tallaNombre === option
-              );
+              const tallaDisponible = sizeAvailable.find((s) => s.tallaNombre === option);
               const isRecommended = dataRecommended?.nombre === option;
               return (
                 <FormControlLabel
@@ -442,27 +486,24 @@ export default function ProductDetails() {
         </FormControl>
       </Box>
 
-      <Box display="flex" alignItems="center" mb={5}>
+      <Box display="flex" alignItems="center" mb={5} mt={2}>
         <Typography
           variant="h6"
           sx={{
             fontFamily: "'Poppins', sans-serif",
             fontSize: { xs: "1rem", md: "1.5rem" },
+            pr: 2,
           }}
         >
-          Cantidad
+          CANTIDAD
         </Typography>
-        <Button
-          onClick={() => setCantidad((prev) => Math.max(1, prev - 1))}
-          sx={{ color: (theme) => theme.palette.text.primary }}
-        >
+        <Button onClick={() => setCantidad((prev) => Math.max(1, prev - 1))} sx={{ color: (theme) => theme.palette.text.primary }}>
           <RemoveIcon />
         </Button>
-        <Typography variant="h6">{cantidad}</Typography>
-        <Button
-          onClick={() => setCantidad((prev) => prev + 1)}
-          sx={{ color: (theme) => theme.palette.text.primary }}
-        >
+        <Typography variant="h6" sx={{ px: 2 }}>
+          {cantidad}
+        </Typography>
+        <Button onClick={() => setCantidad((prev) => prev + 1)} sx={{ color: (theme) => theme.palette.text.primary }}>
           <AddIcon />
         </Button>
       </Box>
@@ -492,13 +533,7 @@ export default function ProductDetails() {
           fullWidth
           variant="contained"
           size="large"
-          startIcon={
-            isAdding ? (
-              <CircularProgress size={20} color="inherit" />
-            ) : (
-              <AddShoppingCartIcon sx={{ fontSize: 20 }} />
-            )
-          }
+          startIcon={isAdding ? <CircularProgress size={20} color="inherit" /> : <AddShoppingCartIcon sx={{ fontSize: 20 }} />}
           sx={{
             fontFamily: "'Poppins', sans-serif",
             fontSize: { xs: "1rem", md: "1rem" },
@@ -512,10 +547,24 @@ export default function ProductDetails() {
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         fullWidth
-        maxWidth="md"
+        maxWidth="lg"
         PaperProps={{
           sx: {
             position: "relative",
+            borderRadius: 4,
+            background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.95)} 0%, ${alpha(
+              theme.palette.background.default,
+              0.98
+            )} 100%)`,
+            backdropFilter: "blur(20px)",
+            boxShadow: `0 24px 80px ${alpha(theme.palette.common.black, 0.15)}`,
+            overflow: "hidden",
+          },
+        }}
+        BackdropProps={{
+          sx: {
+            backgroundColor: alpha(theme.palette.common.black, 0.7),
+            backdropFilter: "blur(8px)",
           },
         }}
       >
@@ -523,127 +572,208 @@ export default function ProductDetails() {
           onClick={() => setOpenDialog(false)}
           sx={{
             position: "absolute",
-            right: 8,
-            top: 8,
-            color: (theme) => theme.palette.grey[500],
-            zIndex: 1,
+            right: 16,
+            top: 16,
+            zIndex: 10,
+            backgroundColor: alpha(theme.palette.background.paper, 0.9),
+            backdropFilter: "blur(10px)",
+            boxShadow: `0 4px 20px ${alpha(theme.palette.common.black, 0.1)}`,
+            "&:hover": {
+              backgroundColor: alpha(theme.palette.error.main, 0.1),
+              transform: "scale(1.1)",
+              boxShadow: `0 6px 25px ${alpha(theme.palette.common.black, 0.15)}`,
+            },
           }}
         >
-          <CloseIcon />
+          <CloseIcon sx={{ color: theme.palette.text.secondary }} />
         </IconButton>
-        <DialogTitle
+
+        <Box
           sx={{
+            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(
+              theme.palette.primary.main,
+              0.05
+            )} 100%)`,
+            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+            px: 4,
+            py: 3,
             textAlign: "center",
-            fontFamily: "'Lexend Zetta', sans-serif",
-            fontSize: { xs: "1.1rem", md: "1.5rem" },
-            fontWeight: "bold",
-            color: (theme) => theme.palette.primary.main,
-            textDecorationLine: "underline",
-            textUnderlineOffset: "10px",
-            pr: 6,
           }}
         >
-          GUÍA DE TALLAS
-        </DialogTitle>
-        <DialogContent>
-          <Box
+          <Typography
+            variant="h4"
+            component="h2"
             sx={{
-              overflowX: "auto",
+              fontFamily: "'Lexend Zetta', sans-serif",
+              fontWeight: "bold",
+              color: theme.palette.primary.main,
+              mb: 1,
+              fontSize: { xs: "1.5rem", md: "2rem" },
             }}
           >
-            <Table
+            GUÍA DE TALLAS
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: theme.palette.text.primary,
+              maxWidth: "100%",
+              mx: "auto",
+            }}
+          >
+            Encuentra tu talla perfecta con nuestra guía detallada de medidas
+          </Typography>
+        </Box>
+
+        <DialogContent sx={{ p: 0 }}>
+          <Box sx={{ p: 3 }}>
+            <Paper
+              elevation={0}
               sx={{
-                minWidth: 650,
-                background: (theme) =>
-                  `linear-gradient(135deg, ${alpha(
-                    theme.palette.info.light,
-                    0.08
-                  )} 0%, ${alpha(theme.palette.primary.light, 0.05)} 100%)`,
-                border: (theme) =>
-                  `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
-                color: (theme) => theme.palette.text.primary,
+                borderRadius: 3,
+                overflow: "hidden",
+                border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                background: alpha(theme.palette.background.paper, 0.7),
+                backdropFilter: "blur(10px)",
               }}
             >
-              <TableHead>
-                <TableRow>
-                  {[
-                    "Talla",
-                    "Altura",
-                    "CuelloManga",
-                    "Pecho",
-                    "Cintura",
-                    "Cadera",
-                    "Entrepierna",
-                  ].map((col) => (
-                    <TableCell
-                      key={col}
-                      align="center"
+              <Box sx={{ overflowX: "auto" }}>
+                <Table sx={{ minWidth: 650 }}>
+                  <TableHead>
+                    <TableRow
                       sx={{
-                        fontWeight: "bold",
-                        fontFamily: "'Poppins', sans-serif",
-                        fontSize: { xs: "0.8rem", md: "1rem" },
+                        background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(
+                          theme.palette.primary.main,
+                          0.03
+                        )} 100%)`,
                       }}
                     >
-                      {col}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {storeSizes.length > 0 ? (
-                  storeSizes
-                    .slice()
-                    .sort(
-                      (a, b) =>
-                        ["S", "M", "L", "XL"].indexOf(a.nombre) -
-                        ["S", "M", "L", "XL"].indexOf(b.nombre)
-                    )
-                    .map((row) => (
-                      <TableRow
-                        key={row.id}
-                        sx={{
-                          backgroundColor:
-                            dataRecommended?.id === row.id
-                              ? (theme) =>
-                                alpha(theme.palette.success.main, 0.1)
-                              : "transparent",
-                        }}
-                      >
-                        <TableCell align="center">
-                          <Box
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                            gap={0.5}
+                      {[
+                        "Talla",
+                        "Altura (cm)",
+                        "Cuello/Manga",
+                        "Pecho (cm)",
+                        "Cintura (cm)",
+                        "Cadera (cm)",
+                        "Entrepierna (cm)",
+                      ].map((col) => (
+                        <TableCell
+                          key={col}
+                          align="center"
+                          sx={{
+                            fontWeight: "bold",
+                            fontFamily: "'Poppins', sans-serif",
+                            fontSize: { xs: "0.85rem", md: "0.95rem" },
+                            color: theme.palette.text.primary,
+                            py: 2.5,
+                            borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                          }}
+                        >
+                          {col}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {storeSizes.length > 0 ? (
+                      storeSizes
+                        .slice()
+                        .sort(
+                          (a, b) =>
+                            ["S", "M", "L", "XL"].indexOf(a.nombre) -
+                            ["S", "M", "L", "XL"].indexOf(b.nombre)
+                        )
+                        .map((row, index) => (
+                          <TableRow
+                            key={row.id}
+                            sx={{
+                              backgroundColor:
+                                dataRecommended?.id === row.id
+                                  ? alpha(theme.palette.primary.main, 0.08)
+                                  : index % 2 === 0
+                                    ? alpha(theme.palette.background.default, 0.3)
+                                    : "transparent",
+                              borderLeft:
+                                dataRecommended?.id === row.id
+                                  ? `4px solid ${theme.palette.primary.main}`
+                                  : "4px solid transparent",
+                            }}
                           >
-                            {row.nombre}
-                            {dataRecommended?.id === row.id && (
-                              <RecommendIcon
-                                sx={{
-                                  fontSize: 16,
-                                  color: (theme) => theme.palette.success.main,
-                                }}
-                              />
+                            <TableCell align="center" sx={{ py: 2 }}>
+                              <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                                <Typography
+                                  variant="h6"
+                                  sx={{
+                                    fontWeight: "bold",
+                                    color: theme.palette.text.primary,
+                                  }}
+                                >
+                                  {row.nombre}
+                                </Typography>
+                                {dataRecommended?.id === row.id && (
+                                  <Chip
+                                    icon={<RecommendIcon sx={{ fontSize: 16 }} />}
+                                    label="Recomendada"
+                                    size="small"
+                                    sx={{
+                                      background: `linear-gradient(45deg, ${theme.palette.success.main} 30%, ${theme.palette
+                                        .success.light} 90%)`,
+                                      color: "white",
+                                      fontWeight: "bold",
+                                      fontSize: "0.7rem",
+                                      "& .MuiChip-icon": {
+                                        color: "white",
+                                      },
+                                    }}
+                                  />
+                                )}
+                              </Box>
+                            </TableCell>
+                            {[row.altura, row.cuelloManga, row.pecho, row.cintura, row.cadera, row.entrepierna].map(
+                              (value, cellIndex) => (
+                                <TableCell
+                                  key={cellIndex}
+                                  align="center"
+                                  sx={{
+                                    py: 2,
+                                    fontWeight: "medium",
+                                    color: theme.palette.text.primary,
+                                  }}
+                                >
+                                  {value}
+                                </TableCell>
+                              )
                             )}
+                          </TableRow>
+                        ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
+                          <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+                            <Box
+                              sx={{
+                                width: 60,
+                                height: 60,
+                                borderRadius: "50%",
+                                backgroundColor: alpha(theme.palette.text.disabled, 0.1),
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <InfoIcon />
+                            </Box>
+                            <Typography variant="body1" color="text.secondary">
+                              No hay datos disponibles
+                            </Typography>
                           </Box>
                         </TableCell>
-                        <TableCell align="center">{row.altura}</TableCell>
-                        <TableCell align="center">{row.cuelloManga}</TableCell>
-                        <TableCell align="center">{row.pecho}</TableCell>
-                        <TableCell align="center">{row.cintura}</TableCell>
-                        <TableCell align="center">{row.cadera}</TableCell>
-                        <TableCell align="center">{row.entrepierna}</TableCell>
                       </TableRow>
-                    ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={7} align="center">
-                      No hay datos disponibles
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                    )}
+                  </TableBody>
+                </Table>
+              </Box>
+            </Paper>
           </Box>
         </DialogContent>
       </Dialog>

@@ -31,7 +31,7 @@ export const Stores = () => {
       } catch (err) {
         setError(
           "Error al cargar las tiendas. Por favor, inténtalo de nuevo más tarde: " +
-            err
+          err
         );
       } finally {
         setLoading(false);
@@ -119,6 +119,7 @@ export const Stores = () => {
             maxWidth: "90%",
             mt: 2,
             mb: 2.5,
+            fontFamily: "'Poppins', sans-serif",
             backgroundColor:
               theme.palette.mode === "light"
                 ? "#f5f5f5"
@@ -128,13 +129,11 @@ export const Stores = () => {
               border: "none",
             },
             "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-              {
-                border: "none",
-              },
+            {
+              border: "none",
+            },
             boxShadow:
-              theme.palette.mode === "light"
-                ? "0px 2px 8px rgba(0, 0, 0, 0.05)"
-                : "0px 2px 8px rgba(0, 0, 0, 0.3)",
+              theme.palette.background.paper
           }}
         />
       </Box>
@@ -155,7 +154,7 @@ export const Stores = () => {
             <StoreSkeleton />
           </>
         ) : filteredStores.length === 0 ? (
-          <Typography variant="h6" sx={{ marginTop: 2 }}>
+          <Typography variant="h6" sx={{ marginTop: 2, fontFamily: "'Poppins', sans-serif", }}>
             No se encontraron tiendas.
           </Typography>
         ) : (

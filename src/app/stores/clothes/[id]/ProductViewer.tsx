@@ -59,8 +59,6 @@ export default function ProductViewer() {
         width: "100%",
         minHeight: { xs: 400, md: 450 },
         maxHeight: { xs: "auto", md: 600 },
-        background: (theme) =>
-          `linear-gradient(135deg, ${alpha(theme.palette.primary.light, 0.1)} 0%, ${alpha(theme.palette.primary.dark, 0.05)} 100%)`,
         borderRadius: 3,
         border: (theme) => `2px solid ${alpha(theme.palette.primary.main, 0.4)}`,
         display: "flex",
