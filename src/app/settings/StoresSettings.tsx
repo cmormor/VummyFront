@@ -44,6 +44,20 @@ import {
   updateStore,
 } from "../../api/storeApi";
 import { ModalConfirmation } from "../../components/ModalConfirmation";
+import * as yup from "yup";
+
+const schema = yup.object().shape({
+  nombre: yup
+    .string()
+    .min(3, "Mínimo 3 caracteres")
+    .required("El nombre es obligatorio"),
+  descripcion: yup
+    .string()
+    .min(3, "Mínimo 3 caracteres")
+    .max(50, "Máximo 50 caracteres")
+    .required("La descripción es obligatoria"),
+});
+
 
 export const StoresSettings = () => {
   const [storeList, setStoreList] = useState<Store[]>([]);
@@ -160,7 +174,12 @@ export const StoresSettings = () => {
 
   const handleSubmit = async () => {
     setLoading(true);
+    setMensaje(""); // limpiar errores anteriores
+
     try {
+      // Validación del formulario
+      await schema.validate(formData, { abortEarly: false });
+
       if (dialogMode === "create") {
         const response = await createStore(formData);
         if (typeof response === "string") {
@@ -174,19 +193,14 @@ export const StoresSettings = () => {
         showSnackbar("Tienda creada exitosamente", "success");
       } else if (dialogMode === "edit") {
         if (!selectedStore) {
-          showSnackbar(
-            "No se ha seleccionado ningúna tienda para editar.",
-            "error"
-          );
+          showSnackbar("No se ha seleccionado ninguna tienda para editar.", "error");
           setLoading(false);
           return;
         }
 
         const data: Partial<Store> = { id: selectedStore.id };
-
         if (formData.nombre !== "") data.nombre = formData.nombre;
-        if (formData.descripcion !== "")
-          data.descripcion = formData.descripcion;
+        if (formData.descripcion !== "") data.descripcion = formData.descripcion;
 
         await updateStore(selectedStore.id!, data);
         await loadStores();
@@ -194,8 +208,12 @@ export const StoresSettings = () => {
       }
 
       handleCloseDialog();
-    } catch (error) {
-      showSnackbar(`Error al procesar la solicitud ${error}`, "error");
+    } catch (validationError) {
+      if (validationError instanceof yup.ValidationError) {
+        const mensajes = validationError.inner.map((err) => err.message).join(" | ");
+        showSnackbar(mensajes, "error");
+        return;
+      }
     } finally {
       setLoading(false);
     }
