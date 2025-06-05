@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { getStores } from "../../api/storeApi";
 import { Store as StoreType } from "../../types/store";
-import { Stack, Box, Skeleton } from "@mui/material";
+import {
+  Stack,
+  Box,
+  Skeleton,
+  TextField,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { StoreCard } from "./StoreCard";
 import { Title } from "../../components/Title";
 import { Layout } from "../../components/Layout";
@@ -9,21 +16,22 @@ import { Details } from "../../components/Details";
 import ErrorModal from "../../components/ErrorModal";
 
 export const Stores = () => {
+  const theme = useTheme();
   const [stores, setStores] = useState<StoreType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
     const fetchStores = async () => {
       try {
         const data = await getStores();
         setStores(data);
-        setLoading(false);
         setError(null);
-      } catch (error) {
+      } catch (err) {
         setError(
           "Error al cargar las tiendas. Por favor, inténtalo de nuevo más tarde: " +
-            error
+            err
         );
       } finally {
         setLoading(false);
@@ -45,7 +53,7 @@ export const Stores = () => {
             height={40}
             width="70%"
             sx={{
-              backgroundColor: (theme) =>
+              backgroundColor:
                 theme.palette.mode === "dark"
                   ? "rgba(255, 255, 255, 0.1)"
                   : "rgba(0, 0, 0, 0.05)",
@@ -59,7 +67,7 @@ export const Stores = () => {
             height={24}
             width="90%"
             sx={{
-              backgroundColor: (theme) =>
+              backgroundColor:
                 theme.palette.mode === "dark"
                   ? "rgba(255, 255, 255, 0.1)"
                   : "rgba(0, 0, 0, 0.05)",
@@ -71,7 +79,7 @@ export const Stores = () => {
             height={24}
             width="75%"
             sx={{
-              backgroundColor: (theme) =>
+              backgroundColor:
                 theme.palette.mode === "dark"
                   ? "rgba(255, 255, 255, 0.1)"
                   : "rgba(0, 0, 0, 0.05)",
@@ -82,41 +90,85 @@ export const Stores = () => {
     </StoreCard>
   );
 
+  const filteredStores = stores.filter((store) =>
+    store.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <>
-      <Layout>
-        <Title
-          text="TIENDAS DISPONIBLES EN VUMMY"
-          marginTop={stores.length > 2 ? 120 : 50}
-          paddingTop="0px"
-        />
-        <Stack
+    <Layout>
+      <Title
+        text="TIENDAS EN VUMMY"
+        marginTop={stores.length > 2 ? 120 : 50}
+        paddingTop="0px"
+      />
+
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          paddingX: 2,
+        }}
+      >
+        <TextField
+          placeholder="Buscar tienda..."
+          variant="outlined"
+          fullWidth
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            padding: "15px",
-            width: "100%",
+            maxWidth: "90%",
+            mt: 2,
+            mb: 2.5,
+            backgroundColor:
+              theme.palette.mode === "light"
+                ? "#f5f5f5"
+                : theme.palette.background.paper,
+            borderRadius: "20px",
+            "& .MuiOutlinedInput-notchedOutline": {
+              border: "none",
+            },
+            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+              {
+                border: "none",
+              },
+            boxShadow:
+              theme.palette.mode === "light"
+                ? "0px 2px 8px rgba(0, 0, 0, 0.05)"
+                : "0px 2px 8px rgba(0, 0, 0, 0.3)",
           }}
-        >
-          {loading ? (
-            <>
-              <StoreSkeleton />
-              <StoreSkeleton />
-              <StoreSkeleton />
-            </>
-          ) : (
-            stores.map((store) => (
-              <StoreCard key={store.id} path={`/stores/${store.id}/clothes`}>
-                <>
-                  <Title text={store.nombre} marginTop={2} paddingTop="20px" />
-                  <Details detail={store.descripcion} />
-                </>
-              </StoreCard>
-            ))
-          )}
-        </Stack>
-      </Layout>
-    </>
+        />
+      </Box>
+
+      <Stack
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          padding: "15px",
+          width: "100%",
+        }}
+      >
+        {loading ? (
+          <>
+            <StoreSkeleton />
+            <StoreSkeleton />
+            <StoreSkeleton />
+          </>
+        ) : filteredStores.length === 0 ? (
+          <Typography variant="h6" sx={{ marginTop: 2 }}>
+            No se encontraron tiendas.
+          </Typography>
+        ) : (
+          filteredStores.map((store) => (
+            <StoreCard path={`/stores/${store.id}/clothes`}>
+              <>
+                <Title text={store.nombre} marginTop={2} paddingTop="20px" />
+                <Details detail={store.descripcion} />
+              </>
+            </StoreCard>
+          ))
+        )}
+      </Stack>
+    </Layout>
   );
 };
