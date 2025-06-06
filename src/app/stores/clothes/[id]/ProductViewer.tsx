@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
-import { alpha, Box, Typography, useTheme, useMediaQuery, Chip, Skeleton, IconButton } from "@mui/material";
+import {
+  alpha,
+  Box,
+  Typography,
+  useTheme,
+  useMediaQuery,
+  Chip,
+  Skeleton,
+  IconButton,
+} from "@mui/material";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import ObjViewer from "../../../../components/ObjViewer";
 import { useParams } from "react-router-dom";
@@ -7,8 +16,8 @@ import { getClotheById } from "../../../../api/clotheApi";
 
 export default function ProductViewer() {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { clotheId } = useParams();
 
   const [image, setImage] = useState<string | null>(null);
@@ -60,7 +69,8 @@ export default function ProductViewer() {
         minHeight: { xs: 400, md: 450 },
         maxHeight: { xs: "auto", md: 600 },
         borderRadius: 3,
-        border: (theme) => `2px solid ${alpha(theme.palette.primary.main, 0.4)}`,
+        border: (theme) =>
+          `2px solid ${alpha(theme.palette.primary.main, 0.4)}`,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -102,8 +112,8 @@ export default function ProductViewer() {
         onClick={toggleView}
         sx={{
           position: "absolute",
-          left: showManiqui ? 20 : 'auto',
-          right: showManiqui ? 'auto' : 20,
+          left: showManiqui ? 20 : "auto",
+          right: showManiqui ? "auto" : 20,
         }}
         aria-label="Cambiar vista"
       >

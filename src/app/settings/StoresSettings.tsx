@@ -49,15 +49,19 @@ import * as yup from "yup";
 const schema = yup.object().shape({
   nombre: yup
     .string()
+    .trim()
     .min(3, "Mínimo 3 caracteres")
-    .required("El nombre es obligatorio"),
+    .required("El nombre es obligatorio")
+    .min(1, "El nombre no puede estar vacío"),
+
   descripcion: yup
     .string()
+    .trim()
     .min(3, "Mínimo 3 caracteres")
     .max(50, "Máximo 50 caracteres")
-    .required("La descripción es obligatoria"),
+    .required("La descripción es obligatoria")
+    .min(1, "La descripción no puede estar vacía"),
 });
-
 
 export const StoresSettings = () => {
   const [storeList, setStoreList] = useState<Store[]>([]);
@@ -174,10 +178,9 @@ export const StoresSettings = () => {
 
   const handleSubmit = async () => {
     setLoading(true);
-    setMensaje(""); // limpiar errores anteriores
+    setMensaje("");
 
     try {
-      // Validación del formulario
       await schema.validate(formData, { abortEarly: false });
 
       if (dialogMode === "create") {
@@ -193,14 +196,18 @@ export const StoresSettings = () => {
         showSnackbar("Tienda creada exitosamente", "success");
       } else if (dialogMode === "edit") {
         if (!selectedStore) {
-          showSnackbar("No se ha seleccionado ninguna tienda para editar.", "error");
+          showSnackbar(
+            "No se ha seleccionado ninguna tienda para editar.",
+            "error"
+          );
           setLoading(false);
           return;
         }
 
         const data: Partial<Store> = { id: selectedStore.id };
         if (formData.nombre !== "") data.nombre = formData.nombre;
-        if (formData.descripcion !== "") data.descripcion = formData.descripcion;
+        if (formData.descripcion !== "")
+          data.descripcion = formData.descripcion;
 
         await updateStore(selectedStore.id!, data);
         await loadStores();
@@ -210,8 +217,9 @@ export const StoresSettings = () => {
       handleCloseDialog();
     } catch (validationError) {
       if (validationError instanceof yup.ValidationError) {
-        const mensajes = validationError.inner.map((err) => err.message).join(" | ");
-        showSnackbar(mensajes, "error");
+        const primerMensaje =
+          validationError.inner[0]?.message || validationError.message;
+        showSnackbar(primerMensaje, "error");
         return;
       }
     } finally {
@@ -676,7 +684,9 @@ export const StoresSettings = () => {
               anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             >
               <Alert
-                onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+                onClose={() =>
+                  setSnackbar((prev) => ({ ...prev, open: false }))
+                }
                 severity={snackbar.severity}
                 variant="filled"
                 sx={{

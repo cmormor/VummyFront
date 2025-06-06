@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as yup from "yup";
 import {
   Box,
   TextField,
@@ -12,16 +13,38 @@ import {
   CircularProgress,
   InputAdornment,
   IconButton,
+  Snackbar,
 } from "@mui/material";
-import { Save, CheckCircle, Key, Lock, VisibilityOff, Visibility } from "@mui/icons-material";
+import {
+  Save,
+  CheckCircle,
+  Key,
+  Lock,
+  VisibilityOff,
+  Visibility,
+} from "@mui/icons-material";
 import { perfilUsuario, updateUsuario } from "../../api/userApi";
 import { Usuario } from "../../types/user";
-import ErrorModal from "../../components/ErrorModal";
+
+const schema = yup.object().shape({
+  password: yup
+    .string()
+    .required("La contraseña es obligatoria")
+    .min(6, "La contraseña debe tener al menos 6 caracteres")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+      "La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial"
+    ),
+});
 
 export const SecuritySettings = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [fieldError, setFieldError] = useState<string | null>(null);
+  const [confirmPasswordError, setConfirmPasswordError] = useState<
+    string | null
+  >(null);
+  const [snackbarError, setSnackbarError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [mostrarPassword, setMostrarPassword] = useState(false);
@@ -30,44 +53,92 @@ export const SecuritySettings = () => {
     setMostrarPassword(!mostrarPassword);
   };
 
+  const validatePasswordsMatch = (
+    newPassword: string,
+    newConfirmPassword: string
+  ) => {
+    if (newConfirmPassword && newPassword !== newConfirmPassword) {
+      setConfirmPasswordError("Las contraseñas no coinciden");
+      return false;
+    } else {
+      setConfirmPasswordError(null);
+      return true;
+    }
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    setFieldError(null);
+    // Validar coincidencia si ya hay algo en confirmar contraseña
+    if (confirmPassword) {
+      validatePasswordsMatch(value, confirmPassword);
+    }
+  };
+
+  const handleConfirmPasswordChange = (value: string) => {
+    setConfirmPassword(value);
+    // Validar coincidencia inmediatamente
+    validatePasswordsMatch(password, value);
+  };
+
   const handleSave = async () => {
     setLoading(true);
-    setError(null);
+    setSnackbarError(null);
+    setFieldError(null);
+    setConfirmPasswordError(null);
     setSuccess(false);
+
+    const formData = { password };
+    try {
+      await schema.validate(formData, { abortEarly: false });
+    } catch (validationError) {
+      if (validationError instanceof yup.ValidationError) {
+        const mensajes = validationError.inner.map((e) => e.message);
+        setFieldError(mensajes[0]);
+      } else {
+        setSnackbarError("Error en validación de datos.");
+      }
+      setLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setConfirmPasswordError("Las contraseñas no coinciden");
+      setLoading(false);
+      return;
+    }
 
     try {
       const perfilActual = await perfilUsuario();
-      const data: Partial<Usuario> = { ...perfilActual };
+      const dataToUpdate: Partial<Usuario> = { ...perfilActual };
 
-      if (password !== confirmPassword) {
-        setError("Las contraseñas no coinciden.");
-        setLoading(false);
-        return;
+      if (password !== "") {
+        dataToUpdate.password = password;
       }
 
-      if (password !== "") data.password = password;
-
-      const keysModificados = Object.keys(data).filter(
+      const keysModificados = Object.keys(dataToUpdate).filter(
         (key) =>
-          data[key as keyof Usuario] !== perfilActual[key as keyof Usuario]
+          dataToUpdate[key as keyof Usuario] !==
+          perfilActual[key as keyof Usuario]
       );
 
       if (keysModificados.length === 0) {
-        setError("No has introducido ningún dato para actualizar.");
+        setSnackbarError("No has introducido ningún dato para actualizar.");
         setLoading(false);
         return;
       }
 
-      await updateUsuario(data);
+      await updateUsuario(dataToUpdate);
 
       setSuccess(true);
       setPassword("");
       setConfirmPassword("");
       setTimeout(() => setSuccess(false), 3000);
-    } catch (error) {
-      setError(
-        `Error al guardar los cambios. Por favor, inténtalo de nuevo: ${error}`
+    } catch (apiError) {
+      setSnackbarError(
+        "Error al guardar los cambios. Por favor, inténtalo de nuevo."
       );
+      console.error("Error en updateUsuario:", apiError);
     } finally {
       setLoading(false);
     }
@@ -100,18 +171,46 @@ export const SecuritySettings = () => {
         color: "primary.main",
       },
     },
+    height: "56px",
+    "& .MuiFormHelperText-root.Mui-error": {
+      color: "error.main",
+      fontWeight: "bold",
+      backgroundColor: "transparent",
+    },
+    "& .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#ff4444",
+      borderWidth: 2,
+    },
+    "& .MuiInputLabel-root.Mui-error": {
+      color: "#ff4444",
+    },
   };
-
-  if (error) {
-    return <ErrorModal error={error} />;
-  }
 
   return (
     <Box sx={{ mt: 2, maxWidth: 800 }}>
+      <Snackbar
+        open={Boolean(snackbarError)}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarError(null)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          severity="error"
+          onClose={() => setSnackbarError(null)}
+          sx={{
+            width: "100%",
+            fontFamily: "'Poppins', sans-serif",
+          }}
+        >
+          {snackbarError}
+        </Alert>
+      </Snackbar>
+
       <Paper
         elevation={4}
         sx={{
-          p: 3,
+          p: 4,
+          pb: 10,
           mb: 3,
           borderRadius: 3,
           background: (theme) =>
@@ -170,10 +269,13 @@ export const SecuritySettings = () => {
             <Box sx={{ flex: 1 }}>
               <TextField
                 label="Password"
+                variant="outlined"
                 type={mostrarPassword ? "text" : "password"}
                 fullWidth
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => handlePasswordChange(e.target.value)}
+                error={Boolean(fieldError)}
+                helperText={fieldError || ""}
                 sx={textFieldStyles}
                 InputProps={{
                   startAdornment: (
@@ -188,7 +290,11 @@ export const SecuritySettings = () => {
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={handleTogglePassword} edge="end" sx={{ color: (theme) => theme.palette.text.primary }}>
+                      <IconButton
+                        onClick={handleTogglePassword}
+                        edge="end"
+                        sx={{ color: (theme) => theme.palette.text.primary }}
+                      >
                         {mostrarPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -200,13 +306,13 @@ export const SecuritySettings = () => {
             <Box sx={{ flex: 1 }}>
               <TextField
                 label="Confirmar Password"
-                type="password"
+                variant="outlined"
+                type={mostrarPassword ? "text" : "password"}
                 fullWidth
                 value={confirmPassword}
-                onChange={(e) => {
-                  setConfirmPassword(e.target.value);
-                  setError(null);
-                }}
+                onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+                error={Boolean(confirmPasswordError)}
+                helperText={confirmPasswordError || ""}
                 sx={textFieldStyles}
                 InputProps={{
                   startAdornment: (
@@ -221,7 +327,11 @@ export const SecuritySettings = () => {
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={handleTogglePassword} edge="end" sx={{ color: (theme) => theme.palette.text.primary }}>
+                      <IconButton
+                        onClick={handleTogglePassword}
+                        edge="end"
+                        sx={{ color: (theme) => theme.palette.text.primary }}
+                      >
                         {mostrarPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -259,9 +369,9 @@ export const SecuritySettings = () => {
             letterSpacing: "0.5px",
             background: success
               ? (theme) =>
-                `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`
+                  `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`
               : (theme) =>
-                `linear-gradient(135deg, ${theme.palette.error.main} 0%, ${theme.palette.error.dark} 100%)`,
+                  `linear-gradient(135deg, ${theme.palette.error.main} 0%, ${theme.palette.error.dark} 100%)`,
             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             "&:hover": {
               transform: "translateY(-2px)",
@@ -278,8 +388,8 @@ export const SecuritySettings = () => {
           {loading
             ? "Restableciendo..."
             : success
-              ? "Contraseña Restablecida!"
-              : "Restablecer Contraseña"}
+            ? "Contraseña Restablecida!"
+            : "Restablecer Contraseña"}
         </Button>
       </Box>
 

@@ -1,7 +1,15 @@
 import { useState } from "react";
 import * as yup from "yup";
 import { createUsuario } from "../../../api/userApi";
-import { Box, TextField, Button, Typography, Stack, InputAdornment, IconButton } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Stack,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Title } from "../../../components/Title";
 import { FormCard } from "../../../components/FormCard";
@@ -12,15 +20,22 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 const schema = yup.object().shape({
   nombre: yup
     .string()
+    .trim()
     .min(3, "Mínimo 3 caracteres")
-    .required("El nombre es obligatorio"),
+    .required("El nombre es obligatorio")
+    .min(1, "El nombre no puede estar vacío"),
+
   email: yup
     .string()
+    .trim()
     .email("Email inválido")
-    .required("El email es obligatorio"),
-  password: yup.string()
+    .required("El email es obligatorio")
+    .min(1, "El email no puede estar vacío"),
+
+  password: yup
+    .string()
     .required("La contraseña es obligatoria")
-    .min(6, "La contraseña debe tener al menos 6 caracteres")
+    .min(6, "La contraseña debe tener al menos 8 caracteres")
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
       "La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial"
@@ -263,8 +278,16 @@ export const Register = () => {
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
-                          <IconButton onClick={handleTogglePassword} edge="end" sx={{ color: "black" }}>
-                            {mostrarPassword ? <VisibilityOff /> : <Visibility />}
+                          <IconButton
+                            onClick={handleTogglePassword}
+                            edge="end"
+                            sx={{ color: "black" }}
+                          >
+                            {mostrarPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
                           </IconButton>
                         </InputAdornment>
                       ),

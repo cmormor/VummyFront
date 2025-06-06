@@ -54,15 +54,22 @@ import * as yup from "yup";
 const schema = yup.object().shape({
   nombre: yup
     .string()
+    .trim()
     .min(3, "Mínimo 3 caracteres")
-    .required("El nombre es obligatorio"),
+    .required("El nombre es obligatorio")
+    .min(1, "El nombre no puede estar vacío"),
+
   email: yup
     .string()
+    .trim()
     .email("Email inválido")
-    .required("El email es obligatorio"),
-  password: yup.string()
+    .required("El email es obligatorio")
+    .min(1, "El email no puede estar vacío"),
+
+  password: yup
+    .string()
     .required("La contraseña es obligatoria")
-    .min(6, "La contraseña debe tener al menos 6 caracteres")
+    .min(6, "La contraseña debe tener al menos 8 caracteres")
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
       "La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial"
@@ -251,19 +258,18 @@ export const UsersSettings = () => {
         await schema.validate(formData, { abortEarly: false });
       } else {
         const toValidate = { ...formData };
-        delete (toValidate as any).password;
+        delete toValidate.password;
         const partialSchema = schema.omit(["password"]);
         await partialSchema.validate(toValidate, { abortEarly: false });
       }
     } catch (validationError) {
       if (validationError instanceof yup.ValidationError) {
-        const mensajes = validationError.inner.map((err) => err.message).join(" | ");
-        showSnackbar(mensajes, "error");
+        const primerMensaje =
+          validationError.inner[0]?.message || validationError.message;
+        showSnackbar(primerMensaje, "error");
         return;
       }
     }
-
-
 
     setLoading(true);
     try {
@@ -922,14 +928,18 @@ export const UsersSettings = () => {
               <Snackbar
                 open={snackbar.open}
                 autoHideDuration={6000}
-                onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+                onClose={() =>
+                  setSnackbar((prev) => ({ ...prev, open: false }))
+                }
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                 sx={{
                   zIndex: 1100,
                 }}
               >
                 <Alert
-                  onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+                  onClose={() =>
+                    setSnackbar((prev) => ({ ...prev, open: false }))
+                  }
                   severity={snackbar.severity}
                   variant="filled"
                   sx={{

@@ -6,21 +6,19 @@ import {
   CardContent,
   IconButton,
   Typography,
-  Tooltip,
-  Fade,
   CircularProgress,
   Backdrop,
-  useTheme,
 } from "@mui/material";
 import {
   ImageNotSupported as NoImageIcon,
-  DeleteOutline as DeleteIcon,
-  Edit as EditIcon,
+  AddPhotoAlternate,
+  DeleteOutline,
 } from "@mui/icons-material";
 import {
   eliminarImagenClothe,
   subirImagenClothe,
 } from "../../../api/clotheApi";
+import { useThemeContext } from "../../../style/ThemeContext";
 
 interface ClotheCardProps {
   id: number;
@@ -37,51 +35,48 @@ export const ClotheCard = ({
   path,
   id,
   imagen: imagenProp,
-  rol
+  rol,
 }: ClotheCardProps) => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const [isHovered, setIsHovered] = useState(false);
   const [imagen, setImagen] = useState(imagenProp);
   const [loading, setLoading] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const theme = useTheme();
-
-  const isAdmin = rol === "ADMINISTRADOR";
+  const { mode } = useThemeContext();
 
   const handleClick = () => {
-    if (!loading) {
-      navigate(path);
-    }
+    navigate(path);
   };
 
-  const handleEditClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
+  const handleEditClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (file) {
+      try {
+        setLoading(true);
+        await subirImagenClothe(id, file);
 
-    try {
-      setLoading(true);
-      await subirImagenClothe(id, file);
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result?.toString().split(",")[1] || "";
-        setImagen(base64String);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagen(reader.result?.toString().split(",")[1] || "");
+          setLoading(false);
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
         setLoading(false);
-      };
-      reader.readAsDataURL(file);
-    } catch (error) {
-      setLoading(false);
-      console.error("Error al subir la imagen:", error);
+        console.error("Error al subir la imagen", error);
+      }
     }
   };
 
-  const handleDeleteImage = async (event: React.MouseEvent) => {
+  const handleDeleteImage = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     event.stopPropagation();
     try {
       setLoading(true);
@@ -90,7 +85,7 @@ export const ClotheCard = ({
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      console.error("Error al eliminar la imagen:", error);
+      console.error("Error al eliminar la imagen", error);
     }
   };
 
@@ -104,18 +99,23 @@ export const ClotheCard = ({
         height: "420px",
         borderRadius: 3,
         overflow: "hidden",
-        cursor: loading ? "default" : "pointer",
         position: "relative",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         transform: isHovered && !loading ? "translateY(-8px)" : "translateY(0)",
         border: (theme) =>
-          `1px solid ${theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.08)"}`,
+          `1px solid ${
+            theme.palette.mode === "dark"
+              ? "rgba(255, 255, 255, 0.1)"
+              : "rgba(0, 0, 0, 0.08)"
+          }`,
         "&:hover": {
           borderColor: (theme) =>
-            theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.2)" : "rgba(25, 118, 210, 0.3)",
-        }
+            theme.palette.mode === "dark"
+              ? "rgba(255, 255, 255, 0.2)"
+              : "rgba(25, 118, 210, 0.3)",
+        },
       }}
-      onClick={handleClick}
+      // ❌ NO onClick aquí - esta era la diferencia clave
     >
       <Backdrop
         sx={{
@@ -129,59 +129,65 @@ export const ClotheCard = ({
         <CircularProgress color="primary" size={40} />
       </Backdrop>
 
-      {isAdmin && (
-        <Fade in={isHovered || imagen !== ""} timeout={200}>
-          <Box
+      {rol === "ADMINISTRADOR" && (
+        <>
+          <IconButton
+            onClick={(event) => {
+              event.stopPropagation();
+              handleEditClick();
+            }}
             sx={{
               position: "absolute",
-              top: 12,
-              right: 5,
-              zIndex: 5,
-              display: "flex",
-              gap: 1,
+              top: 8,
+              right: imagen ? 40 : 8,
+              backgroundColor: (theme) => theme.palette.background.paper,
+              "&:hover": {
+                backgroundColor:
+                  mode === "dark"
+                    ? "rgba(60, 60, 60, 0.9)"
+                    : "rgba(200, 200, 200, 0.9)",
+              },
+              transition: "background 0.2s",
+              pointerEvents: "auto",
+              zIndex: 2,
             }}
           >
-            <Tooltip title="Cambiar imagen" arrow>
-              <IconButton
-                onClick={handleEditClick}
-                size="small"
-                sx={{
-                  backgroundColor: "rgba(0, 0, 0, 0.7)",
-                  color: "white",
-                  backdropFilter: "blur(10px)",
-                  "&:hover": {
-                    backgroundColor: "rgba(0, 0, 0, 0.8)",
-                    transform: "scale(1.1)",
-                  },
-                  transition: "all 0.2s ease",
-                }}
-              >
-                <EditIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
+            <AddPhotoAlternate
+              sx={{
+                color: (theme) => theme.palette.text.primary,
+                fontSize: 18,
+              }}
+            />
+          </IconButton>
 
-            {imagen && (
-              <Tooltip title="Eliminar imagen" arrow>
-                <IconButton
-                  onClick={handleDeleteImage}
-                  size="small"
-                  sx={{
-                    backgroundColor: "rgba(244, 67, 54, 0.8)",
-                    color: "white",
-                    backdropFilter: "blur(10px)",
-                    "&:hover": {
-                      backgroundColor: "rgba(244, 67, 54, 0.9)",
-                      transform: "scale(1.1)",
-                    },
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            )}
-          </Box>
-        </Fade>
+          {imagen && (
+            <IconButton
+              onClick={handleDeleteImage}
+              sx={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                backgroundColor: (theme) => theme.palette.background.paper,
+                "&:hover": {
+                  backgroundColor:
+                    mode === "dark"
+                      ? "rgba(60, 60, 60, 0.9)"
+                      : "rgba(200, 200, 200, 0.9)",
+                },
+                transition: "background 0.2s",
+                pointerEvents: "auto",
+                zIndex: 2,
+              }}
+            >
+              <DeleteOutline
+                sx={{
+                  color: (theme) => theme.palette.text.primary,
+                  fontSize: 18,
+                }}
+              />
+            </IconButton>
+          )}
+        </>
       )}
 
       <input
@@ -198,7 +204,9 @@ export const ClotheCard = ({
           width: "100%",
           position: "relative",
           overflow: "hidden",
+          cursor: "pointer", // ✅ Cursor pointer solo en la imagen
         }}
+        onClick={handleClick} // ✅ onClick solo en la imagen
       >
         {imagen ? (
           <Box
@@ -224,7 +232,9 @@ export const ClotheCard = ({
               justifyContent: "center",
               alignItems: "center",
               backgroundColor: (theme) =>
-                theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.03)",
+                theme.palette.mode === "dark"
+                  ? "rgba(255, 255, 255, 0.05)"
+                  : "rgba(0, 0, 0, 0.03)",
               color: "text.secondary",
               transition: "all 0.3s ease",
             }}
@@ -259,13 +269,14 @@ export const ClotheCard = ({
             right: 0,
             height: "50px",
             zIndex: -1,
-            background: imagen
-              ? `linear-gradient(
+            background: (theme) =>
+              imagen
+                ? `linear-gradient(
                 180deg,
                 transparent,
                 ${theme.palette.background.default}
               )`
-              : "none",
+                : "none",
             pointerEvents: "none",
           }}
         />
@@ -279,7 +290,9 @@ export const ClotheCard = ({
           justifyContent: "space-between",
           alignItems: "center",
           p: 3,
+          cursor: "pointer", // ✅ Cursor pointer solo en el contenido
         }}
+        onClick={handleClick} // ✅ onClick solo en el contenido
       >
         <Box
           sx={{

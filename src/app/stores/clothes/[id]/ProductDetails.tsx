@@ -188,9 +188,19 @@ export default function ProductDetails() {
       <Box px={{ xs: 2, md: 4 }}>
         <Skeleton variant="text" width="40%" height={40} sx={{ mb: 2 }} />
         <Skeleton variant="text" width="80%" height={30} sx={{ mb: 5 }} />
-        <Skeleton variant="rectangular" width="100%" height={200} sx={{ mb: 3 }} />
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={200}
+          sx={{ mb: 3 }}
+        />
         <Skeleton variant="text" width="20%" height={30} sx={{ mb: 1 }} />
-        <Skeleton variant="rectangular" width="100%" height={50} sx={{ mb: 5 }} />
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={50}
+          sx={{ mb: 5 }}
+        />
         <Skeleton variant="rectangular" width="100%" height={50} />
       </Box>
     );
@@ -201,7 +211,12 @@ export default function ProductDetails() {
   }
 
   return (
-    <Box display="flex" flexDirection="column" height="100%" px={{ xs: 2, md: 4 }}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      height="100%"
+      px={{ xs: 2, md: 4 }}
+    >
       <Typography
         variant="h4"
         fontWeight="bold"
@@ -239,7 +254,14 @@ export default function ProductDetails() {
       </Typography>
 
       <Box mb={3}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={4} flexWrap="wrap" gap={1}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={4}
+          flexWrap="wrap"
+          gap={1}
+        >
           <Typography
             variant="h6"
             sx={{
@@ -291,7 +313,10 @@ export default function ProductDetails() {
                 background: theme.palette.background.paper,
                 borderRadius: 4,
                 overflow: "hidden",
-                boxShadow: `0 24px 80px ${alpha(theme.palette.common.black, 0.2)}`,
+                boxShadow: `0 24px 80px ${alpha(
+                  theme.palette.common.black,
+                  0.2
+                )}`,
                 position: "relative",
               },
             }}
@@ -333,7 +358,9 @@ export default function ProductDetails() {
                     height: 80,
                     borderRadius: "50%",
                     backgroundColor: alpha(
-                      dataRecommended ? theme.palette.success.main : theme.palette.warning.main,
+                      dataRecommended
+                        ? theme.palette.success.main
+                        : theme.palette.warning.main,
                       0.1
                     ),
                     display: "flex",
@@ -368,7 +395,9 @@ export default function ProductDetails() {
                   display: "inline-block",
                 }}
               >
-                {dataRecommended ? "TALLA RECOMENDADA" : "No se pudo determinar una talla"}
+                {dataRecommended
+                  ? "TALLA RECOMENDADA"
+                  : "No se pudo determinar una talla"}
                 <Box
                   sx={{
                     position: "absolute",
@@ -413,8 +442,14 @@ export default function ProductDetails() {
                         background: `linear-gradient(135deg, ${alpha(
                           theme.palette.success.main,
                           0.12
-                        )} 0%, ${alpha(theme.palette.success.light, 0.08)} 100%)`,
-                        border: `2px solid ${alpha(theme.palette.success.main, 0.3)}`,
+                        )} 0%, ${alpha(
+                          theme.palette.success.light,
+                          0.08
+                        )} 100%)`,
+                        border: `2px solid ${alpha(
+                          theme.palette.success.main,
+                          0.3
+                        )}`,
                         mb: 3,
                       }}
                     >
@@ -426,7 +461,10 @@ export default function ProductDetails() {
                           fontFamily: "'Poppins', sans-serif",
                           fontSize: { xs: "3rem", md: "4rem" },
                           letterSpacing: "0.05em",
-                          textShadow: `0 2px 10px ${alpha(theme.palette.success.main, 0.3)}`,
+                          textShadow: `0 2px 10px ${alpha(
+                            theme.palette.success.main,
+                            0.3
+                          )}`,
                         }}
                       >
                         {dataRecommended?.nombre}
@@ -447,7 +485,9 @@ export default function ProductDetails() {
             sx={{ flexWrap: "wrap", gap: 2 }}
           >
             {["S", "M", "L", "XL"].map((option) => {
-              const tallaDisponible = sizeAvailable.find((s) => s.tallaNombre === option);
+              const tallaDisponible = sizeAvailable.find(
+                (s) => s.tallaNombre === option
+              );
               const isRecommended = dataRecommended?.nombre === option;
               return (
                 <FormControlLabel
@@ -497,13 +537,19 @@ export default function ProductDetails() {
         >
           CANTIDAD
         </Typography>
-        <Button onClick={() => setCantidad((prev) => Math.max(1, prev - 1))} sx={{ color: (theme) => theme.palette.text.primary }}>
+        <Button
+          onClick={() => setCantidad((prev) => Math.max(1, prev - 1))}
+          sx={{ color: (theme) => theme.palette.text.primary }}
+        >
           <RemoveIcon />
         </Button>
         <Typography variant="h6" sx={{ px: 2 }}>
           {cantidad}
         </Typography>
-        <Button onClick={() => setCantidad((prev) => prev + 1)} sx={{ color: (theme) => theme.palette.text.primary }}>
+        <Button
+          onClick={() => setCantidad((prev) => prev + 1)}
+          sx={{ color: (theme) => theme.palette.text.primary }}
+        >
           <AddIcon />
         </Button>
       </Box>
@@ -533,7 +579,13 @@ export default function ProductDetails() {
           fullWidth
           variant="contained"
           size="large"
-          startIcon={isAdding ? <CircularProgress size={20} color="inherit" /> : <AddShoppingCartIcon sx={{ fontSize: 20 }} />}
+          startIcon={
+            isAdding ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              <AddShoppingCartIcon sx={{ fontSize: 20 }} />
+            )
+          }
           sx={{
             fontFamily: "'Poppins', sans-serif",
             fontSize: { xs: "1rem", md: "1rem" },
@@ -552,10 +604,10 @@ export default function ProductDetails() {
           sx: {
             position: "relative",
             borderRadius: 4,
-            background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.95)} 0%, ${alpha(
-              theme.palette.background.default,
-              0.98
-            )} 100%)`,
+            background: `linear-gradient(135deg, ${alpha(
+              theme.palette.background.paper,
+              0.95
+            )} 0%, ${alpha(theme.palette.background.default, 0.98)} 100%)`,
             backdropFilter: "blur(20px)",
             boxShadow: `0 24px 80px ${alpha(theme.palette.common.black, 0.15)}`,
             overflow: "hidden",
@@ -581,7 +633,10 @@ export default function ProductDetails() {
             "&:hover": {
               backgroundColor: alpha(theme.palette.error.main, 0.1),
               transform: "scale(1.1)",
-              boxShadow: `0 6px 25px ${alpha(theme.palette.common.black, 0.15)}`,
+              boxShadow: `0 6px 25px ${alpha(
+                theme.palette.common.black,
+                0.15
+              )}`,
             },
           }}
         >
@@ -590,10 +645,10 @@ export default function ProductDetails() {
 
         <Box
           sx={{
-            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(
+            background: `linear-gradient(135deg, ${alpha(
               theme.palette.primary.main,
-              0.05
-            )} 100%)`,
+              0.08
+            )} 0%, ${alpha(theme.palette.primary.main, 0.05)} 100%)`,
             borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
             px: 4,
             py: 3,
@@ -642,7 +697,10 @@ export default function ProductDetails() {
                   <TableHead>
                     <TableRow
                       sx={{
-                        background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(
+                        background: `linear-gradient(135deg, ${alpha(
+                          theme.palette.primary.main,
+                          0.05
+                        )} 0%, ${alpha(
                           theme.palette.primary.main,
                           0.03
                         )} 100%)`,
@@ -666,7 +724,10 @@ export default function ProductDetails() {
                             fontSize: { xs: "0.85rem", md: "0.95rem" },
                             color: theme.palette.text.primary,
                             py: 2.5,
-                            borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                            borderBottom: `2px solid ${alpha(
+                              theme.palette.primary.main,
+                              0.1
+                            )}`,
                           }}
                         >
                           {col}
@@ -691,8 +752,8 @@ export default function ProductDetails() {
                                 dataRecommended?.id === row.id
                                   ? alpha(theme.palette.primary.main, 0.08)
                                   : index % 2 === 0
-                                    ? alpha(theme.palette.background.default, 0.3)
-                                    : "transparent",
+                                  ? alpha(theme.palette.background.default, 0.3)
+                                  : "transparent",
                               borderLeft:
                                 dataRecommended?.id === row.id
                                   ? `4px solid ${theme.palette.primary.main}`
@@ -700,7 +761,12 @@ export default function ProductDetails() {
                             }}
                           >
                             <TableCell align="center" sx={{ py: 2 }}>
-                              <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                              <Box
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                gap={1}
+                              >
                                 <Typography
                                   variant="h6"
                                   sx={{
@@ -712,12 +778,13 @@ export default function ProductDetails() {
                                 </Typography>
                                 {dataRecommended?.id === row.id && (
                                   <Chip
-                                    icon={<RecommendIcon sx={{ fontSize: 16 }} />}
+                                    icon={
+                                      <RecommendIcon sx={{ fontSize: 16 }} />
+                                    }
                                     label="Recomendada"
                                     size="small"
                                     sx={{
-                                      background: `linear-gradient(45deg, ${theme.palette.success.main} 30%, ${theme.palette
-                                        .success.light} 90%)`,
+                                      background: `linear-gradient(45deg, ${theme.palette.success.main} 30%, ${theme.palette.success.light} 90%)`,
                                       color: "white",
                                       fontWeight: "bold",
                                       fontSize: "0.7rem",
@@ -729,33 +796,46 @@ export default function ProductDetails() {
                                 )}
                               </Box>
                             </TableCell>
-                            {[row.altura, row.cuelloManga, row.pecho, row.cintura, row.cadera, row.entrepierna].map(
-                              (value, cellIndex) => (
-                                <TableCell
-                                  key={cellIndex}
-                                  align="center"
-                                  sx={{
-                                    py: 2,
-                                    fontWeight: "medium",
-                                    color: theme.palette.text.primary,
-                                  }}
-                                >
-                                  {value}
-                                </TableCell>
-                              )
-                            )}
+                            {[
+                              row.altura,
+                              row.cuelloManga,
+                              row.pecho,
+                              row.cintura,
+                              row.cadera,
+                              row.entrepierna,
+                            ].map((value, cellIndex) => (
+                              <TableCell
+                                key={cellIndex}
+                                align="center"
+                                sx={{
+                                  py: 2,
+                                  fontWeight: "medium",
+                                  color: theme.palette.text.primary,
+                                }}
+                              >
+                                {value}
+                              </TableCell>
+                            ))}
                           </TableRow>
                         ))
                     ) : (
                       <TableRow>
                         <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
-                          <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+                          <Box
+                            display="flex"
+                            flexDirection="column"
+                            alignItems="center"
+                            gap={2}
+                          >
                             <Box
                               sx={{
                                 width: 60,
                                 height: 60,
                                 borderRadius: "50%",
-                                backgroundColor: alpha(theme.palette.text.disabled, 0.1),
+                                backgroundColor: alpha(
+                                  theme.palette.text.disabled,
+                                  0.1
+                                ),
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",

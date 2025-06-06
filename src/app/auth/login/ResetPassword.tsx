@@ -1,7 +1,15 @@
 import { useState } from "react";
 import * as yup from "yup";
 import { resetPassword } from "../../../api/userApi";
-import { Box, TextField, Button, Typography, Stack, InputAdornment, IconButton } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Stack,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Title } from "../../../components/Title";
 import { FormCard } from "../../../components/FormCard";
@@ -12,11 +20,14 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 const schema = yup.object().shape({
   email: yup
     .string()
+    .trim()
     .email("Email inválido")
-    .required("El email es obligatorio"),
-  password: yup.string()
+    .required("El email es obligatorio")
+    .min(1, "El email no puede estar vacío"),
+  password: yup
+    .string()
     .required("La contraseña es obligatoria")
-    .min(6, "La contraseña debe tener al menos 6 caracteres")
+    .min(8, "La contraseña debe tener al menos 8 caracteres")
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
       "La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial"
@@ -121,7 +132,7 @@ export const ResetPassword = () => {
               textAlign: "center",
               maxWidth: "90%",
               margin: "0 auto",
-              marginBottom: 2,
+              marginBottom: 3,
             }}
           >
             <Typography
@@ -131,7 +142,7 @@ export const ResetPassword = () => {
                 color: "gray",
               }}
             >
-              Ingresa tu correo y tu nueva contraseña. ¡Muchas gracias!
+              Ingresa tu correo y tu nueva contraseña.
             </Typography>
           </Box>
 
@@ -142,7 +153,7 @@ export const ResetPassword = () => {
             <Box
               display="flex"
               flexDirection="column"
-              gap={2}
+              gap={3}
               justifyContent="center"
               alignItems="center"
               sx={{
@@ -202,7 +213,11 @@ export const ResetPassword = () => {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={handleTogglePassword} edge="end" sx={{ color: "black" }}>
+                      <IconButton
+                        onClick={handleTogglePassword}
+                        edge="end"
+                        sx={{ color: "black" }}
+                      >
                         {mostrarPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -223,7 +238,7 @@ export const ResetPassword = () => {
                 </Typography>
               )}
 
-              <Box sx={{ width: "100%", maxWidth: 450 }}>
+              <Box sx={{ width: "100%", maxWidth: 450, mt: 1 }}>
                 {isLoading ? (
                   <Box
                     sx={{

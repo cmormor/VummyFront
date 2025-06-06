@@ -7,7 +7,7 @@ import {
   Card,
   CardContent,
   Fade,
-  Container
+  Container,
 } from "@mui/material";
 import { Clothe } from "../../../types/clothe";
 import { Title } from "../../../components/Title";
@@ -68,7 +68,11 @@ export const Clothes = () => {
             ? "0 4px 20px rgba(255, 255, 255, 0.05)"
             : "0 4px 20px rgba(0, 0, 0, 0.08)",
         border: (theme) =>
-          `1px solid ${theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.08)"}`,
+          `1px solid ${
+            theme.palette.mode === "dark"
+              ? "rgba(255, 255, 255, 0.1)"
+              : "rgba(0, 0, 0, 0.08)"
+          }`,
       }}
     >
       <Skeleton
@@ -114,16 +118,12 @@ export const Clothes = () => {
         sx={{
           mb: 2,
           fontWeight: 300,
-          opacity: 0.8
+          opacity: 0.8,
         }}
       >
         No hay prendas disponibles
       </Typography>
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        sx={{ opacity: 0.6 }}
-      >
+      <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.6 }}>
         Esta tienda aún no tiene productos en su catálogo
       </Typography>
     </Box>
@@ -168,7 +168,7 @@ export const Clothes = () => {
             display: "flex",
             flexWrap: "wrap",
             gap: { xs: 2, sm: 3, md: 4 },
-            justifyContent: { xs: "center", sm: "flex-start" },
+            justifyContent: { xs: "center", sm: "center" },
             width: "100%",
             minHeight: loading ? "400px" : "auto",
           }}

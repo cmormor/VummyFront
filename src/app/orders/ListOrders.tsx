@@ -57,9 +57,15 @@ const getStatusIcon = (status?: string) => {
   }
 };
 
-const formatDate = (dateString: string) => {
+const formatDate = (dateInput: string | Date) => {
   try {
-    return new Date(dateString).toLocaleString("es-ES", {
+    const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+
+    if (isNaN(date.getTime())) {
+      return typeof dateInput === "string" ? dateInput : date.toString();
+    }
+
+    return date.toLocaleString("es-ES", {
       timeZone: "Europe/Madrid",
       year: "numeric",
       month: "long",
@@ -68,7 +74,7 @@ const formatDate = (dateString: string) => {
       minute: "2-digit",
     });
   } catch {
-    return dateString;
+    return typeof dateInput === "string" ? dateInput : dateInput.toString();
   }
 };
 
@@ -131,7 +137,8 @@ const generateOrderPDF = (order: Order) => {
     doc.setFont("helvetica", "bold");
     doc.text("Fecha del Pedido:", 20, yPosition + 14);
     doc.setFont("helvetica", "normal");
-    doc.text(formatDate(order.fecha), 65, yPosition + 14);
+    const fechaFormateada = formatDate(order.fecha);
+    doc.text(fechaFormateada, 65, yPosition + 14);
 
     doc.setFont("helvetica", "bold");
     doc.text("Estado:", 20, yPosition + 21);
