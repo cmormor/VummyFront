@@ -41,10 +41,44 @@ import {
   deleteStore,
   getStoreById,
   getStores,
+  postSizes,
   updateStore,
 } from "../../api/storeApi";
+import { getSizesByStore } from "../../api/size-clothe";
 import { ModalConfirmation } from "../../components/ModalConfirmation";
 import * as yup from "yup";
+import { Size } from "../../types/size";
+
+const sizeSchema = yup.object().shape({
+  nombre: yup
+    .mixed<"S" | "M" | "L" | "XL">()
+    .oneOf(["S", "M", "L", "XL"], "La talla debe ser S, M, L o XL")
+    .required("El nombre de la talla es obligatorio"),
+  altura: yup
+    .number()
+    .min(1, "La altura debe ser mayor o igual a 0")
+    .required("La altura es obligatoria"),
+  cuelloManga: yup
+    .number()
+    .min(0, "El cuello/manga debe ser mayor o igual a 0")
+    .required("El cuello/manga es obligatorio"),
+  pecho: yup
+    .number()
+    .min(0, "El pecho debe ser mayor o igual a 0")
+    .required("El pecho es obligatorio"),
+  cintura: yup
+    .number()
+    .min(0, "La cintura debe ser mayor o igual a 0")
+    .required("La cintura es obligatoria"),
+  cadera: yup
+    .number()
+    .min(0, "La cadera debe ser mayor o igual a 0")
+    .required("La cadera es obligatoria"),
+  entrepierna: yup
+    .number()
+    .min(0, "La entrepierna debe ser mayor o igual a 0")
+    .required("La entrepierna es obligatoria"),
+});
 
 const schema = yup.object().shape({
   nombre: yup
@@ -53,7 +87,6 @@ const schema = yup.object().shape({
     .min(3, "Mínimo 3 caracteres")
     .required("El nombre es obligatorio")
     .min(1, "El nombre no puede estar vacío"),
-
   descripcion: yup
     .string()
     .trim()
@@ -61,6 +94,28 @@ const schema = yup.object().shape({
     .max(50, "Máximo 50 caracteres")
     .required("La descripción es obligatoria")
     .min(1, "La descripción no puede estar vacía"),
+  tallas: yup
+    .array()
+    .of(sizeSchema)
+    .optional()
+    .test(
+      "unique-sizes",
+      "No se pueden repetir las tallas",
+      function (tallas) {
+        if (!tallas || tallas.length === 0) return true;
+        const nombres = tallas.map((t) => t?.nombre).filter(Boolean);
+        const uniqueNombres = new Set(nombres);
+        return nombres.length === uniqueNombres.size;
+      }
+    )
+    .test(
+      "max-sizes",
+      "No se pueden agregar más de 4 tallas (S, M, L, XL)",
+      function (tallas) {
+        if (!tallas) return true;
+        return tallas.length <= 4;
+      }
+    ),
 });
 
 export const StoresSettings = () => {
@@ -79,11 +134,16 @@ export const StoresSettings = () => {
   const [formData, setFormData] = useState<Store>({
     nombre: "",
     descripcion: "",
+    tallas: [],
   });
-  const [snackbar, setSnackbar] = useState({
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "warning" | "info";
+  }>({
     open: false,
     message: "",
-    severity: "success" as "success" | "error" | "warning" | "info",
+    severity: "success",
   });
 
   useEffect(() => {
@@ -98,8 +158,8 @@ export const StoresSettings = () => {
       stores.sort((a, b) => a.nombre!.localeCompare(b.nombre!));
       setStoreList(stores);
       setFilteredStore(stores);
-    } catch (error) {
-      showSnackbar(`Error al cargar las tiendas ${error}`, "error");
+    } catch (error: any) {
+      showSnackbar(`Error al cargar las tiendas: ${error}`, "error");
     } finally {
       setLoading(false);
     }
@@ -116,7 +176,7 @@ export const StoresSettings = () => {
       );
       setFilteredStore(filtered);
     }
-  }, [searchTerm, storeList, selectedStore]);
+  }, [searchTerm, storeList]);
 
   const handleOpenDialog = async (
     mode: "create" | "edit" | "view",
@@ -128,35 +188,53 @@ export const StoresSettings = () => {
 
       if (mode === "view" || mode === "edit") {
         try {
-          const fullStore = await getStoreById(store.id!);
+          // 1) Traer tallas filtradas por storeId
+          const sizes = await getSizesByStore(store.id!);
 
-          setFormData({
+          // 2) llenar formData.tallas con esas tallas
+          setFormData(() => ({
+            id: store.id,
+            nombre: store.nombre,
+            descripcion: store.descripcion,
+            prendas: store.prendas || [],
+            tallas: sizes,
+          }));
+
+          // 3) obtener datos completos de la tienda (prendas, etc.)
+          const fullStore = await getStoreById(store.id!);
+          setFormData((prev) => ({
+            ...prev,
             id: fullStore!.id,
             nombre: fullStore!.nombre,
             descripcion: fullStore!.descripcion,
             prendas: fullStore!.prendas || [],
-          });
-        } catch (error) {
+            // tallas ya viene de above
+          }));
+        } catch (error: any) {
           setFormData({
             id: store.id,
             nombre: store.nombre,
             descripcion: store.descripcion,
             prendas: store.prendas || [],
+            tallas: [],
           });
           showSnackbar(
-            `Error al cargar detalles completos de la tienda ${error}`,
+            `Error al cargar detalles o tallas de la tienda: ${error}`,
             "warning"
           );
         }
       }
     } else {
+      // Modo crear
       setSelectedStore(null);
       setFormData({
         nombre: "",
         descripcion: "",
         prendas: [],
+        tallas: [],
       });
     }
+
     setOpenDialog(true);
   };
 
@@ -166,6 +244,7 @@ export const StoresSettings = () => {
     setFormData({
       nombre: "",
       descripcion: "",
+      tallas: [],
     });
   };
 
@@ -176,12 +255,52 @@ export const StoresSettings = () => {
     }));
   };
 
+  const validateTallas = async (tallas: Size[]): Promise<string[]> => {
+    const errors: string[] = [];
+
+    for (let i = 0; i < tallas.length; i++) {
+      const talla = tallas[i];
+      if (!talla.id) {
+        try {
+          await sizeSchema.validate(talla, { abortEarly: false });
+        } catch (validationError: any) {
+          if (validationError instanceof yup.ValidationError) {
+            validationError.inner.forEach((err) => {
+              errors.push(`Talla ${talla.nombre} - ${err.message}`);
+            });
+          }
+        }
+      }
+    }
+
+    const nombres = tallas.map((t) => t.nombre);
+    const duplicados = nombres.filter(
+      (n, idx) => nombres.indexOf(n) !== idx
+    );
+    if (duplicados.length > 0) {
+      errors.push(
+        `Hay tallas duplicadas: ${[...new Set(duplicados)].join(", ")}`
+      );
+    }
+
+    return errors;
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
-    setMensaje("");
-
     try {
       await schema.validate(formData, { abortEarly: false });
+
+      if (formData.tallas && formData.tallas.length > 0) {
+        const tallaErrors = await validateTallas(formData.tallas);
+        if (tallaErrors.length > 0) {
+          showSnackbar(
+            `Errores en las tallas: ${tallaErrors.join(". ")}`,
+            "error"
+          );
+          return;
+        }
+      }
 
       if (dialogMode === "create") {
         const response = await createStore(formData);
@@ -189,10 +308,24 @@ export const StoresSettings = () => {
           showSnackbar(response, "error");
           return;
         }
+
         const newStore = response as Store;
         const updatedList = [...storeList, newStore];
         setStoreList(updatedList);
         setFilteredStore(updatedList);
+
+        if (formData.tallas && formData.tallas.length > 0) {
+          for (const talla of formData.tallas) {
+            if (!talla.id) {
+              const data = {
+                ...talla,
+                tienda: { id: newStore.id! },
+              };
+              await postSizes(data);
+            }
+          }
+        }
+
         showSnackbar("Tienda creada exitosamente", "success");
       } else if (dialogMode === "edit") {
         if (!selectedStore) {
@@ -215,13 +348,14 @@ export const StoresSettings = () => {
       }
 
       handleCloseDialog();
-    } catch (validationError) {
+    } catch (validationError: any) {
       if (validationError instanceof yup.ValidationError) {
         const primerMensaje =
           validationError.inner[0]?.message || validationError.message;
         showSnackbar(primerMensaje, "error");
         return;
       }
+      showSnackbar(`Error inesperado: ${validationError}`, "error");
     } finally {
       setLoading(false);
     }
@@ -242,21 +376,57 @@ export const StoresSettings = () => {
     try {
       await deleteStore(storeToDelete);
 
-      const updatedList = storeList.filter(
-        (store) => store.id !== storeToDelete
-      );
+      const updatedList = storeList.filter((s) => s.id !== storeToDelete);
       setStoreList(updatedList);
       setFilteredStore(updatedList);
 
-      showSnackbar("Tienda eliminado exitosamente", "success");
-    } catch (error) {
-      showSnackbar(`Error al eliminar la tienda ${error}`, "error");
+      showSnackbar("Tienda eliminada exitosamente", "success");
+    } catch (error: any) {
+      showSnackbar(`Error al eliminar la tienda: ${error}`, "error");
     } finally {
       setLoading(false);
       setOpenModal(false);
       setStoreToDelete(null);
       setMensaje("");
     }
+  };
+
+  const handleAddTalla = () => {
+    const nombresExistentes = formData.tallas?.map((t) => t.nombre) ?? [];
+
+    const opcionesDisponibles: Size["nombre"][] = ["S", "M", "L", "XL"].filter(
+      (n) => !nombresExistentes.includes(n)
+    );
+
+    if (opcionesDisponibles.length === 0) {
+      showSnackbar("Ya se agregaron todas las tallas", "warning");
+      return;
+    }
+
+    const siguienteTalla = opcionesDisponibles[0];
+
+    setFormData((prev) => ({
+      ...prev,
+      tallas: [
+        ...(prev.tallas ?? []),
+        {
+          nombre: siguienteTalla,
+          altura: 0,
+          cuelloManga: 0,
+          pecho: 0,
+          cintura: 0,
+          cadera: 0,
+          entrepierna: 0,
+        },
+      ],
+    }));
+  };
+
+  const handleRemoveTalla = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      tallas: prev.tallas?.filter((_, i) => i !== index) ?? [],
+    }));
   };
 
   const showSnackbar = (
@@ -549,7 +719,7 @@ export const StoresSettings = () => {
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
-        maxWidth="sm"
+        maxWidth="md"
         fullWidth
         PaperProps={{
           sx: {
@@ -650,17 +820,182 @@ export const StoresSettings = () => {
                 fontSize: { xs: "0.9rem", md: "1rem" },
               }}
             />
+
+            <Divider sx={{ my: 2 }} />
+
+            <Alert
+              severity="warning"
+              variant="outlined"
+              sx={{
+                width: "100%",
+                fontFamily: "'Poppins', sans-serif",
+                fontSize: { xs: "0.9rem", md: "1rem" },
+              }}
+            >
+              LAS TALLAS SOLO SE PUEDEN ASIGNAR DURANTE LA CREACIÓN DE LA TIENDA
+            </Alert>
+
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Typography
+                variant="h6"
+                sx={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontWeight: 600,
+                }}
+              >
+                Tallas
+              </Typography>
+              {dialogMode === "create" && (
+                <Button
+                  onClick={handleAddTalla}
+                  variant="outlined"
+                  startIcon={<Add />}
+                  sx={{
+                    textTransform: "none",
+                    fontFamily: "'Poppins', sans-serif",
+                    borderRadius: 2,
+                  }}
+                >
+                  Agregar talla
+                </Button>
+              )}
+            </Box>
+
+            {formData.tallas && formData.tallas.length > 0 ? (
+              formData.tallas.map((talla, index) => (
+                <Paper
+                  key={index}
+                  sx={{
+                    p: 5,
+                    mb: 2,
+                    position: "relative",
+                    borderRadius: 2,
+                    border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                    background: (theme) => alpha(theme.palette.primary.light, 0.02),
+                  }}
+                >
+                  {dialogMode === "create" && !talla.id && (
+                    <IconButton
+                      onClick={() => handleRemoveTalla(index)}
+                      size="small"
+                      color="error"
+                      sx={{
+                        position: "absolute",
+                        top: 8,
+                        right: 8,
+                        zIndex: 1,
+                      }}
+                    >
+                      <Close />
+                    </IconButton>
+                  )}
+
+                  <Stack spacing={2}>
+                    <TextField
+                      label="Talla"
+                      value={talla.nombre}
+                      onChange={(e) => {
+                        const newTallas = [...(formData.tallas || [])];
+                        newTallas[index] = {
+                          ...talla,
+                          nombre: e.target.value as "S" | "M" | "L" | "XL",
+                        };
+                        handleInputChange("tallas", newTallas);
+                      }}
+                      select
+                      SelectProps={{ native: true }}
+                      disabled={dialogMode === "view" || !!talla.id}
+                      sx={{
+                        background: (theme) => theme.palette.background.paper,
+                        fontFamily: "'Poppins', sans-serif'",
+                        fontSize: { xs: "0.9rem", md: "1rem" },
+                      }}
+                    >
+                      <option value="S">S</option>
+                      <option value="M">M</option>
+                      <option value="L">L</option>
+                      <option value="XL">XL</option>
+                    </TextField>
+
+                    <Box
+                      display="grid"
+                      gridTemplateColumns={{
+                        xs: "1fr",
+                        sm: "repeat(2, 1fr)",
+                        md: "repeat(3, 1fr)",
+                      }}
+                      gap={2}
+                    >
+                      {[
+                        { label: "Altura", field: "altura" },
+                        { label: "Cuello/Manga", field: "cuelloManga" },
+                        { label: "Pecho", field: "pecho" },
+                        { label: "Cintura", field: "cintura" },
+                        { label: "Cadera", field: "cadera" },
+                        { label: "Entrepierna", field: "entrepierna" },
+                      ].map(({ label, field }) => (
+                        <TextField
+                          key={field}
+                          label={label}
+                          type="number"
+                          value={talla[field as keyof Size]}
+                          onChange={(e) => {
+                            const newTallas = [...(formData.tallas || [])];
+                            newTallas[index] = {
+                              ...talla,
+                              [field]: parseFloat(e.target.value) || 0,
+                            };
+                            handleInputChange("tallas", newTallas);
+                          }}
+                          disabled={dialogMode === "view" || !!talla.id}
+                          sx={{
+                            background: (theme) => theme.palette.background.paper,
+                            fontFamily: "'Poppins', sans-serif'",
+                            fontSize: { xs: "0.9rem", md: "1rem" },
+                          }}
+                          inputProps={{ min: 0, step: 0.1 }}
+                        />
+                      ))}
+                    </Box>
+                  </Stack>
+                </Paper>
+              ))
+            ) : (
+              <Paper
+                sx={{
+                  p: 4,
+                  textAlign: "center",
+                  borderRadius: 2,
+                  border: (theme) => `2px dashed ${alpha(theme.palette.primary.main, 0.3)}`,
+                  background: (theme) => alpha(theme.palette.primary.light, 0.05),
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    fontFamily: "'Poppins', sans-serif'",
+                    fontSize: { xs: "0.9rem", md: "1rem" },
+                  }}
+                >
+                  {dialogMode === "create"
+                    ? "No hay tallas agregadas. Haz clic en 'Agregar talla' para comenzar."
+                    : "Esta tienda no tiene tallas configuradas."}
+                </Typography>
+              </Paper>
+            )}
           </Stack>
         </DialogContent>
 
         {dialogMode !== "view" && (
-          <DialogActions sx={{ px: 3, pb: 3 }}>
+          <DialogActions sx={{ px: 3, pb: 3, pt: 2 }}>
             <Button
               onClick={handleCloseDialog}
               color="inherit"
               sx={{
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Poppins', sans-serif'",
                 fontSize: { xs: "0.9rem", md: "1rem" },
+                textTransform: "none",
               }}
             >
               Cancelar
@@ -671,36 +1006,69 @@ export const StoresSettings = () => {
               disabled={loading || !formData.nombre || !formData.descripcion}
               startIcon={loading && <CircularProgress size={16} />}
               sx={{
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Poppins', sans-serif'",
                 fontSize: { xs: "0.9rem", md: "1rem" },
+                textTransform: "none",
+                borderRadius: 2,
               }}
             >
               {dialogMode === "create" ? "Crear" : "Guardar"}
             </Button>
-            <Snackbar
-              open={snackbar.open}
-              autoHideDuration={6000}
-              onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            >
-              <Alert
-                onClose={() =>
-                  setSnackbar((prev) => ({ ...prev, open: false }))
-                }
-                severity={snackbar.severity}
-                variant="filled"
-                sx={{
-                  width: "100%",
-                  fontFamily: "'Poppins', sans-serif",
-                  fontSize: { xs: "0.9rem", md: "1rem" },
-                }}
-              >
-                {snackbar.message}
-              </Alert>
-            </Snackbar>
           </DialogActions>
         )}
+
+        {snackbar.severity !== "success" && (
+          <Snackbar
+            open={snackbar.open}
+            autoHideDuration={6000}
+            onClose={() =>
+              setSnackbar((prev) => ({ ...prev, open: false }))
+            }
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            sx={{
+              zIndex: 1100,
+            }}
+          >
+            <Alert
+              onClose={() =>
+                setSnackbar((prev) => ({ ...prev, open: false }))
+              }
+              severity={snackbar.severity}
+              variant="filled"
+              sx={{
+                width: "100%",
+                fontFamily: "'Poppins', sans-serif'",
+                fontSize: { xs: "0.9rem", md: "1rem" },
+              }}
+            >
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
+        )}
       </Dialog>
+
+      {snackbar.severity === "success" && (
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          sx={{ mt: 10 }}
+        >
+          <Alert
+            onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+            severity={snackbar.severity}
+            variant="filled"
+            sx={{
+              width: "100%",
+              fontFamily: "'Poppins', sans-serif'",
+              fontSize: { xs: "0.9rem", md: "1rem" },
+            }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      )}
 
       <ModalConfirmation
         open={openModal}

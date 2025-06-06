@@ -921,7 +921,7 @@ export const UsersSettings = () => {
                 onClose={() =>
                   setSnackbar((prev) => ({ ...prev, open: false }))
                 }
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
                 sx={{
                   zIndex: 1100,
                 }}
@@ -951,10 +951,8 @@ export const UsersSettings = () => {
           open={snackbar.open}
           autoHideDuration={6000}
           onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-          sx={{
-            zIndex: 1100,
-          }}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          sx={{ mt: 10 }}
         >
           <Alert
             onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}

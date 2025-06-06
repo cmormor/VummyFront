@@ -97,7 +97,6 @@ export const OrdersSettings = () => {
     } finally {
       setLoading(false);
     }
-    console.log(orderList.map((o) => o.prendas?.map((p) => p.prenda.nombre)))
   };
 
   useEffect(() => {
@@ -230,10 +229,10 @@ export const OrdersSettings = () => {
     }
   };
 
-  const handleDeleteClick = (clotheId: number, clothe: string) => {
-    setOrderToDelete(clotheId);
+  const handleDeleteClick = (orderId: number, order: string) => {
+    setOrderToDelete(orderId);
     setMensaje(
-      `¿Estás seguro de que deseas eliminar al usuario "${clothe}"? Esta acción no se puede deshacer.`
+      `¿Estás seguro de que deseas eliminar el pedido "${order}"? Esta acción no se puede deshacer.`
     );
     setOpenModal(true);
   };
@@ -251,7 +250,7 @@ export const OrdersSettings = () => {
       setOrderList(updatedList);
       setFilteredOrder(updatedList);
 
-      showSnackbar("Usuario eliminado exitosamente", "success");
+      showSnackbar("Pedido eliminado exitosamente", "success");
     } catch (error) {
       showSnackbar(`Error al eliminar el pedido ${error}`, "error");
     } finally {
@@ -895,7 +894,8 @@ export const OrdersSettings = () => {
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        sx={{ mt: 10 }}
       >
         <Alert
           onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}

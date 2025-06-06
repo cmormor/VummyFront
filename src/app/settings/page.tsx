@@ -1192,7 +1192,7 @@ export const Settings = () => {
   return (
     <>
       <Layout>
-        <Title text="AJUSTES" marginTop={50} paddingTop="0px" />
+        <Title text="AJUSTES" marginTop={30} paddingTop="0px" />
         {isMobile ? (
           <Box sx={{ px: 2, py: 2, width: "100%" }}>
             <Paper

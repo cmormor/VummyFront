@@ -1,4 +1,5 @@
 import { Clothe } from "./clothe";
+import { Size } from "./size";
 
 export interface Store {
   id?: number;
@@ -6,4 +7,5 @@ export interface Store {
   descripcion: string;
   imagenUrl?: string;
   prendas?: Clothe[];
+  tallas?: Size[];
 }

@@ -1,3 +1,4 @@
+import * as yup from "yup";
 import {
   Box,
   Paper,
@@ -24,9 +25,12 @@ import {
   Stack,
   InputAdornment,
   Chip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import {
-  Add,
   Edit,
   Delete,
   Visibility,
@@ -47,8 +51,35 @@ import {
   updateClothe,
 } from "../../api/clotheApi";
 import { ModalConfirmation } from "../../components/ModalConfirmation";
+import { getStores } from "../../api/storeApi";
+import { Store } from "../../types/store";
 
-// TODO: NOT SEND IMAGE = NULL 
+const schema = yup.object().shape({
+  nombre: yup
+    .string()
+    .trim()
+    .min(3, "Mínimo 3 caracteres")
+    .required("El nombre es obligatorio"),
+
+  descripcion: yup
+    .string()
+    .trim()
+    .min(3, "Mínimo 3 caracteres")
+    .max(50, "Máximo 50 caracteres")
+    .required("La descripción es obligatoria"),
+
+  precio: yup
+    .number()
+    .typeError("El precio debe ser un número")
+    .positive("El precio debe ser mayor que cero")
+    .required("El precio es obligatorio"),
+
+  tiendaId: yup
+    .number()
+    .typeError("Debes seleccionar una tienda")
+    .moreThan(0, "Debes seleccionar una tienda")
+    .required("La tienda es obligatoria"),
+});
 
 export const ClotheSettings = () => {
   const [clotheList, setClotheList] = useState<Clothe[]>([]);
@@ -58,6 +89,7 @@ export const ClotheSettings = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [mensaje, setMensaje] = useState("");
+  const [stores, setStores] = useState<Store[]>([]);
   const [clotheToDelete, setClotheToDelete] = useState<number | null>(null);
   const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
     "create"
@@ -114,6 +146,16 @@ export const ClotheSettings = () => {
       setFilteredClothe(filtered);
     }
   }, [searchTerm, clotheList, selectedClothe]);
+
+  useEffect(() => {
+    const fetchStores = async () => {
+      const stores = await getStores();
+      setStores(stores);
+    };
+
+    fetchStores();
+  }, []);
+
 
   const handleOpenDialog = async (
     mode: "create" | "edit" | "view",
@@ -196,6 +238,8 @@ export const ClotheSettings = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      await schema.validate(formData, { abortEarly: false });
+
       if (dialogMode === "create") {
         const response = await postClothe(formData);
         if (typeof response === "string") {
@@ -237,12 +281,17 @@ export const ClotheSettings = () => {
 
         await updateClothe(selectedClothe.id!, data);
         await loadClothe();
-        showSnackbar("Prendas actualizada exitosamente", "success");
+        showSnackbar("Prenda actualizada exitosamente", "success");
       }
 
       handleCloseDialog();
-    } catch (error) {
-      showSnackbar(`Error al procesar la solicitud ${error}`, "error");
+    } catch (validationError) {
+      if (validationError instanceof yup.ValidationError) {
+        const primerMensaje =
+          validationError.inner[0]?.message || validationError.message;
+        showSnackbar(primerMensaje, "error");
+        return;
+      }
     } finally {
       setLoading(false);
     }
@@ -269,7 +318,7 @@ export const ClotheSettings = () => {
       setClotheList(updatedList);
       setFilteredClothe(updatedList);
 
-      showSnackbar("Prenda eliminado exitosamente", "success");
+      showSnackbar("Prenda eliminada exitosamente", "success");
     } catch (error) {
       showSnackbar(`Error al eliminar la Prenda ${error}`, "error");
     } finally {
@@ -354,19 +403,6 @@ export const ClotheSettings = () => {
               LISTA DE PRENDAS
             </Typography>
           </Box>
-
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={() => handleOpenDialog("create")}
-            sx={{
-              borderRadius: 2,
-              textTransform: "none",
-              fontWeight: 600,
-            }}
-          >
-            Nueva Prenda
-          </Button>
         </Box>
 
         <Divider
@@ -669,8 +705,6 @@ export const ClotheSettings = () => {
               fullWidth
               disabled={dialogMode === "view"}
               required
-              multiline
-              rows={3}
               sx={{
                 background: (theme) => theme.palette.background.paper,
                 fontFamily: "'Poppins', sans-serif",
@@ -700,43 +734,28 @@ export const ClotheSettings = () => {
               }}
             />
 
-            <TextField
-              label="ID de la tienda"
-              type="number"
-              value={formData.tiendaId}
-              onChange={(e) =>
-                handleInputChange("tiendaId", parseInt(e.target.value) || 0)
-              }
-              fullWidth
-              disabled={dialogMode === "view"}
-              required
-              inputProps={{ min: 1 }}
-              sx={{
-                background: (theme) => theme.palette.background.paper,
-                fontFamily: "'Poppins', sans-serif",
-                fontSize: { xs: "0.9rem", md: "1rem" },
-              }}
-            />
-
-            {dialogMode === "view" && (
-              <>
-                <TextField
-                  label="Nombre de la tienda"
-                  value={formData.tiendaNombre}
-                  onChange={(e) =>
-                    handleInputChange("tiendaNombre", e.target.value)
-                  }
-                  fullWidth
-                  disabled={dialogMode === "view"}
-                  required
-                  sx={{
-                    background: (theme) => theme.palette.background.paper,
-                    fontFamily: "'Poppins', sans-serif",
-                    fontSize: { xs: "0.9rem", md: "1rem" },
-                  }}
-                />
-              </>
-            )}
+            <FormControl fullWidth required disabled={dialogMode === "view"}>
+              <InputLabel id="tienda-label">Tienda</InputLabel>
+              <Select
+                labelId="tienda-label"
+                value={formData.tiendaId}
+                onChange={(e) =>
+                  handleInputChange("tiendaId", parseInt(e.target.value as string) || 0)
+                }
+                label="Tienda"
+                sx={{
+                  background: (theme) => theme.palette.background.paper,
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: { xs: "0.9rem", md: "1rem" },
+                }}
+              >
+                {stores.map((store) => (
+                  <MenuItem key={store.id} value={store.id}>
+                    {store.nombre}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Stack>
         </DialogContent>
 
@@ -754,7 +773,6 @@ export const ClotheSettings = () => {
             </Button>
             <Button
               onClick={handleSubmit}
-              variant="contained"
               disabled={loading || !formData.nombre || !formData.descripcion}
               startIcon={loading && <CircularProgress size={16} />}
               sx={{
@@ -764,29 +782,60 @@ export const ClotheSettings = () => {
             >
               {dialogMode === "create" ? "Crear" : "Guardar"}
             </Button>
+            {snackbar.severity !== "success" && (
+              <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() =>
+                  setSnackbar((prev) => ({ ...prev, open: false }))
+                }
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                sx={{
+                  zIndex: 1100,
+                }}
+              >
+                <Alert
+                  onClose={() =>
+                    setSnackbar((prev) => ({ ...prev, open: false }))
+                  }
+                  severity={snackbar.severity}
+                  variant="filled"
+                  sx={{
+                    width: "100%",
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: { xs: "0.9rem", md: "1rem" },
+                  }}
+                >
+                  {snackbar.message}
+                </Alert>
+              </Snackbar>
+            )}
           </DialogActions>
         )}
       </Dialog>
 
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
+      {snackbar.severity === "success" && (
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
           onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{
-            width: "100%",
-            fontFamily: "'Poppins', sans-serif",
-            fontSize: { xs: "0.9rem", md: "1rem" },
-          }}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          sx={{ mt: 10 }}
         >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+          <Alert
+            onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+            severity={snackbar.severity}
+            variant="filled"
+            sx={{
+              width: "100%",
+              fontFamily: "'Poppins', sans-serif",
+              fontSize: { xs: "0.9rem", md: "1rem" },
+            }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      )}
     </Box>
   );
 };

@@ -58,6 +58,12 @@ export const deleteStore = async (id: number) => {
 }
 
 export const sizesStore = async (id: number): Promise<Size[]> => {
-  const response = await API.get<Size[]>(`stores/${id}/sizes`);
+  const response = await API.get<Size[]>(`/stores/${id}/sizes`);
   return response.data;
 };
+
+export const postSizes = async (data: Size) => {
+  const response = await API.post<Size>("sizes", data);
+  return response.data;
+}
+

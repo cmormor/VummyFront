@@ -9,5 +9,6 @@ export interface Size {
   entrepierna: number;
   tienda?: {
     id: number;
+    name?: string;
   };
 }
