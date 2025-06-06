@@ -48,8 +48,6 @@ export const createUsuario = async (
   }
 };
 
-
-
 export const loginUsuario = async (
   email: string,
   password: string

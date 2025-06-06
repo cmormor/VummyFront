@@ -1,6 +1,6 @@
 import { useState } from "react";
 import * as yup from "yup";
-import { createUsuario } from "../../../api/userApi";
+import { createUsuario, loginUsuario } from "../../../api/userApi";
 import {
   Box,
   TextField,
@@ -24,14 +24,12 @@ const schema = yup.object().shape({
     .min(3, "Mínimo 3 caracteres")
     .required("El nombre es obligatorio")
     .min(1, "El nombre no puede estar vacío"),
-
   email: yup
     .string()
     .trim()
     .email("Email inválido")
     .required("El email es obligatorio")
     .min(1, "El email no puede estar vacío"),
-
   password: yup
     .string()
     .required("La contraseña es obligatoria")
@@ -112,32 +110,49 @@ export const Register = () => {
       setErrorsForm({});
       setError(null);
 
+      // 1) Validar con Yup
       await schema.validate(data, { abortEarly: false });
 
       isSetLoading(true);
 
+      // 2) Crear el usuario en la BD (se asume que createUsuario no devuelve token)
       const result = await createUsuario(data);
 
       isSetLoading(false);
 
       if (typeof result === "string") {
         setError(result);
-      } else {
-        setNombre("");
-        setEmail("");
-        setPassword("");
-        setAltura("");
-        setCuelloManga("");
-        setPecho("");
-        setCintura("");
-        setCadera("");
-        setEntrepierna("");
-        setError(null);
-        navigate("/home", { replace: true });
+        return;
       }
-    } catch (err) {
+
+      isSetLoading(true);
+      const loginResult = await loginUsuario(email, password);
       isSetLoading(false);
 
+      if (typeof loginResult === "string") {
+        setError(loginResult);
+        return;
+      }
+
+      // // 4) Si login fue OK, guardamos el token en localStorage y configuramos Axios
+      // const { token } = loginResult;
+      // localStorage.setItem("token", token);
+      // axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      setNombre("");
+      setEmail("");
+      setPassword("");
+      setAltura("");
+      setCuelloManga("");
+      setPecho("");
+      setCintura("");
+      setCadera("");
+      setEntrepierna("");
+      setError(null);
+
+      navigate("/home", { replace: true });
+    } catch (err: any) {
+      isSetLoading(false);
       if (err instanceof yup.ValidationError) {
         const formErrors: { [key: string]: string } = {};
         err.inner.forEach((error) => {
@@ -164,7 +179,7 @@ export const Register = () => {
         >
           <FormCard path="/">
             <Title
-              text="UNETE A VUMMY"
+              text="ÚNETE A VUMMY"
               sizeXs="1.25rem"
               sizeMd="2rem"
               marginTop={0}
@@ -185,7 +200,7 @@ export const Register = () => {
                   color: "gray",
                 }}
               >
-                Es necesario que ingrese sus medidas para poder brindarle una
+                Es necesario que ingreses tus medidas para brindarte una
                 mejor experiencia en la app.
               </Typography>
             </Box>
@@ -491,7 +506,7 @@ export const Register = () => {
                       borderRadius: "8px",
                     }}
                   >
-                    REGISTRATE
+                    REGÍSTRATE
                   </Button>
                 )}
               </Box>

@@ -58,14 +58,12 @@ const schema = yup.object().shape({
     .min(3, "Mínimo 3 caracteres")
     .required("El nombre es obligatorio")
     .min(1, "El nombre no puede estar vacío"),
-
   email: yup
     .string()
     .trim()
     .email("Email inválido")
     .required("El email es obligatorio")
     .min(1, "El email no puede estar vacío"),
-
   password: yup
     .string()
     .required("La contraseña es obligatoria")
@@ -74,6 +72,10 @@ const schema = yup.object().shape({
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
       "La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial"
     ),
+  rol: yup
+    .string()
+    .oneOf(["ADMINISTRADOR", "REGISTRADO"], "Rol inválido")
+    .required("El rol es obligatorio"),
   altura: yup
     .number()
     .typeError("La altura debe ser un número")
@@ -386,18 +388,6 @@ export const UsersSettings = () => {
     }
   };
 
-  const getRolColor = (rol?: string) => {
-    if (!rol) return "default";
-    switch (rol.toLowerCase()) {
-      case "ADMINISTRADOR":
-        return "error";
-      case "REGISTRADO":
-        return "warning";
-      default:
-        return "default";
-    }
-  };
-
   return (
     <Box sx={{ mt: 2, maxWidth: 1200 }}>
       <Paper
@@ -560,7 +550,7 @@ export const UsersSettings = () => {
                     <TableCell>
                       <Chip
                         label={user.rol || "Sin rol"}
-                        color={getRolColor(user.rol)}
+                        color={user.rol === "ADMINISTRADOR" ? "primary" : "secondary"}
                         size="small"
                         variant="outlined"
                       />
