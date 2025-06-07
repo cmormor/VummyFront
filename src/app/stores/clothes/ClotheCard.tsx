@@ -103,10 +103,9 @@ export const ClotheCard = ({
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         transform: isHovered && !loading ? "translateY(-8px)" : "translateY(0)",
         border: (theme) =>
-          `1px solid ${
-            theme.palette.mode === "dark"
-              ? "rgba(255, 255, 255, 0.1)"
-              : "rgba(0, 0, 0, 0.08)"
+          `1px solid ${theme.palette.mode === "dark"
+            ? "rgba(255, 255, 255, 0.1)"
+            : "rgba(0, 0, 0, 0.08)"
           }`,
         "&:hover": {
           borderColor: (theme) =>
@@ -115,7 +114,6 @@ export const ClotheCard = ({
               : "rgba(25, 118, 210, 0.3)",
         },
       }}
-      // ❌ NO onClick aquí - esta era la diferencia clave
     >
       <Backdrop
         sx={{
@@ -204,9 +202,9 @@ export const ClotheCard = ({
           width: "100%",
           position: "relative",
           overflow: "hidden",
-          cursor: "pointer", // ✅ Cursor pointer solo en la imagen
+          cursor: "pointer",
         }}
-        onClick={handleClick} // ✅ onClick solo en la imagen
+        onClick={handleClick}
       >
         {imagen ? (
           <Box
@@ -290,9 +288,9 @@ export const ClotheCard = ({
           justifyContent: "space-between",
           alignItems: "center",
           p: 3,
-          cursor: "pointer", // ✅ Cursor pointer solo en el contenido
+          cursor: "pointer",
         }}
-        onClick={handleClick} // ✅ onClick solo en el contenido
+        onClick={handleClick}
       >
         <Box
           sx={{

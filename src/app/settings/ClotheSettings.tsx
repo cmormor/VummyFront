@@ -29,6 +29,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import {
   Edit,
@@ -40,6 +42,7 @@ import {
   Cases,
   CheckCircle,
   Cancel,
+  Add,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { Clothe } from "../../types/clothe";
@@ -53,6 +56,7 @@ import {
 import { ModalConfirmation } from "../../components/ModalConfirmation";
 import { getStores } from "../../api/storeApi";
 import { Store } from "../../types/store";
+import { assignSizeToClothe, getSizesByStore } from "../../api/size-clothe";
 
 const schema = yup.object().shape({
   nombre: yup
@@ -91,6 +95,8 @@ export const ClotheSettings = () => {
   const [mensaje, setMensaje] = useState("");
   const [stores, setStores] = useState<Store[]>([]);
   const [clotheToDelete, setClotheToDelete] = useState<number | null>(null);
+  const [availableSizes, setAvailableSizes] = useState<any[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<number[]>([]);
   const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
     "create"
   );
@@ -126,6 +132,27 @@ export const ClotheSettings = () => {
       showSnackbar(`Error al cargar las prendas ${error}`, "error");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadAvailableSizes = async (storeId: number) => {
+    setLoading(true);
+    try {
+      const sizes = await getSizesByStore(storeId);
+      setAvailableSizes(sizes);
+    } catch (error) {
+      console.error("Error al cargar tallas:", error);
+      setAvailableSizes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSizeChange = (sizeId: number, isChecked: boolean) => {
+    if (isChecked) {
+      setSelectedSizes(prev => [...prev, sizeId]);
+    } else {
+      setSelectedSizes(prev => prev.filter(id => id !== sizeId));
     }
   };
 
@@ -180,6 +207,8 @@ export const ClotheSettings = () => {
             tiendaId: fullClothe!.tiendaId,
             imagen: fullClothe!.imagen,
           });
+
+          await loadAvailableSizes(fullClothe!.tiendaId!);
         } catch (error) {
           setFormData({
             id: clothe!.id,
@@ -210,6 +239,8 @@ export const ClotheSettings = () => {
         tallaNombre: "",
         tiendaNombre: "",
       });
+      setAvailableSizes([]);
+      setSelectedSizes([]);
     }
     setOpenDialog(true);
   };
@@ -247,10 +278,24 @@ export const ClotheSettings = () => {
           return;
         }
         const newClothe = response as Clothe;
+
+        if (selectedSizes.length > 0 && newClothe.id) {
+          try {
+            for (const sizeId of selectedSizes) {
+              await assignSizeToClothe(newClothe.id, sizeId, 10);
+            }
+            showSnackbar("Prenda creada y tallas asignadas exitosamente", "success");
+          } catch (error) {
+            showSnackbar(`Prenda creada pero error al asignar algunas tallas: ${error}`, "warning");
+          }
+        } else {
+          showSnackbar("Prenda creada exitosamente", "success");
+        }
+
         const updatedList = [...clotheList, newClothe];
         setClotheList(updatedList);
         setFilteredClothe(updatedList);
-        showSnackbar("Teinda creada exitosamente", "success");
+
       } else if (dialogMode === "edit") {
         if (!selectedClothe) {
           showSnackbar(
@@ -329,6 +374,16 @@ export const ClotheSettings = () => {
     }
   };
 
+  const handleStoreChange = async (storeId: number) => {
+    handleInputChange("tiendaId", storeId);
+    if (storeId > 0) {
+      await loadAvailableSizes(storeId);
+    } else {
+      setAvailableSizes([]);
+    }
+    setSelectedSizes([]);
+  };
+
   const showSnackbar = (
     message: string,
     severity: "success" | "error" | "warning" | "info"
@@ -403,6 +458,19 @@ export const ClotheSettings = () => {
               LISTA DE PRENDAS
             </Typography>
           </Box>
+
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={() => handleOpenDialog("create")}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Nueva Prenda
+          </Button>
         </Box>
 
         <Divider
@@ -739,9 +807,7 @@ export const ClotheSettings = () => {
               <Select
                 labelId="tienda-label"
                 value={formData.tiendaId}
-                onChange={(e) =>
-                  handleInputChange("tiendaId", parseInt(e.target.value as string) || 0)
-                }
+                onChange={(e) => handleStoreChange(parseInt(e.target.value as string) || 0)}
                 label="Tienda"
                 sx={{
                   background: (theme) => theme.palette.background.paper,
@@ -756,6 +822,74 @@ export const ClotheSettings = () => {
                 ))}
               </Select>
             </FormControl>
+
+            <Divider sx={{ my: 2 }} />
+
+            <Alert
+              severity="info"
+              variant="outlined"
+              sx={{
+                width: "100%",
+                fontFamily: "'Poppins', sans-serif",
+                fontSize: { xs: "0.9rem", md: "1rem" },
+              }}
+            >
+              PUEDES AGREGAR TALLAS PARA ESTA PRENDA (OPCIONAL)
+            </Alert>
+
+            {loading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              availableSizes.length > 0 && dialogMode === "create" && (
+                <Box>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      fontFamily: "'Poppins', sans-serif",
+                      fontWeight: 600,
+                      mb: 1,
+                    }}
+                  >
+                    Tallas disponibles:
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {availableSizes.map((size) => (
+                      <FormControlLabel
+                        key={size.id}
+                        control={
+                          <Checkbox
+                            checked={selectedSizes.includes(size.id)}
+                            onChange={(e) => handleSizeChange(size.id, e.target.checked)}
+                          />
+                        }
+                        label={size.nombre || `Talla ${size.id}`}
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          fontSize: { xs: "0.9rem", md: "1rem" },
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              )
+            )}
+
+            {availableSizes.length === 0 && formData.tiendaId > 0 && dialogMode === "create" && (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: { xs: "0.9rem", md: "1rem" },
+                  textAlign: 'center',
+                  py: 2,
+                }}
+              >
+                No hay tallas disponibles para esta tienda
+              </Typography>
+            )}
           </Stack>
         </DialogContent>
 
@@ -773,7 +907,8 @@ export const ClotheSettings = () => {
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={loading || !formData.nombre || !formData.descripcion}
+              disabled={loading || !formData.nombre || !formData.descripcion || !formData.tiendaId}
+              variant="contained"
               startIcon={loading && <CircularProgress size={16} />}
               sx={{
                 fontFamily: "'Poppins', sans-serif",

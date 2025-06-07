@@ -886,30 +886,60 @@ export const OrdersSettings = () => {
             >
               Guardar
             </Button>
+            {snackbar.severity !== "success" && (
+              <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() =>
+                  setSnackbar((prev) => ({ ...prev, open: false }))
+                }
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                sx={{
+                  zIndex: 1100,
+                }}
+              >
+                <Alert
+                  onClose={() =>
+                    setSnackbar((prev) => ({ ...prev, open: false }))
+                  }
+                  severity={snackbar.severity}
+                  variant="filled"
+                  sx={{
+                    width: "100%",
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: { xs: "0.9rem", md: "1rem" },
+                  }}
+                >
+                  {snackbar.message}
+                </Alert>
+              </Snackbar>
+            )}
           </DialogActions>
         )}
       </Dialog>
 
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        sx={{ mt: 10 }}
-      >
-        <Alert
+      {snackbar.severity === "success" && (
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
           onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{
-            width: "100%",
-            fontFamily: "'Poppins', sans-serif",
-            fontSize: { xs: "0.9rem", md: "1rem" },
-          }}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          sx={{ mt: 10 }}
         >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+          <Alert
+            onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+            severity={snackbar.severity}
+            variant="filled"
+            sx={{
+              width: "100%",
+              fontFamily: "'Poppins', sans-serif",
+              fontSize: { xs: "0.9rem", md: "1rem" },
+            }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      )}
     </Box>
   );
 };

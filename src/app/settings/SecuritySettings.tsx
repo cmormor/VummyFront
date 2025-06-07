@@ -69,7 +69,6 @@ export const SecuritySettings = () => {
   const handlePasswordChange = (value: string) => {
     setPassword(value);
     setFieldError(null);
-    // Validar coincidencia si ya hay algo en confirmar contraseña
     if (confirmPassword) {
       validatePasswordsMatch(value, confirmPassword);
     }
@@ -77,7 +76,6 @@ export const SecuritySettings = () => {
 
   const handleConfirmPasswordChange = (value: string) => {
     setConfirmPassword(value);
-    // Validar coincidencia inmediatamente
     validatePasswordsMatch(password, value);
   };
 
@@ -369,9 +367,9 @@ export const SecuritySettings = () => {
             letterSpacing: "0.5px",
             background: success
               ? (theme) =>
-                  `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`
+                `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`
               : (theme) =>
-                  `linear-gradient(135deg, ${theme.palette.error.main} 0%, ${theme.palette.error.dark} 100%)`,
+                `linear-gradient(135deg, ${theme.palette.error.main} 0%, ${theme.palette.error.dark} 100%)`,
             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             "&:hover": {
               transform: "translateY(-2px)",
@@ -388,8 +386,8 @@ export const SecuritySettings = () => {
           {loading
             ? "Restableciendo..."
             : success
-            ? "Contraseña Restablecida!"
-            : "Restablecer Contraseña"}
+              ? "Contraseña Restablecida!"
+              : "Restablecer Contraseña"}
         </Button>
       </Box>
 

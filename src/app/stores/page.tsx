@@ -158,14 +158,16 @@ export const Stores = () => {
             No se encontraron tiendas.
           </Typography>
         ) : (
-          filteredStores.map((store) => (
-            <StoreCard path={`/stores/${store.id}/clothes`}>
-              <>
-                <Title text={store.nombre} marginTop={2} paddingTop="20px" />
-                <Details detail={store.descripcion} />
-              </>
-            </StoreCard>
-          ))
+          filteredStores
+            .sort((a, b) => a.id! - b.id!)
+            .map((store) => (
+              <StoreCard key={store.id} path={`/stores/${store.id}/clothes`}>
+                <>
+                  <Title text={store.nombre} marginTop={2} paddingTop="20px" />
+                  <Details detail={store.descripcion} />
+                </>
+              </StoreCard>
+            ))
         )}
       </Stack>
     </Layout>

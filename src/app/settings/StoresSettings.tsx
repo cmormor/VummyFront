@@ -97,7 +97,8 @@ const schema = yup.object().shape({
   tallas: yup
     .array()
     .of(sizeSchema)
-    .optional()
+    .min(1, "Debe agregar al menos una talla")
+    .required("Las tallas son obligatorias")
     .test(
       "unique-sizes",
       "No se pueden repetir las tallas",
@@ -188,10 +189,8 @@ export const StoresSettings = () => {
 
       if (mode === "view" || mode === "edit") {
         try {
-          // 1) Traer tallas filtradas por storeId
           const sizes = await getSizesByStore(store.id!);
 
-          // 2) llenar formData.tallas con esas tallas
           setFormData(() => ({
             id: store.id,
             nombre: store.nombre,
@@ -200,7 +199,6 @@ export const StoresSettings = () => {
             tallas: sizes,
           }));
 
-          // 3) obtener datos completos de la tienda (prendas, etc.)
           const fullStore = await getStoreById(store.id!);
           setFormData((prev) => ({
             ...prev,
@@ -208,7 +206,6 @@ export const StoresSettings = () => {
             nombre: fullStore!.nombre,
             descripcion: fullStore!.descripcion,
             prendas: fullStore!.prendas || [],
-            // tallas ya viene de above
           }));
         } catch (error: any) {
           setFormData({
@@ -225,7 +222,6 @@ export const StoresSettings = () => {
         }
       }
     } else {
-      // Modo crear
       setSelectedStore(null);
       setFormData({
         nombre: "",
@@ -289,6 +285,12 @@ export const StoresSettings = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      if (dialogMode === "create" && (!formData.tallas || formData.tallas.length === 0)) {
+        showSnackbar("Debe agregar al menos una talla para crear la tienda", "error");
+        setLoading(false);
+        return;
+      }
+
       await schema.validate(formData, { abortEarly: false });
 
       if (formData.tallas && formData.tallas.length > 0) {
@@ -298,6 +300,7 @@ export const StoresSettings = () => {
             `Errores en las tallas: ${tallaErrors.join(". ")}`,
             "error"
           );
+          setLoading(false);
           return;
         }
       }
@@ -824,7 +827,7 @@ export const StoresSettings = () => {
             <Divider sx={{ my: 2 }} />
 
             <Alert
-              severity="warning"
+              severity={dialogMode === "create" ? "info" : "warning"}
               variant="outlined"
               sx={{
                 width: "100%",
@@ -832,7 +835,10 @@ export const StoresSettings = () => {
                 fontSize: { xs: "0.9rem", md: "1rem" },
               }}
             >
-              LAS TALLAS SOLO SE PUEDEN ASIGNAR DURANTE LA CREACIÓN DE LA TIENDA
+              {dialogMode === "create"
+                ? "DEBES AGREGAR AL MENOS UNA TALLA PARA CREAR LA TIENDA"
+                : "LAS TALLAS SOLO SE PUEDEN ASIGNAR DURANTE LA CREACIÓN DE LA TIENDA"
+              }
             </Alert>
 
             <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -993,23 +999,24 @@ export const StoresSettings = () => {
               onClick={handleCloseDialog}
               color="inherit"
               sx={{
-                fontFamily: "'Poppins', sans-serif'",
+                fontFamily: "'Poppins', sans-serif",
                 fontSize: { xs: "0.9rem", md: "1rem" },
-                textTransform: "none",
               }}
             >
               Cancelar
             </Button>
             <Button
               onClick={handleSubmit}
-              variant="contained"
-              disabled={loading || !formData.nombre || !formData.descripcion}
+              disabled={
+                loading ||
+                !formData.nombre ||
+                !formData.descripcion ||
+                (dialogMode === "create" && (!formData.tallas || formData.tallas.length === 0))
+              } variant="contained"
               startIcon={loading && <CircularProgress size={16} />}
               sx={{
-                fontFamily: "'Poppins', sans-serif'",
+                fontFamily: "'Poppins', sans-serif",
                 fontSize: { xs: "0.9rem", md: "1rem" },
-                textTransform: "none",
-                borderRadius: 2,
               }}
             >
               {dialogMode === "create" ? "Crear" : "Guardar"}

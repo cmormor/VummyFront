@@ -110,12 +110,10 @@ export const Register = () => {
       setErrorsForm({});
       setError(null);
 
-      // 1) Validar con Yup
       await schema.validate(data, { abortEarly: false });
 
       isSetLoading(true);
 
-      // 2) Crear el usuario en la BD (se asume que createUsuario no devuelve token)
       const result = await createUsuario(data);
 
       isSetLoading(false);
@@ -133,11 +131,6 @@ export const Register = () => {
         setError(loginResult);
         return;
       }
-
-      // // 4) Si login fue OK, guardamos el token en localStorage y configuramos Axios
-      // const { token } = loginResult;
-      // localStorage.setItem("token", token);
-      // axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       setNombre("");
       setEmail("");
