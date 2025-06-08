@@ -54,7 +54,7 @@ export default function ProductDetails() {
   const [isAdding, setIsAdding] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [loadingClothe, setLoadingClothe] = useState(false);
-  const [loadingSizes, setLoadingSizes] = useState(false);
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showRecommendation, setShowRecommendation] = useState(false);
   const theme = useTheme();
@@ -62,6 +62,7 @@ export default function ProductDetails() {
   useEffect(() => {
     if (clotheId) {
       setLoadingClothe(true);
+      setLoadingAvailability(true);
       setError(null);
       getClotheById(Number(clotheId))
         .then((res) => {
@@ -73,18 +74,33 @@ export default function ProductDetails() {
               .then((availableSizes) => {
                 setSizeAvailable(availableSizes || []);
               })
-              .finally(() => setLoadingSizes(false));
+              .finally(() => {
+                setLoadingAvailability(false);
+              });
           }
         })
         .catch(() => {
           setClothe(null);
           setError("Error al cargar la prenda.");
+          setLoadingAvailability(false);
         })
         .finally(() => {
           setLoadingClothe(false);
         });
     }
   }, [clotheId]);
+
+  useEffect(() => {
+    if (dataRecommended && sizeAvailable.length > 0 && !size) {
+      const tallaRecomendadaDisponible = sizeAvailable.find(
+        (s) => s.tallaNombre === dataRecommended.nombre
+      );
+
+      if (tallaRecomendadaDisponible) {
+        setSize(dataRecommended.nombre);
+      }
+    }
+  }, [dataRecommended, sizeAvailable, size]);
 
   useEffect(() => {
     if (clothe?.tiendaId) {
@@ -183,7 +199,7 @@ export default function ProductDetails() {
     }
   };
 
-  if (loadingClothe || loadingSizes) {
+  if (loadingClothe) {
     return (
       <Box px={{ xs: 2, md: 4 }}>
         <Skeleton variant="text" width="40%" height={40} sx={{ mb: 2 }} />
@@ -301,6 +317,80 @@ export default function ProductDetails() {
             </Button>
           </Box>
         </Box>
+
+        {loadingAvailability ? (
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={2}
+            mb={3}
+            sx={{
+              padding: 2,
+              borderRadius: 2,
+              backgroundColor: alpha(theme.palette.primary.main, 0.05),
+              border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+            }}
+          >
+            <CircularProgress size={20} />
+            <Typography
+              variant="body2"
+              sx={{
+                color: theme.palette.text.secondary,
+                fontFamily: "'Poppins', sans-serif",
+              }}
+            >
+              Cargando disponibilidad de tallas...
+            </Typography>
+          </Box>
+        ) : (
+          <FormControl>
+            <RadioGroup
+              row
+              value={size}
+              onChange={(e) => setSize(e.target.value)}
+              sx={{ flexWrap: "wrap", gap: 2 }}
+            >
+              {["S", "M", "L", "XL"].map((option) => {
+                const tallaDisponible = sizeAvailable.find(
+                  (s) => s.tallaNombre === option
+                );
+                const isRecommended = dataRecommended?.nombre === option;
+                return (
+                  <FormControlLabel
+                    key={option}
+                    value={option}
+                    control={<Radio disabled={!tallaDisponible} />}
+                    label={
+                      <Box display="flex" alignItems="center" gap={0.5}>
+                        {option}
+                        {isRecommended && (
+                          <RecommendIcon
+                            sx={{
+                              fontSize: 16,
+                              color: (theme) => theme.palette.success.main,
+                            }}
+                          />
+                        )}
+                      </Box>
+                    }
+                    sx={{
+                      "& .MuiFormControlLabel-label": {
+                        fontSize: "20px",
+                        color: (theme) =>
+                          tallaDisponible
+                            ? isRecommended
+                              ? theme.palette.success.main
+                              : theme.palette.text.primary
+                            : theme.palette.text.disabled,
+                        fontWeight: isRecommended ? "bold" : "normal",
+                      },
+                    }}
+                  />
+                );
+              })}
+            </RadioGroup>
+          </FormControl>
+        )}
 
         {showRecommendation && (
           <Dialog
@@ -476,54 +566,6 @@ export default function ProductDetails() {
             </Box>
           </Dialog>
         )}
-
-        <FormControl>
-          <RadioGroup
-            row
-            value={size}
-            onChange={(e) => setSize(e.target.value)}
-            sx={{ flexWrap: "wrap", gap: 2 }}
-          >
-            {["S", "M", "L", "XL"].map((option) => {
-              const tallaDisponible = sizeAvailable.find(
-                (s) => s.tallaNombre === option
-              );
-              const isRecommended = dataRecommended?.nombre === option;
-              return (
-                <FormControlLabel
-                  key={option}
-                  value={option}
-                  control={<Radio disabled={!tallaDisponible} />}
-                  label={
-                    <Box display="flex" alignItems="center" gap={0.5}>
-                      {option}
-                      {isRecommended && (
-                        <RecommendIcon
-                          sx={{
-                            fontSize: 16,
-                            color: (theme) => theme.palette.success.main,
-                          }}
-                        />
-                      )}
-                    </Box>
-                  }
-                  sx={{
-                    "& .MuiFormControlLabel-label": {
-                      fontSize: "20px",
-                      color: (theme) =>
-                        tallaDisponible
-                          ? isRecommended
-                            ? theme.palette.success.main
-                            : theme.palette.text.primary
-                          : theme.palette.text.disabled,
-                      fontWeight: isRecommended ? "bold" : "normal",
-                    },
-                  }}
-                />
-              );
-            })}
-          </RadioGroup>
-        </FormControl>
       </Box>
 
       <Box display="flex" alignItems="center" mb={5} mt={2}>
@@ -752,8 +794,8 @@ export default function ProductDetails() {
                                 dataRecommended?.id === row.id
                                   ? alpha(theme.palette.primary.main, 0.08)
                                   : index % 2 === 0
-                                  ? alpha(theme.palette.background.default, 0.3)
-                                  : "transparent",
+                                    ? alpha(theme.palette.background.default, 0.3)
+                                    : "transparent",
                               borderLeft:
                                 dataRecommended?.id === row.id
                                   ? `4px solid ${theme.palette.primary.main}`
