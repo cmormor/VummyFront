@@ -284,17 +284,33 @@ export const ClotheSettings = () => {
             for (const sizeId of selectedSizes) {
               await assignSizeToClothe(newClothe.id, sizeId, 10);
             }
+
+            const totalStock = selectedSizes.length * 10;
+
+            const clotheWithStock = {
+              ...newClothe,
+              stock: totalStock
+            };
+
+            const updatedList = [...clotheList, clotheWithStock];
+            setClotheList(updatedList);
+            setFilteredClothe(updatedList);
+
             showSnackbar("Prenda creada y tallas asignadas exitosamente", "success");
           } catch (error) {
+            const updatedList = [...clotheList, newClothe];
+            setClotheList(updatedList);
+            setFilteredClothe(updatedList);
+
             showSnackbar(`Prenda creada pero error al asignar algunas tallas: ${error}`, "warning");
           }
         } else {
+          const updatedList = [...clotheList, newClothe];
+          setClotheList(updatedList);
+          setFilteredClothe(updatedList);
+
           showSnackbar("Prenda creada exitosamente", "success");
         }
-
-        const updatedList = [...clotheList, newClothe];
-        setClotheList(updatedList);
-        setFilteredClothe(updatedList);
 
       } else if (dialogMode === "edit") {
         if (!selectedClothe) {
@@ -802,7 +818,7 @@ export const ClotheSettings = () => {
               }}
             />
 
-            <FormControl fullWidth required disabled={dialogMode === "view"}>
+            <FormControl fullWidth required disabled={dialogMode === "view" || dialogMode === "edit"}>
               <InputLabel id="tienda-label">Tienda</InputLabel>
               <Select
                 labelId="tienda-label"
@@ -825,70 +841,70 @@ export const ClotheSettings = () => {
 
             <Divider sx={{ my: 2 }} />
 
-            <Alert
-              severity="info"
-              variant="outlined"
-              sx={{
-                width: "100%",
-                fontFamily: "'Poppins', sans-serif",
-                fontSize: { xs: "0.9rem", md: "1rem" },
-              }}
-            >
-              PUEDES AGREGAR TALLAS PARA ESTA PRENDA (OPCIONAL)
-            </Alert>
+            {dialogMode === "create" && (
+              <>
+                <Alert
+                  severity="error"
+                  variant="outlined"
+                  sx={{
+                    width: "100%",
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: { xs: "0.9rem", md: "1rem" },
+                  }}
+                >
+                  SOLO PUEDES ASOCIAR LAS TALLAS AL CREARSE
+                </Alert>
 
-            {loading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
-                <CircularProgress />
-              </Box>
-            ) : (
-              availableSizes.length > 0 && dialogMode === "create" && (
-                <Box>
+                {loading ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+                    <CircularProgress />
+                  </Box>
+                ) : availableSizes.length > 0 ? (
+                  <Box>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        fontFamily: "'Poppins', sans-serif",
+                        fontWeight: 600,
+                        mb: 1,
+                      }}
+                    >
+                      Tallas disponibles:
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      {availableSizes.map((size) => (
+                        <FormControlLabel
+                          key={size.id}
+                          control={
+                            <Checkbox
+                              checked={selectedSizes.includes(size.id)}
+                              onChange={(e) => handleSizeChange(size.id, e.target.checked)}
+                            />
+                          }
+                          label={size.nombre || `Talla ${size.id}`}
+                          sx={{
+                            fontFamily: "'Poppins', sans-serif",
+                            fontSize: { xs: "0.9rem", md: "1rem" },
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </Box>
+                ) : formData.tiendaId > 0 ? (
                   <Typography
-                    variant="subtitle1"
+                    variant="body2"
+                    color="text.secondary"
                     sx={{
                       fontFamily: "'Poppins', sans-serif",
-                      fontWeight: 600,
-                      mb: 1,
+                      fontSize: { xs: "0.9rem", md: "1rem" },
+                      textAlign: 'center',
+                      py: 2,
                     }}
                   >
-                    Tallas disponibles:
+                    No hay tallas disponibles para esta tienda
                   </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    {availableSizes.map((size) => (
-                      <FormControlLabel
-                        key={size.id}
-                        control={
-                          <Checkbox
-                            checked={selectedSizes.includes(size.id)}
-                            onChange={(e) => handleSizeChange(size.id, e.target.checked)}
-                          />
-                        }
-                        label={size.nombre || `Talla ${size.id}`}
-                        sx={{
-                          fontFamily: "'Poppins', sans-serif",
-                          fontSize: { xs: "0.9rem", md: "1rem" },
-                        }}
-                      />
-                    ))}
-                  </Box>
-                </Box>
-              )
-            )}
-
-            {availableSizes.length === 0 && formData.tiendaId > 0 && dialogMode === "create" && (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{
-                  fontFamily: "'Poppins', sans-serif",
-                  fontSize: { xs: "0.9rem", md: "1rem" },
-                  textAlign: 'center',
-                  py: 2,
-                }}
-              >
-                No hay tallas disponibles para esta tienda
-              </Typography>
+                ) : null}
+              </>
             )}
           </Stack>
         </DialogContent>

@@ -17,14 +17,16 @@ export const getSizesByStore = async (storeId: number) => {
     return response.data;
 }
 
-export const assignSizeToClothe = async (clotheId: number, sizeId: number, cantidad: number = 10) => {
-    const response = await API.post(`/clothes/sizes/${clotheId}`, {
-        talla: {
-            id: sizeId
-        },
-        cantidad: cantidad
-    });
+export const assignSizeToClothe = async (
+    clotheId: number,
+    sizeId: number,
+    cantidad: number = 10
+) => {
+    const response = await API.post(`/clothes/sizes/${clotheId}`, [
+        {
+            tallaId: sizeId,
+            cantidad: cantidad
+        }
+    ]);
     return response.data;
 };
-
-// TODO: THIS ENDPOINT IS IN DEPLOYMEND
