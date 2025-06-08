@@ -722,7 +722,7 @@ export const OrdersSettings = () => {
                 {(() => {
                   const pedidoSeleccionado = orderList.find((order) => order.id === formData.id);
 
-                  if (!pedidoSeleccionado || !Array.isArray(pedidoSeleccionado.prendas)) {
+                  if (!pedidoSeleccionado || !Array.isArray(pedidoSeleccionado.prendas) || pedidoSeleccionado.prendas.length === 0) {
                     return (
                       <Box
                         sx={{
@@ -741,7 +741,7 @@ export const OrdersSettings = () => {
                             fontSize: { xs: "0.85rem", md: "0.9rem" },
                           }}
                         >
-                          No hay prendas para este pedido
+                          LAS PRENDAS DE ESTE PEDIDO HAN SIDO ELIMINADAS
                         </Typography>
                       </Box>
                     );

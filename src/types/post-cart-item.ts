@@ -1,10 +1,6 @@
 
 export interface PostCartItem {
-    prenda: {
-        id: number;
-    }
-    talla: {
-        id: number;
-    };
+    prenda: number;
+    talla: number;
     cantidad: number;
 };

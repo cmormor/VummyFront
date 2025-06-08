@@ -169,12 +169,8 @@ export default function ProductDetails() {
     if (!selectedSize) return;
 
     const itemToPost = {
-      prenda: {
-        id: clothe.id!,
-      },
-      talla: {
-        id: selectedSize.tallaId!,
-      },
+      prenda: clothe.id!,
+      talla: selectedSize.tallaId!,
       cantidad: cantidad,
     };
 
